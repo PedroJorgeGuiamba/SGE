@@ -1,0 +1,90 @@
+estagio
+├── Conexao/
+│   └── conector,php
+│   │
+│   ├── Model/
+│   │   └── Usuario.php
+│   │   └── Estagio.php
+│   │   └── Empresa.php
+│   │   └── Curso.php
+│   │   └── Formador.php
+│   │   └── Formando.php
+│   │   └── PedidoDeCarta.php
+│   │   └── Pessoa.php
+│   │   └── Turma.php
+│   │   └── Supervisor.php
+│   │
+│   ├── Controller/
+│   │   └── auth/
+│   │   │   └── AuthController.php
+│   │   │   └── .env
+│   │   │   └── AuthMailSender.py
+│   │   │   └── AuthConfirmation.php
+│   │   │   └── LogoutController.php
+│   │   └── Formando/
+│   │   │   └── Home.php
+│   │   │   └── CadastrarFormando.php
+│   │   └── Formador/
+│   │   │   └── Home.php
+│   │   └── Supervisor/
+│   │   │   └── Home.php
+│   │   └── Admin/
+│   │   │   └── Home.php
+│   │   └── Curso/
+│   │   │   └── CadastrarCuro.php
+│   │   │   └── getCursos.php
+│   │   └── Estagio/
+│   │   │   └── editarPedido.php
+│   │   │   └── FormularioDeCartaDeEstagio.php
+│   │   │   └── remover_pedidos.php
+│   │   │   └── search_pedidos.php
+│   │   └── Modulos/
+│   │   │   └── getModulos.php
+│   │   └── Qualificacoes/
+│   │   │   └── getQualificacoes.php
+│   │   └── Turmas/
+│   │   │   └── CadastrarTurmas.php
+│   │   │   └── getTurmas.php
+│   │
+│   ├── Style/
+│   │   └── Home.css
+│   │   └── login.css
+│   │
+│   ├── Helpers/
+│   │   └── Sessao.php
+│   │   └── auth.php
+│   │   └── Actividade.php
+│   │
+│   ├── middleware/
+│   │   └── auth.php
+│   │
+│   ├── View/
+│   │   └── Auth/
+│   │   │   └── ValidarUser.php
+│   │   └── Cursos/
+│   │   │   └── CadastrarCurso.php
+│   │   └── estagio/
+│   │   │   └── detalhes_pedido.php
+│   │   │   └── editar_pedido.php
+│   │   │   └── formularioDeAvaliacaoDeEstagio.php
+│   │   │   └── formularioDeCartaDeEstagio.php
+│   │   │   └── listaDePedido.php
+│   │   │   └── situacaoDeEstagio.php
+│   │   └── Admin/
+│   │   │   └── PainelAdmin.php
+│   │   └── Formando/
+│   │   │   └── PainelFormando.php
+│   │   │   └── CadastrarFormador.php
+│   │   └── Formandor/
+│   │   │   └── PainelFormandor.php
+│   │   │   └── CadastrarFormando.php
+│   │   └── Modulos/
+│   │   │   └── CadastrarModulo.php
+│   │   └── Qualificacao/
+│   │   │   └── CadastrarQualificacao.php
+│   │   └── Turmas/
+│   │   │   └── CadastrarTurma.php
+│   │   └── Supervisor/
+│   │   │   └── PainelSupervisor.php
+│   │   └── Login.php
+│   │

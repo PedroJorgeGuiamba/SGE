@@ -11,20 +11,20 @@ class AuthMiddleware
         }
 
         $token = $_COOKIE["token_sessao"];
-        $sessao = selecionarSessao($token, 1); // Usa a função já existente
+        $sessao = selecionarSessao($token, 1);
 
         if (!$sessao) {
             return false;
         }
 
-        // Identifica perfil e armazena na sessão
+        
         if (!empty($sessao['id_cliente'])) {
             $_SESSION['cliente_id'] = $sessao['id_cliente'];
             $_SESSION['perfil'] = 'cliente';
         } elseif (!empty($sessao['id_utilizador'])) {
             $_SESSION['utilizador_id'] = $sessao['id_utilizador'];
 
-            // Buscar perfil do utilizador
+            
             $conexao = new Conector();
             $conn = $conexao->getConexao();
 
@@ -34,7 +34,7 @@ class AuthMiddleware
             $resultado = $stmt->get_result();
             $perfil = $resultado->fetch_assoc()['perfil'] ?? null;
 
-            $_SESSION['perfil'] = $perfil; // admin ou funcionario
+            $_SESSION['perfil'] = $perfil;
         }
 
         $_SESSION['token'] = $token;

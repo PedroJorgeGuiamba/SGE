@@ -79,5 +79,5 @@ function selecionarSessao($token, $seValido = 1)
 
     $stmt->close();
 
-    return $sessao ?: null; // Retorna null se não encontrar
+    return $sessao ?: null;
 }

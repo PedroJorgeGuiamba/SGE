@@ -1,6 +1,7 @@
 <?php
 session_start();
 include '../../Controller/formando/Home.php';
+include '../../Controller/Admin/Home.php';
 require_once __DIR__ .'/../../middleware/auth.php';
 ?>
 

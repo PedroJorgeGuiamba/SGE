@@ -5,7 +5,7 @@
 if (isset($_SESSION['user_id'])) {
     $role = $_SESSION['role'] ?? '';
     switch (strtolower($role)) {
-        case 'admin': header("Location: Auth/Admin/PainelAdmin.php"); break;  // Ajuste path se necessário
+        case 'admin': header("Location: Auth/Admin/PainelAdmin.php"); break;
         case 'formando': header("Location: Auth/Formando/PainelFormando.php"); break;
         case 'formador': header("Location: Auth/Formador/PainelFormador.php"); break;
         case 'supervisor': header("Location: Auth/Supervisor/PainelSupervisor.php"); break;

@@ -29,7 +29,6 @@ class AuthConfirmationController {
             return $this->error;
         }
 
-        // Descriptografar o pending_user_id da sessão
         $user_id_criptografado = $_SESSION['pending_user_id'] ?? null;
         if (!$user_id_criptografado) {
             $this->error = "Sessão expirou. Faça login novamente.";
@@ -41,7 +40,6 @@ class AuthConfirmationController {
             return $this->error;
         }
 
-        // Verificar OTP
         $sql = "SELECT * FROM user_otps WHERE user_id = ? ORDER BY created_at DESC LIMIT 1";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $user_id);
@@ -66,7 +64,6 @@ class AuthConfirmationController {
             return $this->error;
         }
 
-        // Buscar dados do usuário
         $sqlUser = "SELECT id, email, role FROM usuarios WHERE id = ?";
         $stmtUser = $this->conn->prepare($sqlUser);
         $stmtUser->bind_param("i", $user_id);
@@ -79,36 +76,29 @@ class AuthConfirmationController {
             return $this->error;
         }
 
-        // Descriptografar o e-mail do banco
         $email_descriptografado = $this->criptografia->descriptografar($user['email']);
         if (!$email_descriptografado) {
             $this->error = "Erro ao descriptografar e-mail do usuário.";
             return $this->error;
         }
 
-        // Marcar OTP como usado
         $sqlUpdate = "UPDATE user_otps SET is_used = 1 WHERE id = ?";
         $stmtUpdate = $this->conn->prepare($sqlUpdate);
         $stmtUpdate->bind_param("i", $otp['id']);
         $stmtUpdate->execute();
         $stmtUpdate->close();
 
-        // Configurar sessão com dados criptografados
         $_SESSION['email'] = $email_descriptografado;
         $_SESSION['role'] = $user['role'];
         $_SESSION['usuario_id'] = $user['id'];
 
-        // Limpar pending_user_id
         unset($_SESSION['pending_user_id']);
 
-        // Registrar atividade
         $sessaoId = iniciarSessao($user['id']);
         registrarAtividade($sessaoId, "Login do User: " . $this->criptografia->criptografar($email_descriptografado) . " Realizado com sucesso", "LOGIN");
 
-        // Regenerar ID da sessão para maior segurança
         session_regenerate_id(true);
 
-        // Redirecionar com base na role
         $role = strtolower($user['role']);
         switch ($role) {
             case 'formando':

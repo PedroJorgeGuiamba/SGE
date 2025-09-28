@@ -91,7 +91,7 @@ require_once __DIR__ .'/../../middleware/auth.php';
                     <a class="nav-link" href="#">Situação de Pagamento</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="situacaoDeEstagio.html">Situação de Estagio</a>
+                    <a class="nav-link" href="../estagio/situacaoDeEstagio.php">Situação de Estagio</a>
                 </li>
             </ul>
         </nav>

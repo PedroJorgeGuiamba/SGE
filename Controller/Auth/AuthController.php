@@ -37,7 +37,6 @@ class AuthController {
             $this->loginAttempts++;
             $_SESSION['login_attempts'] = $this->loginAttempts;
             registrarAtividade(null, "Email inválido: " . $this->criptografia->criptografar($email), "LOGIN_FAILED");
-            // registrarAtividade(null, "Email inválido: ", "LOGIN_FAILED");
             return $this->error;
         }
 
@@ -48,11 +47,6 @@ class AuthController {
             return $this->error;
         }
 
-        // $sql = "SELECT id, email, password, role FROM usuarios WHERE email = ?";
-        // $stmt = $this->conn->prepare($sql);
-        // $stmt->bind_param("s", $email);
-        // $stmt->execute();
-        // $result = $stmt->get_result();
         $sql = "SELECT id, email, password, role FROM usuarios";
         $result = $this->conn->query($sql);
 
@@ -68,59 +62,6 @@ class AuthController {
                 }
             }
         }
-
-    //     if ($result->num_rows > 0) {
-    //         $row = $result->fetch_assoc();
-    //         $stmt->close();
-
-    //         if (password_verify($senha, $row['password'])) {
-    //             $_SESSION['login_attempts'] = 0; // Reset
-
-    //             $otp = random_int(100000, 999999);
-    //             $expira = date("Y-m-d H:i:s", time() + 300);
-
-    //             $sqlOtp = "INSERT INTO user_otps (user_id, otp_code, expires_at, created_at) VALUES (?, ?, ?, NOW())";
-    //             $stmtOtp = $this->conn->prepare($sqlOtp);
-    //             $stmtOtp->bind_param("iis", $row['id'], $otp, $expira);
-
-    //             if ($stmtOtp->execute()) {
-    //                 $stmtOtp->close();
-
-    //                 // Envio email via Python
-    //                 $escapedEmail = escapeshellarg($email);
-    //                 $escapedOtp = escapeshellarg($otp);
-    //                 $pythonPath = __DIR__ . '/AuthMailSender.py';
-    //                 $command = "python $pythonPath $escapedEmail $escapedOtp 2>&1";
-    //                 $output = shell_exec($command);
-    //                 if (strpos($output ?? '', 'Erro') !== false) {
-    //                     error_log("Falha email OTP: $output");
-    //                 }
-
-    //                 $_SESSION['pending_user_id'] = $row['id'];
-    //                 $_SESSION['user_email'] = $row['email'];
-    //                 $_SESSION['role'] = strtolower(trim($row['role'] ?? ''));
-    //                 error_log("DEBUG - AuthController: Role: '{$_SESSION['role']}' para {$email}");
-    //                 header("Location: /estagio/View/Auth/ValidarUser.php");
-    //                 exit();
-    //             } else {
-    //                 $this->error = "Erro ao gerar OTP.";
-    //                 return $this->error;
-    //             }
-    //         } else {
-    //             $this->error = "Senha incorreta.";
-    //             $this->loginAttempts++;
-    //             $_SESSION['login_attempts'] = $this->loginAttempts;
-    //             registrarAtividade(null, "Senha errada para {$email}", "LOGIN_FAILED");
-    //             return $this->error;
-    //         }
-    //     } else {
-    //         $this->error = "Email não encontrado.";
-    //         $this->loginAttempts++;
-    //         $_SESSION['login_attempts'] = $this->loginAttempts;
-    //         registrarAtividade(null, "Email não registrado: {$email}", "LOGIN_FAILED");
-    //         return $this->error;
-    //     }
-    // }
 
     if ($userEncontrado && $row) {
             if (password_verify($senha, $row['password'])) {

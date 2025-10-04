@@ -1,6 +1,5 @@
 <?php
 session_start();
-include '../../Controller/formando/Home.php';
 include '../../Controller/Admin/Home.php';
 require_once __DIR__ .'/../../middleware/auth.php';
 ?>
@@ -72,7 +71,7 @@ require_once __DIR__ .'/../../middleware/auth.php';
                         href="../../View/Formando/portalDeEstudante.php">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="./formularioDeCartaDeEstagio.php">Fazer Pedido de Estágio</a>
+                    <a class="nav-link" href="formularioDeCartaDeEstagio.php">Fazer Pedido de Estágio</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="listaDePedidos.php">Pedidos de Estágio</a>

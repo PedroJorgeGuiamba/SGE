@@ -1,6 +1,11 @@
 estagio
 ├── Conexao/
-│   └── conector,php
+│   └── conector.php
+│   │
+├── Assets/
+│   └── Estrutura/
+│   │   └── SGE.md
+│   └── img/
 │   │
 │   ├── Model/
 │   │   └── Usuario.php
@@ -17,6 +22,7 @@ estagio
 │   ├── Controller/
 │   │   └── auth/
 │   │   │   └── AuthController.php
+│   │   │   └── RegisterController.php
 │   │   │   └── .env
 │   │   │   └── AuthMailSender.py
 │   │   │   └── AuthConfirmation.php
@@ -35,6 +41,7 @@ estagio
 │   │   │   └── getCursos.php
 │   │   └── Estagio/
 │   │   │   └── editarPedido.php
+│   │   │   └── GerarPdfCarta.php
 │   │   │   └── FormularioDeCartaDeEstagio.php
 │   │   │   └── remover_pedidos.php
 │   │   │   └── search_pedidos.php
@@ -54,30 +61,37 @@ estagio
 │   │   └── Sessao.php
 │   │   └── auth.php
 │   │   └── Actividade.php
+│   │   └── Criptografia.php
 │   │
 │   ├── middleware/
 │   │   └── auth.php
 │   │
+│   ├── Temp/
+│   │
 │   ├── View/
+│   │   └── Admin/
+│   │   │   └── portalDoAdmin.php
 │   │   └── Auth/
 │   │   │   └── ValidarUser.php
+│   │   │   └── Register.php
 │   │   └── Cursos/
 │   │   │   └── CadastrarCurso.php
 │   │   └── estagio/
+│   │   │   └── CartaDePedido.php
 │   │   │   └── detalhes_pedido.php
-│   │   │   └── editar_pedido.php
+│   │   │   └── editarPedido.php
 │   │   │   └── formularioDeAvaliacaoDeEstagio.php
 │   │   │   └── formularioDeCartaDeEstagio.php
 │   │   │   └── listaDePedido.php
 │   │   │   └── situacaoDeEstagio.php
 │   │   └── Admin/
-│   │   │   └── PainelAdmin.php
+│   │   │   └── portalDoAdmin.php
 │   │   └── Formando/
-│   │   │   └── PainelFormando.php
-│   │   │   └── CadastrarFormador.php
-│   │   └── Formandor/
-│   │   │   └── PainelFormandor.php
+│   │   │   └── portalDoFormando.php
 │   │   │   └── CadastrarFormando.php
+│   │   └── Formador/
+│   │   │   └── portalDoFormador.php
+│   │   │   └── CadastrarFormador.php
 │   │   └── Modulos/
 │   │   │   └── CadastrarModulo.php
 │   │   └── Qualificacao/
@@ -85,6 +99,8 @@ estagio
 │   │   └── Turmas/
 │   │   │   └── CadastrarTurma.php
 │   │   └── Supervisor/
-│   │   │   └── PainelSupervisor.php
+│   │   │   └── portalDoSupervisor.php
 │   │   └── Login.php
-│   │
+├── Index.php
+└──.gitignore
+└──.gitattributes

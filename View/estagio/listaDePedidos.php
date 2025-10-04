@@ -1,27 +1,10 @@
 <?php
 session_start();
-include '../../Controller/formando/Home.php';
+include '../../Controller/Admin/Home.php';
 require_once __DIR__ .'/../../middleware/auth.php';
-
-require_once __DIR__ . '/../../Conexao/conector.php';
-$conexao = new Conector();
-$conn = $conexao->getConexao();
-
-$sql = "SELECT numero, nome, apelido, codigo_formando, qualificacao, codigo_turma, data_do_pedido, hora_do_pedido, empresa, contactoPrincipal, contactoSecundario, email FROM pedido_carta";
-$result = $conn->query($sql);
-
-if (!$result) {
-    die("Erro ao executar a consulta: " . $conn->error);
-}
-
-if ($result->num_rows == 0) {
-    die("Nenhum pedido encontrado.");
-}
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,8 +17,14 @@ if ($result->num_rows == 0) {
     <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
     <!-- CSS -->
     <link rel="stylesheet" href="../../Style/home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+    <style>
+        button{
+            padding-bottom: 110px;
+        }
+    </style>
 </head>
 
 <body>
@@ -126,37 +115,16 @@ if ($result->num_rows == 0) {
                     </tr>
                 </thead>
                 <tbody id="pedidosTbody">
-                    <?php while ($pedido = $result->fetch_assoc()) : ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($pedido['numero'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?php echo htmlspecialchars($pedido['nome'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?php echo htmlspecialchars($pedido['apelido'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?php echo htmlspecialchars($pedido['codigo_formando'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?php echo htmlspecialchars($pedido['qualificacao'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?php echo htmlspecialchars($pedido['codigo_turma'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?php echo date("d/m/Y", strtotime($pedido['data_do_pedido'])); ?></td>
-                            <td><?php echo htmlspecialchars($pedido['hora_do_pedido'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?php echo htmlspecialchars($pedido['empresa'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?php echo htmlspecialchars($pedido['contactoPrincipal'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?php echo htmlspecialchars($pedido['contactoSecundario'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?php echo htmlspecialchars($pedido['email'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td>
-                                <button class="btn btn-sm btn-primary editar-btn" data-id="<?php echo $pedido['numero']; ?>">Editar</button>
-                                <button class="btn btn-sm btn-danger remover-btn" data-id="<?php echo $pedido['numero']; ?>">Remover</button>
-                            </td>
-                        </tr>
-                    <?php endwhile; ?>
                 </tbody>
             </table>
+            <nav>
+            <ul class="pagination justify-content-center mt-3" id="pagination"></ul>
+        </nav>
+
         </div>
         <div class="mt-3">
             <a href="formularioDeCartaDeEstagio.php" class="btn btn-primary">Novo Pedido</a>
         </div>
-
-        <?php
-        $conn->close();
-        ?>
-
     </main>
 
     <footer>
@@ -174,74 +142,78 @@ if ($result->num_rows == 0) {
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
     </script>
-    <script>
-        $(document).ready(function() {
-            buscarPedidos('');
-
-            // Evento para botão de editar
-            $(document).on('click', '.editar-btn', function() {
-                var id = $(this).data('id');
-                alert('Editar pedido com ID: ' + id);
-                window.location.href = 'editar_pedido.php?id=' + id;
-            });
-
-        });
-
-        // function buscarPedidos(filtro = '') {
-        //     $.ajax({
-        //         url: '../../Controller/Estagio/search_pedidos.php', // Endpoint que criamos
-        //         method: 'GET',
-        //         data: {
-        //             empresa: filtro
-        //         },
-        //         success: function(data) {
-        //             $('#pedidosTbody');
-        //         },
-        //         error: function() {
-        //             $('#pedidosTbody').html('<tr><td colspan="13" class="text-center">Erro ao carregar dados.</td></tr>');
-        //         }
-        //     });
-        // }
-
-        // buscarPedidos();
-
-        // $('#searchInput').on('input', function() {
-        //     var filtro = $(this).val().trim();
-        //     buscarPedidos(filtro);
-        // });
-    </script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    
 
     <script>
         $(document).ready(function() {
-            
-            function buscarPedidos(pesquisa) {
-                $.get('../../Controller/Estagio/search_pedidos.php', {
-                    empresa: pesquisa
-                }, function(data) {
-                    $('#pedidosTbody').empty();
+            let currentPage = 1;
+            const rowsPerPage = 4;
+            let pedidosData = [];
 
-                    data.forEach(pedido => {
-                        $('#pedidosTbody').append(`
-                    <tr>
-                        <td>${pedido.numero}</td>
-                        <td>${pedido.nome}</td>
-                        <td>${pedido.apelido}</td>
-                        <td>${pedido.codigo_formando}</td>
-                        <td>${pedido.qualificacao}</td>
-                        <td>${pedido.codigo_turma}</td>
-                        <td>${pedido.data_do_pedido.split('-').reverse().join('/')}</td>
-                        <td>${pedido.hora_do_pedido}</td>
-                        <td>${pedido.empresa}</td>
-                        <td>${pedido.contactoPrincipal}</td>
-                        <td>${pedido.contactoSecundario}</td>
-                        <td>${pedido.email}</td>
-                        <td>
-                            <button class="btn btn-sm btn-primary editar-btn" data-id="${pedido.numero}">Editar</button>
-                            <button class="btn btn-sm btn-danger remover-btn" data-id="${pedido.numero}">Remover</button>
-                        </td>
-                    </tr>
-                `);
-                    });
+            function renderTable() {
+                $('#pedidosTbody').empty();
+                const start = (currentPage - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+                const pageData = pedidosData.slice(start, end);
+
+                pageData.forEach(pedido => {
+                    $('#pedidosTbody').append(`
+                        <tr>
+                            <td>${pedido.numero}</td>
+                            <td>${pedido.nome}</td>
+                            <td>${pedido.apelido}</td>
+                            <td>${pedido.codigo_formando}</td>
+                            <td>${pedido.qualificacao}</td>
+                            <td>${pedido.codigo_turma}</td>
+                            <td>${pedido.data_do_pedido.split('-').reverse().join('/')}</td>
+                            <td>${pedido.hora_do_pedido}</td>
+                            <td>${pedido.empresa}</td>
+                            <td>${pedido.contactoPrincipal}</td>
+                            <td>${pedido.contactoSecundario}</td>
+                            <td>${pedido.email}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary gerar-pdf-btn" data-id="${pedido.numero}" title="Gerar PDF">
+                                    <i class="fas fa-file-pdf"></i>
+                                </button>
+                                <button class="btn btn-sm btn-warning editar-btn" data-id="${pedido.numero}" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger remover-btn" data-id="${pedido.numero}" title="Remover">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `);
+                });
+
+                renderPagination();
+            }
+
+            function renderPagination() {
+                const totalPages = Math.ceil(pedidosData.length / rowsPerPage);
+                $('#pagination').empty();
+
+                for (let i = 1; i <= totalPages; i++) {
+                    $('#pagination').append(`
+                        <li class="page-item ${i === currentPage ? 'active' : ''}">
+                            <a class="page-link" href="#">${i}</a>
+                        </li>
+                    `);
+                }
+
+                $('.page-link').click(function(e) {
+                    e.preventDefault();
+                    currentPage = parseInt($(this).text());
+                    renderTable();
+                });
+            }
+
+            function buscarPedidos(pesquisa = '') {
+                $.get('../../Controller/Estagio/search_pedidos.php', { empresa: pesquisa }, function(data) {
+                    pedidosData = data;
+                    currentPage = 1;
+                    renderTable();
                 });
             }
 
@@ -250,8 +222,18 @@ if ($result->num_rows == 0) {
             $('#searchInput').on('input', function() {
                 buscarPedidos($(this).val().trim());
             });
+
+            $(document).on('click', '.gerar-pdf-btn', function() {
+                var id = $(this).data('id');
+                window.location.href = '../../Controller/Estagio/GerarPdfCarta.php?numero=' + id;
+            });
+
+            $(document).on('click', '.editar-btn', function() {
+                var id = $(this).data('id');
+                window.location.href = 'editarPedido.php?numero=' + id;
+            });
         });
+
     </script>
 </body>
-
 </html>

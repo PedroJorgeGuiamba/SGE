@@ -1,5 +1,8 @@
 <?php
 include_once __DIR__ . '/../../Controller/Auth/AuthConfirmationController.php';
+include_once __DIR__ . '/../../Helpers/CSRFProtection.php';
+require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
+SecurityHeaders::setLogin();
 ?>
 
 <!DOCTYPE html>
@@ -38,6 +41,7 @@ include_once __DIR__ . '/../../Controller/Auth/AuthConfirmationController.php';
         <?php endif; ?>
 
         <form method="post">
+            <?= CSRFProtection::getTokenField() ?>
             <div class="card mb-3">
                 <div class="card-body">
                     <div class="row">
@@ -53,7 +57,8 @@ include_once __DIR__ . '/../../Controller/Auth/AuthConfirmationController.php';
                     <button type="submit" class="btn btn-success form-control">Validar</button>
                 </div>
                 <div class="col-md-3 mt-2">
-                    <button type="button" class="btn btn-secondary form-control" onclick="location.href='../Login.php';">Reenviar</button>
+                    <!-- <button type="button" class="btn btn-secondary form-control" onclick="location.href='../Login.php';">Reenviar</button> -->
+                    <a href="../Login.php" class="btn btn-secondary form-control">Reenviar</a>
                 </div>
             </div>
         </form>

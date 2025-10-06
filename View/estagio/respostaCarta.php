@@ -8,7 +8,7 @@ require_once __DIR__ .'/../../middleware/auth.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulário de Estágio</title>
+    <title>Respostas Das Cartas de Estágio</title>
 
     <!-- BootStrap Links -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -85,9 +85,6 @@ require_once __DIR__ .'/../../middleware/auth.php';
                 <li class="nav-item">
                     <a class="nav-link" href="#">Verificar tempo de termino de Estágio</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="respostaCarta.php">Respostas Das Cartas de Estagio</a>
-                </li>
             </ul>
         </nav>
     </header>
@@ -95,29 +92,23 @@ require_once __DIR__ .'/../../middleware/auth.php';
 
     <main class="container mt-4">
 
-        <h2 class="mb-4">Lista de Todos os Pedidos</h2>
+        <h2 class="mb-4">Lista de Todos as Respostas</h2>
 
-        <input type="text" id="searchInput" class="form-control mb-3" placeholder="Pesquisar por empresa">
+        <input type="text" id="searchInput" class="form-control mb-3" placeholder="Pesquisar por resposta">
         <div class="table-responsive">
-            <table id="pedidosTable" class="table table-bordered">
+            <table id="respostasTable" class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>Numero</th>
-                        <th>Nome</th>
-                        <th>Apelido</th>
-                        <th>Código Formando</th>
-                        <th>Qualificação</th>
-                        <th>Turma</th>
-                        <th>Data do Pedido</th>
-                        <th>Hora do Pedido</th>
-                        <th>Empresa</th>
-                        <th>Contacto Principal</th>
-                        <th>Contacto Secundário</th>
-                        <th>Email</th>
-                        <th>Ações</th>
+                        <th>Numero da Resposta</th>
+                        <th>Numero do Pedido</th>
+                        <th>Status da Resposta</th>
+                        <th>Data da Resposta</th>
+                        <th>Contacto do Responsavel</th>
+                        <th>Data do Ínicio do Estágio</th>
+                        <th>Data do Fim</th>
                     </tr>
                 </thead>
-                <tbody id="pedidosTbody">
+                <tbody id="respostasTbody">
                 </tbody>
             </table>
             <nav>
@@ -126,7 +117,7 @@ require_once __DIR__ .'/../../middleware/auth.php';
 
         </div>
         <div class="mt-3">
-            <a href="formularioDeCartaDeEstagio.php" class="btn btn-primary">Novo Pedido</a>
+            <a href="adicionarRespostaCarta.php" class="btn btn-primary">Nova Resposta</a>
         </div>
     </main>
 
@@ -152,37 +143,37 @@ require_once __DIR__ .'/../../middleware/auth.php';
         $(document).ready(function() {
             let currentPage = 1;
             const rowsPerPage = 4;
-            let pedidosData = [];
+            let respostasData = [];
 
             function renderTable() {
-                $('#pedidosTbody').empty();
+                $('#respostasTbody').empty();
                 const start = (currentPage - 1) * rowsPerPage;
                 const end = start + rowsPerPage;
-                const pageData = pedidosData.slice(start, end);
+                const pageData = respostasData.slice(start, end);
 
-                pageData.forEach(pedido => {
-                    $('#pedidosTbody').append(`
+                pageData.forEach(resposta => {
+                    // Adicione verificações para evitar erros
+                    const dataInicio = resposta.data_inicio_estagio ? 
+                        resposta.data_inicio_estagio.split('-').reverse().join('/') : 'N/A';
+                    const dataFim = resposta.data_fim_estagio ? 
+                        resposta.data_fim_estagio.split('-').reverse().join('/') : 'N/A';
+                    const dataResposta = resposta.data_resposta ? 
+                        resposta.data_resposta.split('-').reverse().join('/') : 'N/A';
+
+                    $('#respostasTbody').append(`
                         <tr>
-                            <td>${pedido.numero}</td>
-                            <td>${pedido.nome}</td>
-                            <td>${pedido.apelido}</td>
-                            <td>${pedido.codigo_formando}</td>
-                            <td>${pedido.qualificacao}</td>
-                            <td>${pedido.codigo_turma}</td>
-                            <td>${pedido.data_do_pedido.split('-').reverse().join('/')}</td>
-                            <td>${pedido.hora_do_pedido}</td>
-                            <td>${pedido.empresa}</td>
-                            <td>${pedido.contactoPrincipal}</td>
-                            <td>${pedido.contactoSecundario}</td>
-                            <td>${pedido.email}</td>
+                            <td>${resposta.id_resposta || 'N/A'}</td>
+                            <td>${resposta.numero_carta || 'N/A'}</td>
+                            <td>${resposta.status_resposta || 'N/A'}</td>
+                            <td>${dataResposta}</td>
+                            <td>${resposta.contacto_responsavel || 'N/A'}</td>
+                            <td>${dataInicio}</td>
+                            <td>${dataFim}</td>
                             <td>
-                                <button class="btn btn-sm btn-primary gerar-pdf-btn" data-id="${pedido.numero}" title="Gerar PDF">
-                                    <i class="fas fa-file-pdf"></i>
-                                </button>
-                                <button class="btn btn-sm btn-warning editar-btn" data-id="${pedido.numero}" title="Editar">
+                                <button class="btn btn-sm btn-warning editar-btn" data-id="${resposta.id_resposta}" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="btn btn-sm btn-danger remover-btn" data-id="${pedido.numero}" title="Remover">
+                                <button class="btn btn-sm btn-danger remover-btn" data-id="${resposta.id_resposta}" title="Remover">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </td>
@@ -194,7 +185,7 @@ require_once __DIR__ .'/../../middleware/auth.php';
             }
 
             function renderPagination() {
-                const totalPages = Math.ceil(pedidosData.length / rowsPerPage);
+                const totalPages = Math.ceil(respostasData.length / rowsPerPage);
                 $('#pagination').empty();
 
                 for (let i = 1; i <= totalPages; i++) {
@@ -212,31 +203,31 @@ require_once __DIR__ .'/../../middleware/auth.php';
                 });
             }
 
-            function buscarPedidos(pesquisa = '') {
-                $.get('../../Controller/Estagio/search_pedidos.php', { empresa: pesquisa }, function(data) {
-                    pedidosData = data;
+            function buscarRespostas(pesquisa = '') {
+                $.get('../../Controller/Estagio/search_respostas.php', { numero: pesquisa }, function(data) {
+                    console.log('Dados recebidos:', data); // Para debug
+                    respostasData = Array.isArray(data) ? data : [];
                     currentPage = 1;
+                    renderTable();
+                }).fail(function(xhr, status, error) {
+                    console.error('Erro na requisição:', status, error);
+                    respostasData = [];
                     renderTable();
                 });
             }
 
-            buscarPedidos('');
+            // Inicializar
+            buscarRespostas('');
 
             $('#searchInput').on('input', function() {
-                buscarPedidos($(this).val().trim());
-            });
-
-            $(document).on('click', '.gerar-pdf-btn', function() {
-                var id = $(this).data('id');
-                window.location.href = '../../Controller/Estagio/GerarPdfCarta.php?numero=' + id;
+                buscarRespostas($(this).val().trim());
             });
 
             $(document).on('click', '.editar-btn', function() {
                 var id = $(this).data('id');
-                window.location.href = 'editarPedido.php?numero=' + id;
+                window.location.href = 'editarResposta.php?numero=' + id;
             });
         });
-
     </script>
 </body>
 </html>

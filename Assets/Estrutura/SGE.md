@@ -18,6 +18,7 @@ estagio
 │   │   └── Pessoa.php
 │   │   └── Turma.php
 │   │   └── Supervisor.php
+│   │   └── Resposta.php
 │   │
 │   ├── Controller/
 │   │   └── auth/
@@ -40,11 +41,14 @@ estagio
 │   │   │   └── CadastrarCuro.php
 │   │   │   └── getCursos.php
 │   │   └── Estagio/
+│   │   │   └── AdicionarRespostaCarta.php
 │   │   │   └── editarPedido.php
 │   │   │   └── GerarPdfCarta.php
+│   │   │   └── getNumero.php
 │   │   │   └── FormularioDeCartaDeEstagio.php
 │   │   │   └── remover_pedidos.php
 │   │   │   └── search_pedidos.php
+│   │   │   └── search_respostas.php
 │   │   └── Modulos/
 │   │   │   └── getModulos.php
 │   │   └── Qualificacoes/
@@ -62,6 +66,9 @@ estagio
 │   │   └── auth.php
 │   │   └── Actividade.php
 │   │   └── Criptografia.php
+│   │   └── CSRFProtection.php
+│   │   └── SecurityHeaders.php
+│   │   └── SecurityLogger.php
 │   │
 │   ├── middleware/
 │   │   └── auth.php
@@ -71,18 +78,22 @@ estagio
 │   ├── View/
 │   │   └── Admin/
 │   │   │   └── portalDoAdmin.php
+│   │   └── Erros/
+│   │   │   └── error.php
 │   │   └── Auth/
 │   │   │   └── ValidarUser.php
 │   │   │   └── Register.php
 │   │   └── Cursos/
 │   │   │   └── CadastrarCurso.php
 │   │   └── estagio/
+│   │   │   └── adicionarRespostaCarta.php
 │   │   │   └── CartaDePedido.php
 │   │   │   └── detalhes_pedido.php
 │   │   │   └── editarPedido.php
 │   │   │   └── formularioDeAvaliacaoDeEstagio.php
 │   │   │   └── formularioDeCartaDeEstagio.php
 │   │   │   └── listaDePedido.php
+│   │   │   └── respostaCarta.php
 │   │   │   └── situacaoDeEstagio.php
 │   │   └── Admin/
 │   │   │   └── portalDoAdmin.php

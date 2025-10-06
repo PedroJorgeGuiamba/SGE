@@ -17,6 +17,13 @@ class Criptografia {
     }
 
     public function criptografar($dados) {
+        $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
+        if (empty($dados)) {
+            return '';
+        }
+        
+        $dados = $this->sanitizeForEncryption($dados);
+
         $criptografado = openssl_encrypt(
             $dados,
             'aes-256-cbc',
@@ -39,6 +46,18 @@ class Criptografia {
             0,
             $iv
         );
+    }
+
+    private function sanitizeForEncryption($data) {
+        if (is_numeric($data)) {
+            return strval($data);
+        }
+        
+        // Remover caracteres de controle e espaços excessivos
+        $data = preg_replace('/[\x00-\x1F\x7F]/u', '', $data);
+        $data = trim($data);
+        
+        return $data;
     }
 }
 ?>

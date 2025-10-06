@@ -3,6 +3,15 @@ require_once __DIR__ . '/../../Conexao/conector.php';
 require_once __DIR__ . '/../../Helpers/Sessao.php';
 require_once __DIR__ . '/../../Helpers/Actividade.php';
 require_once __DIR__ . '/../../Helpers/Criptografia.php';
+require_once __DIR__ . '/../../Helpers/CSRFProtection.php';
+require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
+
+SecurityHeaders::setBasic();
+
+header("X-Content-Type-Options: nosniff");
+header("X-Frame-Options: DENY");
+header("X-XSS-Protection: 1; mode=block");
+
 session_start();
 
 class AuthConfirmationController {
@@ -23,9 +32,23 @@ class AuthConfirmationController {
             return $this->error;
         }
 
+        try {
+            CSRFProtection::validateToken($_POST['csrf_token'] ?? '');
+        } catch (Exception $e) {
+            $this->error = "Token de segurança inválido. Recarregue a página e tente novamente.";
+            error_log("CSRF Validation Failed: " . $e->getMessage());
+            return $this->error;
+        }
+
         $codigo = trim($_POST['codigo'] ?? '');
-        if (!preg_match('/^\d{6}$/', $codigo)) {
-            $this->error = "Código inválido. Deve ter 6 dígitos.";
+        if (!preg_match('/^\d{6}$/', $codigo) || !ctype_digit($codigo)) {
+            $this->error = "Código inválido. Deve ter exatamente 6 dígitos.";
+            return $this->error;
+        }
+
+        // ✅ CORREÇÃO:
+        if (!preg_match('/^\d{6}$/', $codigo) || !ctype_digit($codigo) || strlen($codigo) !== 6) {
+            $this->error = "Código inválido.";
             return $this->error;
         }
 
@@ -40,10 +63,30 @@ class AuthConfirmationController {
             return $this->error;
         }
 
+        $user_id = intval($user_id);
+        if ($user_id <= 0) {
+            $this->error = "ID de usuário inválido.";
+            return $this->error;
+        }
+        
         $sql = "SELECT * FROM user_otps WHERE user_id = ? ORDER BY created_at DESC LIMIT 1";
         $stmt = $this->conn->prepare($sql);
+
+        if (!$stmt) {
+            $this->error = "Erro interno do sistema.";
+            error_log("Erro prepare OTP: " . $this->conn->error);
+            return $this->error;
+        }
+
         $stmt->bind_param("i", $user_id);
-        $stmt->execute();
+
+        if (!$stmt->execute()) {
+            $this->error = "Erro ao verificar código.";
+            error_log("Erro execute OTP: " . $stmt->error);
+            $stmt->close();
+            return $this->error;
+        }
+
         $otp = $stmt->get_result()->fetch_assoc();
         $stmt->close();
 
@@ -59,18 +102,13 @@ class AuthConfirmationController {
             $this->error = "Código expirado.";
             return $this->error;
         }
-        if ($otp['otp_code'] != $codigo) {
+
+        if (!hash_equals($otp['otp_code'], $codigo)) {
             $this->error = "Código inválido.";
             return $this->error;
         }
 
-        $sqlUser = "SELECT id, email, role FROM usuarios WHERE id = ?";
-        $stmtUser = $this->conn->prepare($sqlUser);
-        $stmtUser->bind_param("i", $user_id);
-        $stmtUser->execute();
-        $user = $stmtUser->get_result()->fetch_assoc();
-        $stmtUser->close();
-
+        $user = $this->getUserById($user_id);
         if (!$user) {
             $this->error = "Usuário não encontrado.";
             return $this->error;
@@ -84,8 +122,20 @@ class AuthConfirmationController {
 
         $sqlUpdate = "UPDATE user_otps SET is_used = 1 WHERE id = ?";
         $stmtUpdate = $this->conn->prepare($sqlUpdate);
+
+        if (!$stmtUpdate) {
+            $this->error = "Erro interno do sistema.";
+            error_log("Erro prepare update OTP: " . $this->conn->error);
+            return $this->error;
+        }
+
         $stmtUpdate->bind_param("i", $otp['id']);
-        $stmtUpdate->execute();
+        if (!$stmtUpdate->execute()) {
+            $this->error = "Erro ao processar código.";
+            error_log("Erro execute update OTP: " . $stmtUpdate->error);
+            $stmtUpdate->close();
+            return $this->error;
+        }
         $stmtUpdate->close();
 
         $_SESSION['email'] = $email_descriptografado;
@@ -123,6 +173,30 @@ class AuthConfirmationController {
 
     public function getError() {
         return $this->error;
+    }
+
+    private function getUserById($user_id) {
+        $sql = "SELECT id, email, role FROM usuarios WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        
+        if (!$stmt) {
+            error_log("Erro prepare getUserById: " . $this->conn->error);
+            return null;
+        }
+        
+        $stmt->bind_param("i", $user_id);
+        
+        if (!$stmt->execute()) {
+            error_log("Erro execute getUserById: " . $stmt->error);
+            $stmt->close();
+            return null;
+        }
+        
+        $result = $stmt->get_result();
+        $user = $result->fetch_assoc();
+        $stmt->close();
+        
+        return $user;
     }
 }
 

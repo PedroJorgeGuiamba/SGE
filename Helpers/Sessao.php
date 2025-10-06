@@ -3,6 +3,11 @@ require_once __DIR__ . '/../Conexao/conector.php';
 
 function iniciarSessao($utilizador_id)
 {
+    $utilizador_id = intval($utilizador_id);
+    if ($utilizador_id <= 0) {
+        throw new Exception('ID de usuário inválido para iniciar sessão.');
+    }
+
     $conexao = new Conector();
     $conn = $conexao->getConexao();
 
@@ -67,6 +72,10 @@ function terminarSessao()
 
 function selecionarSessao($token, $seValido = 1)
 {
+    if (empty($token) || strlen($token) !== 64 || !ctype_xdigit($token)) {
+        return null;
+    }
+    
     $conexao = new Conector();
     $conn = $conexao->getConexao();
 

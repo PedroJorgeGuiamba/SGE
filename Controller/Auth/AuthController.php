@@ -2,7 +2,14 @@
 require_once __DIR__ . '/../../Conexao/conector.php';
 require_once __DIR__ . '/../../Helpers/Actividade.php';
 require_once __DIR__ . '/../../Helpers/Criptografia.php';
-session_start();
+require_once __DIR__ . '/../../Helpers/CSRFProtection.php';
+require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
+
+SecurityHeaders::setBasic();
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 class AuthController {
     private $conn;
@@ -23,14 +30,29 @@ class AuthController {
             return "Método inválido.";
         }
 
-        if ($this->loginAttempts >= 5) {
-            $this->error = "Muitas tentativas. Espere 5 minutos.";
-            $_SESSION['login_attempts'] = $this->loginAttempts;
+        error_log("=== AUTH CONTROLLER SESSION DEBUG ===");
+        error_log("Session ID: " . session_id());
+        error_log("All Session Data: " . print_r($_SESSION, true));
+
+        try {
+            CSRFProtection::validateToken($_POST['csrf_token'] ?? '');
+        } catch (Exception $e) {
+            $this->error = "Token de segurança inválido. Recarregue a página e tente novamente.";
+            error_log("CSRF Validation Failed: " . $e->getMessage());
             return $this->error;
         }
 
+        // if ($this->loginAttempts >= 5) {
+        //     $this->error = "Muitas tentativas. Espere 5 minutos.";
+        //     $_SESSION['login_attempts'] = $this->loginAttempts;
+        //     return $this->error;
+        // }
+
         $email = filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL);
-        $senha = $_POST['password'] ?? '';
+        $senha = trim($_POST['password'] ?? '');
+        $senha = strip_tags($senha);
+        $senha = htmlspecialchars($senha,
+        ENT_QUOTES, 'UTF-8');
 
         if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $this->error = "Email inválido.";
@@ -49,9 +71,23 @@ class AuthController {
 
         $sql = "SELECT id, email, password, role FROM usuarios";
         $result = $this->conn->query($sql);
-
         $userEncontrado = false;
         $row = null;
+
+        // $stmt = $this->conn->prepare($sql);
+        
+        // if (!$stmt) {
+        //     $this->error = "Erro interno do sistema.";
+        //     error_log("Erro prepare user query: " . $this->conn->error);
+        //     return $this->error;
+        // }
+        
+        // if (!$stmt->execute()) {
+        //     $this->error = "Erro ao buscar usuários.";
+        //     error_log("Erro execute user query: " . $stmt->error);
+        //     $stmt->close();
+        //     return $this->error;
+        // }
 
         if ($result && $result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
@@ -63,7 +99,7 @@ class AuthController {
             }
         }
 
-    if ($userEncontrado && $row) {
+        if ($userEncontrado && $row) {
             if (password_verify($senha, $row['password'])) {
                 $_SESSION['login_attempts'] = 0; // Reset
 
@@ -72,6 +108,13 @@ class AuthController {
 
                 $sqlOtp = "INSERT INTO user_otps (user_id, otp_code, expires_at, created_at) VALUES (?, ?, ?, NOW())";
                 $stmtOtp = $this->conn->prepare($sqlOtp);
+
+                if (!$stmtOtp) {
+                    $this->error = "Erro ao preparar consulta OTP.";
+                    error_log("Erro prepare OTP: " . $this->conn->error);
+                    return $this->error;
+                }
+
                 $stmtOtp->bind_param("iis", $row['id'], $otp, $expira);
 
                 if ($stmtOtp->execute()) {
@@ -88,9 +131,15 @@ class AuthController {
                     }
 
                     $_SESSION['pending_user_id'] = $this->criptografia->criptografar($row['id']);
-                    $_SESSION['user_email'] = $this->criptografia->criptografar($row['email']);
+                    $_SESSION['user_email'] = $this->criptografia->criptografar($email);
                     $_SESSION['role'] = $this->criptografia->criptografar(strtolower(trim($row['role'] ?? '')));
-                    error_log("DEBUG - AuthController: Role: '" . $this->criptografia->criptografar($row['role']) . "' para {$email}");
+                    if (class_exists('SecurityLogger')) {
+                        SecurityLogger::logSecurityEvent('LOGIN_SUCCESS', $row['id'], [
+                            'email_hash' => hash('sha256', $email)
+                        ]);
+                    } else {
+                        error_log("LOGIN_SUCCESS - User ID: " . $row['id']);
+                    }
                     header("Location: /estagio/View/Auth/ValidarUser.php");
                     exit();
                 } else {

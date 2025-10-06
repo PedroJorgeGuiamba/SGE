@@ -1,4 +1,14 @@
-<?php include_once '../../Controller/Auth/RegisterController.php'; ?>
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+include_once __DIR__ . '/../../Helpers/CSRFProtection.php';
+require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
+SecurityHeaders::setLogin();
+
+include_once '../../Controller/Auth/RegisterController.php';
+?>
 
 <!DOCTYPE html>
 <html lang="pt-pt">
@@ -44,12 +54,13 @@
         </h2>
 
         <hr />
+        
+        <?php if (isset($_GET['error']) || isset($error)): ?>
+            <div class="alert alert-danger"><?= htmlspecialchars($_GET['error'] ?? $error) ?></div>
+        <?php endif; ?>
 
         <form method="post">
-            <?php if (isset($error)): ?>
-                <div class="alert alert-danger"><?= $error ?></div>
-            <?php endif; ?>
-
+            <?= CSRFProtection::getTokenField() ?>
             <div class="card mb-3">
                 <div class="card-body">
                     <div class="row">

@@ -68,7 +68,7 @@ require_once __DIR__ .'/../../middleware/auth.php';
             <ul class="nav justify-content-center">
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page"
-                        href="../../View/Formando/portalDeEstudante.php">Home</a>
+                        href="../../View/Admin/portalDoAdmin.php">Home</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="formularioDeCartaDeEstagio.php">Fazer Pedido de Estágio</a>

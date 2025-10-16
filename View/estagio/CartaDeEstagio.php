@@ -115,7 +115,7 @@ if ($result->num_rows === 0) {
         </p>
 
         <p class="ref">
-            <b>N. Ref:</b> 2404 - 1032/GETFC/ITC/<?= date('Y') ?><br>
+            <b>N. Ref: </b><?= htmlspecialchars($dados['numero'] ?? null) ?> - 1032/GETFC/ITC/<?= date('Y') ?><br>
             <b>Maputo,</b> <?= htmlspecialchars(date('j \d\e F \d\e Y', strtotime($dados['data_do_pedido'] ?? date('Y-m-d')))) ?>
         </p>
 

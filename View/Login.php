@@ -7,25 +7,6 @@ include_once __DIR__ . '/../Helpers/CSRFProtection.php';
 require_once __DIR__ . '/../Helpers/SecurityHeaders.php';
 SecurityHeaders::setLogin();
 
-// if (isset($_SESSION['user_id'])) {
-//     $role = $_SESSION['role'] ?? '';
-//     switch (strtolower($role)) {
-//         case 'formando':
-//                 header("Location: /estagio/View/Formando/portalDoFormando.php");
-//                 break;
-//             case 'supervisor':
-//                 header("Location: /estagio/View/Supervisor/portalDoSupervisor.php");
-//                 break;
-//             case 'formador':
-//                 header("Location: /estagio/View/Formador/portalDoFormador.php");
-//                 break;
-//             case 'admin':
-//                 header("Location: /estagio/View/Admin/portalDoAdmin.php");
-//                 break;
-//         default: header("Location: /estagio/View/Login.php?error=role_invalida"); break;
-//     }
-//     exit();
-// }
 include_once __DIR__ . '/../Controller/Auth/AuthController.php';
 ?>
 

@@ -102,7 +102,7 @@ require_once __DIR__ .'/../../middleware/auth.php';
                         <label for="status" class="form-label">Status da Resposta</label>
                         <select class="form-select" id="status" aria-label="Default select example" name="status">
                             <option selected>Open this select menu</option>
-                            <option value="pendente">Pedente</option>
+                            <option value="Pendente">Pedente</option>
                             <option value="Aceito">Aprovado</option>
                             <option value="Recusado">Reprovado</option>
                         </select>
@@ -135,6 +135,16 @@ require_once __DIR__ .'/../../middleware/auth.php';
                         <label for="dataFim" class="form-label">Data do Inicio do Estágio</label>
                         <input type="date" name="dataFim" class="form-control" id="dataFim">
                         <span class="error_form" id="dataFim_error_message"></span>
+                    </div>
+
+                    <div class="form-group col-md-4">
+                        <label for="statusEstagio" class="form-label">Status do Estágio</label>
+                        <select class="form-select" id="statusEstagio" aria-label="Default select example" name="statusEstagio">
+                            <option selected>Open this select menu</option>
+                            <option value="Nao Concluido">Não Concluído</option>
+                            <option value="Concluido">Concluído</option>
+                        </select>
+                        <span class="error_form" id="statusEstagio_error_message"></span>
                     </div>
                 </div>
                 
@@ -206,6 +216,9 @@ require_once __DIR__ .'/../../middleware/auth.php';
                 contactoResponsavel: {
                     required: true,
                     pattern: /^(\+258)?[ -]?[8][2-7][0-9]{7}$/
+                },
+                statusEstagio: {
+                    required: true
                 }
             },
             messages: {
@@ -220,19 +233,22 @@ require_once __DIR__ .'/../../middleware/auth.php';
                     required: "Selecione uma turma."
                 },
                 dataResposta: {
-                    required: "Informe a data do pedido.",
+                    required: "Informe a data da resposta.",
                     date: "Formato inválido."
                 },
                 dataInicio: {
-                    required: "Informe o nome da dataInicio.",
+                    required: "Informe uma data de Inicio.",
                 },
                 dataFim: {
-                    required: "Informe o nome da dataFim.",
+                    required: "Informe uma da data de Fim.",
                 },
                 contactoResponsavel: {
                     required: "Informe um contacto válido.",
                     pattern: "Número inválido. Ex: +258 84xxxxxxx"
-                }
+                },
+                statusEstagio: {
+                    required: "Selecione um Status."
+                },
             },
             errorClass: "is-invalid",
             validClass: "is-valid",

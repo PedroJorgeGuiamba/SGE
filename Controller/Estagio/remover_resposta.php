@@ -9,21 +9,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $numero = isset($_POST['numero']) ? (int)$_POST['numero'] : null;
 
     if ($numero) {
-        $sql = "DELETE FROM pedido_carta WHERE numero = ?";
+        $sql = "DELETE FROM resposta_carta WHERE id_resposta = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $numero);
 
         if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'message' => 'Pedido removido com sucesso']);
+            echo json_encode(['success' => true, 'message' => 'Resposta removida com sucesso']);
         } else {
             header('HTTP/1.1 500 Internal Server Error');
-            echo json_encode(['error' => 'Erro ao remover o pedido']);
+            echo json_encode(['error' => 'Erro ao remover a resposta']);
         }
 
         $stmt->close();
     } else {
         header('HTTP/1.1 400 Bad Request');
-        echo json_encode(['error' => 'Número do pedido não fornecido']);
+        echo json_encode(['error' => 'Número da resposta não fornecido']);
     }
 } else {
     header('HTTP/1.1 405 Method Not Allowed');

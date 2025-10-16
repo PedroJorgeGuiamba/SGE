@@ -1,7 +1,9 @@
 <?php
 session_start();
+require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
 include '../../Controller/Supervisor/Home.php';
 require_once __DIR__ .'/../../middleware/auth.php';
+SecurityHeaders::setFull();
 ?>
 
 <!DOCTYPE html>

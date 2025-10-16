@@ -1,7 +1,9 @@
 <?php
 session_start();
+require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
 include '../../Controller/Admin/Home.php';
 require_once __DIR__ .'/../../middleware/auth.php';
+SecurityHeaders::setFull();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -21,12 +23,11 @@ require_once __DIR__ .'/../../middleware/auth.php';
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        button{
+        button {
             padding-bottom: 110px;
         }
     </style>
 </head>
-
 <body>
     <header>
         <!-- Nav principal -->
@@ -40,25 +41,17 @@ require_once __DIR__ .'/../../middleware/auth.php';
                     </button>
                     <div class="collapse navbar-collapse" id="navbarText">
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                            <!-- Instagram -->
                             <li class="nav-item">
-                                <a class="nav-link" aria-current="page"
-                                    href="https://www.instagram.com/itc.ac">Instagram</a>
+                                <a class="nav-link" aria-current="page" href="https://www.instagram.com/itc.ac">Instagram</a>
                             </li>
-                            <!-- Facebook -->
                             <li class="nav-item">
-                                <a class="nav-link" aria-current="page"
-                                    href="https://pt-br.facebook.com/itc.transcom">Facebook</a>
+                                <a class="nav-link" aria-current="page" href="https://pt-br.facebook.com/itc.transcom">Facebook</a>
                             </li>
-                            <!-- Google -->
                             <li class="nav-item">
-                                <a class="nav-link"
-                                    href="https://plus.google.com/share?url=https://simplesharebuttons.com">Google</a>
+                                <a class="nav-link" href="https://plus.google.com/share?url=https://simplesharebuttons.com">Google</a>
                             </li>
-                            <!-- LinkedIn -->
                             <li class="nav-item">
-                                <a class="nav-link"
-                                    href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://simplesharebuttons.com">Linkedin</a>
+                                <a class="nav-link" href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://simplesharebuttons.com">Linkedin</a>
                             </li>
                             <li class="nav-item">
                                 <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger">Logout</a>
@@ -68,13 +61,11 @@ require_once __DIR__ .'/../../middleware/auth.php';
                 </div>
             </div>
         </nav>
-
         <!-- Nav Secundária -->
         <nav>
             <ul class="nav justify-content-center">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page"
-                        href="../../View/Formando/portalDeEstudante.php">Home</a>
+                    <a class="nav-link active" aria-current="page" href="../../View/Admin/portalDoAdmin.php">Home</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="../estagio/formularioDeCartaDeEstagio.php">Fazer Pedido de Estágio</a>
@@ -82,18 +73,11 @@ require_once __DIR__ .'/../../middleware/auth.php';
                 <li class="nav-item">
                     <a class="nav-link" href="listaDePedidos.php">Pedidos de Estágio</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Verificar tempo de termino de Estágio</a>
-                </li>
             </ul>
         </nav>
     </header>
-
-
     <main class="container mt-4">
-
         <h2 class="mb-4">Lista de Todos as Respostas</h2>
-
         <input type="text" id="searchInput" class="form-control mb-3" placeholder="Pesquisar por resposta">
         <div class="table-responsive">
             <table id="respostasTable" class="table table-bordered">
@@ -106,41 +90,37 @@ require_once __DIR__ .'/../../middleware/auth.php';
                         <th>Contacto do Responsavel</th>
                         <th>Data do Ínicio do Estágio</th>
                         <th>Data do Fim</th>
+                        <th>Status do Estagio</th>
+                        <th>Acções</th>
                     </tr>
                 </thead>
                 <tbody id="respostasTbody">
                 </tbody>
             </table>
             <nav>
-            <ul class="pagination justify-content-center mt-3" id="pagination"></ul>
-        </nav>
-
+                <ul class="pagination justify-content-center mt-3" id="pagination"></ul>
+            </nav>
         </div>
         <div class="mt-3">
             <a href="adicionarRespostaCarta.php" class="btn btn-primary">Nova Resposta</a>
         </div>
     </main>
-
     <footer>
         <div class="container-footer">
             <p>© 2019 TRANSCOM . DIREITOS RESERVADOS . DESIGN & DEVELOPMENT <span>TRANSCOM</span></p>
         </div>
     </footer>
-
     <!-- Scripts do BootStrap -->
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script>
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
     </script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    
-
     <script>
         $(document).ready(function() {
+            $('#respostasTable').DataTable();
             let currentPage = 1;
             const rowsPerPage = 4;
             let respostasData = [];
@@ -150,26 +130,31 @@ require_once __DIR__ .'/../../middleware/auth.php';
                 const start = (currentPage - 1) * rowsPerPage;
                 const end = start + rowsPerPage;
                 const pageData = respostasData.slice(start, end);
-
+                
                 pageData.forEach(resposta => {
-                    // Adicione verificações para evitar erros
-                    const dataInicio = resposta.data_inicio_estagio ? 
-                        resposta.data_inicio_estagio.split('-').reverse().join('/') : 'N/A';
-                    const dataFim = resposta.data_fim_estagio ? 
+                    const dataInicio = resposta.data_inicio_estagio ?
+                    resposta.data_inicio_estagio.split('-').reverse().join('/') : 'N/A';
+                    const dataFim = resposta.data_fim_estagio ?
                         resposta.data_fim_estagio.split('-').reverse().join('/') : 'N/A';
-                    const dataResposta = resposta.data_resposta ? 
+                        const dataResposta = resposta.data_resposta ?
                         resposta.data_resposta.split('-').reverse().join('/') : 'N/A';
-
-                    $('#respostasTbody').append(`
+                        const avaliarButton = resposta.status_estagio === 'Concluido' && resposta.status_resposta === 'Aceito'?
+                                `<button class="btn btn-sm btn-primary avaliar-btn" data-id="${resposta.id_resposta}" title="Avaliar Estágio">
+                                    <i class="fas fa-star"></i>
+                                </button>` : '';
+                        
+                        $('#respostasTbody').append(`
                         <tr>
                             <td>${resposta.id_resposta || 'N/A'}</td>
                             <td>${resposta.numero_carta || 'N/A'}</td>
                             <td>${resposta.status_resposta || 'N/A'}</td>
                             <td>${dataResposta}</td>
-                            <td>${resposta.contacto_responsavel || 'N/A'}</td>
+                            <td>${resposta.contato_responsavel || 'N/A'}</td>
                             <td>${dataInicio}</td>
                             <td>${dataFim}</td>
+                            <td>${resposta.status_estagio || 'N/A'}</td>
                             <td>
+                                ${avaliarButton}
                                 <button class="btn btn-sm btn-warning editar-btn" data-id="${resposta.id_resposta}" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </button>
@@ -205,7 +190,7 @@ require_once __DIR__ .'/../../middleware/auth.php';
 
             function buscarRespostas(pesquisa = '') {
                 $.get('../../Controller/Estagio/search_respostas.php', { numero: pesquisa }, function(data) {
-                    console.log('Dados recebidos:', data); // Para debug
+                    console.log('Dados recebidos:', data);
                     respostasData = Array.isArray(data) ? data : [];
                     currentPage = 1;
                     renderTable();
@@ -216,7 +201,6 @@ require_once __DIR__ .'/../../middleware/auth.php';
                 });
             }
 
-            // Inicializar
             buscarRespostas('');
 
             $('#searchInput').on('input', function() {
@@ -225,7 +209,38 @@ require_once __DIR__ .'/../../middleware/auth.php';
 
             $(document).on('click', '.editar-btn', function() {
                 var id = $(this).data('id');
-                window.location.href = 'editarResposta.php?numero=' + id;
+                window.location.href = 'editarResposta.php?id_resposta=' + id;
+            });
+
+            $(document).on('click', '.avaliar-btn', function() {
+                var id = $(this).data('id');
+                window.location.href = 'avaliarEstagio.php?numero=' + id;
+            });
+
+            $(document).on('click', '.remover-btn', function() {
+                var id = $(this).data('id');
+                
+                // Confirmação antes de remover
+                if (confirm('Tem certeza que deseja remover a resposta nº ' + id + '?')) {
+                    $.ajax({
+                        url: '../../Controller/Estagio/remover_resposta.php',
+                        type: 'POST',
+                        data: { numero: id },
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.success) {
+                                alert(response.message);
+                                // Atualiza a tabela após remoção
+                                buscarRespostas($('#searchInput').val().trim());
+                            } else {
+                                alert(response.error || 'Erro ao remover a resposta');
+                            }
+                        },
+                        error: function() {
+                            alert('Erro ao comunicar com o servidor');
+                        }
+                    });
+                }
             });
         });
     </script>

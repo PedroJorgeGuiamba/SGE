@@ -22,17 +22,22 @@ class RespostaCarta
                 }
                 $resposta->setNumero($numero);
 
-                // Status: validar por whitelist
                 $statusRaw = trim($_POST['status'] ?? '');
                 $allowedStatuses = ['Aceito', 'Recusado', 'Pendente'];
-                $status = '';
-                $status = strtolower($statusRaw);
+                $status = $statusRaw;
                 if (!in_array($status, $allowedStatuses, true)) {
                     $status = 'Pendente';
                 }
                 $resposta->setStatus($status);
 
-                // Data de resposta: aceitar formato YYYY-MM-DD ou vazio
+                $statusEstagioRaw = trim($_POST['statusEstagio'] ?? '');
+                $allowedEstagioStatuses = ['Concluido', 'Nao Concluido'];
+                $statusEstagio = $statusEstagioRaw;
+                if (!in_array($statusEstagio, $allowedEstagioStatuses, true)) {
+                    $$statusEstagio = '';
+                }
+                $resposta->setStatusEstagio($statusEstagio);
+
                 $dataRespostaRaw = trim($_POST['dataResposta'] ?? '');
                 $dataResposta = '';
                 if ($dataRespostaRaw !== '') {
@@ -45,13 +50,11 @@ class RespostaCarta
                 }
                 $resposta->setDataResposta($dataResposta);
 
-                // Contacto do responsável: remover tags e escapar
                 $contacto = trim($_POST['contactoResponsavel'] ?? '');
                 $contacto = strip_tags($contacto);
                 $contacto = htmlspecialchars($contacto, ENT_QUOTES, 'UTF-8');
                 $resposta->setContactoResponsavel($contacto);
 
-                // Datas de inicio/fim: validar formato YYYY-MM-DD ou vazio
                 $dataInicioRaw = trim($_POST['dataInicio'] ?? '');
                 $dataFimRaw = trim($_POST['dataFim'] ?? '');
 
@@ -84,8 +87,6 @@ class RespostaCarta
                         registrarAtividade($_SESSION['sessao_id'], "resposta de carta de estágio realizado", "CRIACAO");
                     }
 
-                    // Registrar atividade já foi feito acima
-                    // Definir mensagem de sucesso em sessão e redirecionar
                     $_SESSION['flash_success'] = 'resposta de carta enviado com sucesso!';
                     header("Location: /estagio/View/estagio/respostaCarta.php");
                     exit;

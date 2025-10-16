@@ -11,6 +11,7 @@ class Resposta
     private $contactoResponsavel;
     private $dataInicio;
     private $dataFim;
+    private $statusEstagio;
 
     public function __construct()
     {
@@ -49,9 +50,14 @@ class Resposta
         $this->dataFim = $dataFim;
     }
 
+        public function setStatusEstagio(string $statusEstagio)
+    {
+        $this->statusEstagio = $statusEstagio;
+    }
+
     public function salvar(): bool
     {
-        $stmt = $this->conn->prepare("INSERT INTO resposta_carta (numero_carta, status_resposta, data_resposta, contato_responsavel, data_inicio_estagio, data_fim_estagio) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt = $this->conn->prepare("INSERT INTO resposta_carta (numero_carta, status_resposta, data_resposta, contato_responsavel, data_inicio_estagio, data_fim_estagio, status_estagio) VALUES (?, ?, ?, ?, ?, ?, ?)");
 
         if (!$stmt) {
             // Erro na preparação da query
@@ -59,14 +65,14 @@ class Resposta
         }
 
         $stmt->bind_param(
-            "isssss",
+            "issssss",
             $this->numero,
             $this->status,
             $this->dataResposta,
             $this->contactoResponsavel,
             $this->dataInicio,
             $this->dataFim,
-
+            $this->statusEstagio
         );
 
         return $stmt->execute();

@@ -67,16 +67,7 @@ require_once __DIR__ .'/../../middleware/auth.php';
                     <a class="nav-link active" aria-current="page" href="#">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Módulos</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Horário</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Situação de Pagamento</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="../../View/estagio/situacaoDeEstagio.php">Situação de Estagio</a>
+                    <a class="nav-link" href="../estagio/formularioDeCartaDeEstagio.php">Fazer Pedido de Estágio</a>
                 </li>
             </ul>
         </nav>

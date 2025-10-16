@@ -2,6 +2,42 @@
 session_start();
 include '../../Controller/Admin/Home.php';
 require_once __DIR__ .'/../../middleware/auth.php';
+require_once __DIR__ . '/../../Conexao/conector.php';
+
+$conector = new Conector();
+$conn = $conector->getConexao();
+
+// User roles pie chart
+$user_roles_query = mysqli_query($conn, "SELECT role, COUNT(*) as count FROM usuarios GROUP BY role");
+$user_roles_labels = [];
+$user_roles_data = [];
+if ($user_roles_query) {
+    while ($row = mysqli_fetch_assoc($user_roles_query)) {
+        $user_roles_labels[] = $row['role'];
+        $user_roles_data[] = $row['count'];
+    }
+}
+
+// Monthly sessions bar chart
+$months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+$monthly_sessions_query = mysqli_query($conn, "SELECT MONTH(data) as month, COUNT(*) as count FROM sessao WHERE YEAR(data) = YEAR(CURDATE()) GROUP BY MONTH(data)");
+$monthly_sessions = array_fill(0, 12, 0);
+if ($monthly_sessions_query) {
+    while ($row = mysqli_fetch_assoc($monthly_sessions_query)) {
+        $monthly_sessions[$row['month'] - 1] = $row['count'];
+    }
+}
+
+// Formandos per curso bar chart
+$formandos_per_curso_query = mysqli_query($conn, "SELECT c.nome, COUNT(f.id_formando) as count FROM formando f JOIN turma_formando tf ON f.codigo = tf.codigo_formando JOIN turma t ON tf.codigo_turma = t.codigo JOIN curso c ON t.codigo_curso = c.codigo GROUP BY c.nome");
+$formandos_curso_labels = [];
+$formandos_curso_data = [];
+if ($formandos_per_curso_query) {
+    while ($row = mysqli_fetch_assoc($formandos_per_curso_query)) {
+        $formandos_curso_labels[] = $row['nome'];
+        $formandos_curso_data[] = $row['count'];
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -12,14 +48,58 @@ require_once __DIR__ .'/../../middleware/auth.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal de Admin</title>
 
-    <!-- BootStrap Links -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <!-- CSS -->
     <link rel="stylesheet" href="../../Style/home.css">
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --info-color: #0dcaf0;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --border-radius: 15px;
+        }
+        body {
+            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .dashboard-header {
+            background: var(--bg-gradient);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+        .chart-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .chart-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+        footer {
+            background: var(--bg-gradient);
+            color: white;
+            padding: 1rem 0;
+            margin-top: 3rem;
+        }
+    </style>
 </head>
 
 <body>
@@ -69,7 +149,7 @@ require_once __DIR__ .'/../../middleware/auth.php';
                     <a class="nav-link" href="#">Módulos</a>
                 </li>
                 
-                <li class="nav-item">
+                <li class="nav-item" style="color: black;">
                     <div class="dropdown">
                         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                             Cadastrar
@@ -97,106 +177,50 @@ require_once __DIR__ .'/../../middleware/auth.php';
         </nav>
     </header>
 
-    <main>
-        <section class="noticias">
-            <div class="row row-cols-1 row-cols-md-2 g-4">
-                <div class="col">
-                    <div class="card">
-                        <img src="https://www.itc.ac.mz/wp-content/uploads/2020/07/itc-p.png" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">Card title</h5>
-                            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional
-                                content. This content is a little bit longer.</p>
-                        </div>
-                    </div>
-                </div>
+    <section class="dashboard-header text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold"><i class="fas fa-chart-line me-3"></i>General Dashboard</h1>
+            <p class="lead">Overview of System Data</p>
+        </div>
+    </section>
 
-                <div class="col">
-                    <div class="card">
-                        <img src="https://www.itc.ac.mz/wp-content/uploads/2024/10/WhatsApp-Image-2024-10-29-at-14.36.59-7-768x1024.jpeg" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">Card title</h5>
-                            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional
-                                content. This content is a little bit longer.</p>
-                        </div>
-                    </div>
+    <main class="container-fluid">
+        <!-- Charts Section -->
+        <section class="row g-4">
+            <!-- Pie Chart: User Roles -->
+            <div class="col-lg-6">
+                <div class="chart-container">
+                    <h4 class="chart-title"><i class="fas fa-chart-pie me-2"></i>User Roles Distribution</h4>
+                    <canvas id="pieChart" height="300"></canvas>
                 </div>
+            </div>
 
-                <div class="col">
-                    <div class="card">
-                        <img src="https://www.itc.ac.mz/wp-content/uploads/2023/10/WhatsApp-Image-2023-10-26-at-15.03.08-2.jpeg" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">Card title</h5>
-                            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional
-                                content.</p>
-                        </div>
-                    </div>
+            <!-- Bar Chart: Monthly Sessions -->
+            <div class="col-lg-6">
+                <div class="chart-container">
+                    <h4 class="chart-title"><i class="fas fa-chart-bar me-2"></i>Sessions per Month (Current Year)</h4>
+                    <canvas id="barChart" height="300"></canvas>
                 </div>
+            </div>
 
-                <div class="col">
-                    <div class="card">
-                        <img src="https://www.itc.ac.mz/wp-content/uploads/2023/10/WhatsApp-Image-2023-10-26-at-15.03.08-2.jpeg" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">Card title</h5>
-                            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional
-                                content. This content is a little bit longer.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card">
-                        <img src="https://www.itc.ac.mz/wp-content/uploads/2023/10/WhatsApp-Image-2023-10-26-at-15.03.08-2.jpeg" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">Card title</h5>
-                            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional
-                                content. This content is a little bit longer.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card">
-                        <img src="https://www.itc.ac.mz/wp-content/uploads/2023/10/WhatsApp-Image-2023-10-26-at-15.03.08-2.jpeg" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">Card title</h5>
-                            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional
-                                content. This content is a little bit longer.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card">
-                        <img src="https://www.itc.ac.mz/wp-content/uploads/2023/10/WhatsApp-Image-2023-10-26-at-15.03.08-2.jpeg" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">Card title</h5>
-                            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional
-                                content.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card">
-                        <img src="https://www.itc.ac.mz/wp-content/uploads/2023/10/WhatsApp-Image-2023-10-26-at-15.03.08-2.jpeg" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">Card title</h5>
-                            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional
-                                content. This content is a little bit longer.</p>
-                        </div>
-                    </div>
+            <!-- Bar Chart: Formandos per Curso -->
+            <div class="col-lg-6">
+                <div class="chart-container">
+                    <h4 class="chart-title"><i class="fas fa-chart-bar me-2"></i>Formandos per Curso</h4>
+                    <canvas id="formandosChart" height="300"></canvas>
                 </div>
             </div>
         </section>
+    </main>
+
 
         <!-- Rodapé -->
-        <footer>
-            <div class="container-footer">
-                <p>© 2019 TRANSCOM . DIREITOS RESERVADOS . DESIGN & DEVELOPMENT <span>TRANSCOM</span></p>
-            </div>
-        </footer>
-    </main>
+    <footer>
+        <div class="container-footer">
+            <p>© 2019 TRANSCOM . DIREITOS RESERVADOS . DESIGN & DEVELOPMENT <span>TRANSCOM</span></p>
+        </div>
+    </footer>
+    
     <!-- Scripts do BootStrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
@@ -205,6 +229,68 @@ require_once __DIR__ .'/../../middleware/auth.php';
     <script>
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    </script>
+    <script>
+        // Pie Chart: User Roles
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: <?php echo json_encode($user_roles_labels); ?>,
+                datasets: [{
+                    data: <?php echo json_encode($user_roles_data); ?>,
+                    backgroundColor: ['#0dcaf0', '#198754', '#ffc107', '#dc3545'],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        // Bar Chart: Monthly Sessions
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: <?php echo json_encode($months); ?>,
+                datasets: [{
+                    label: 'Number of Sessions',
+                    data: <?php echo json_encode($monthly_sessions); ?>,
+                    backgroundColor: 'rgba(13, 202, 240, 0.6)',
+                    borderColor: 'rgba(13, 202, 240, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        // Bar Chart: Formandos per Curso
+        const ctxFormandos = document.getElementById('formandosChart').getContext('2d');
+        new Chart(ctxFormandos, {
+            type: 'bar',
+            data: {
+                labels: <?php echo json_encode($formandos_curso_labels); ?>,
+                datasets: [{
+                    label: 'Number of Formandos',
+                    data: <?php echo json_encode($formandos_curso_data); ?>,
+                    backgroundColor: 'rgba(25, 135, 84, 0.6)',
+                    borderColor: 'rgba(25, 135, 84, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
     </script>
 </body>
 

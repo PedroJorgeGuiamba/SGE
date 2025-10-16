@@ -1,3 +1,7 @@
 Assets/img/*
 
 !Assets/img/.gitkeep
+
+uploads/avaliacaoEstagios/*
+
+!uploads/avaliacaoEstagios/.gitkeep

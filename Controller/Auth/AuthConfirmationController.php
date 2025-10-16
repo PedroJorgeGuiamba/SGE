@@ -163,6 +163,9 @@ class AuthConfirmationController {
             case 'admin':
                 header("Location: /estagio/View/Admin/portalDoAdmin.php");
                 break;
+            case 'seguranca':
+                header("Location: /estagio/View/Seguranca/portalDoSeguranca.php");
+                break;
             default:
                 registrarAtividade($sessaoId, "Tentativa de redirecionamento com role inválida: {$role}", "ERROR");
                 $this->error = "Tipo de usuário desconhecido.";

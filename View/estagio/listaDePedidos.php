@@ -1,7 +1,9 @@
 <?php
 session_start();
+require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
 include '../../Controller/Admin/Home.php';
 require_once __DIR__ .'/../../middleware/auth.php';
+SecurityHeaders::setFull();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -81,9 +83,6 @@ require_once __DIR__ .'/../../middleware/auth.php';
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="listaDePedidos.php">Pedidos de Estágio</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Verificar tempo de termino de Estágio</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="respostaCarta.php">Respostas Das Cartas de Estagio</a>
@@ -234,6 +233,32 @@ require_once __DIR__ .'/../../middleware/auth.php';
             $(document).on('click', '.editar-btn', function() {
                 var id = $(this).data('id');
                 window.location.href = 'editarPedido.php?numero=' + id;
+            });
+
+            $(document).on('click', '.remover-btn', function() {
+                var id = $(this).data('id');
+                
+                // Confirmação antes de remover
+                if (confirm('Tem certeza que deseja remover o pedido #' + id + '?')) {
+                    $.ajax({
+                        url: '../../Controller/Estagio/remover_pedido.php',
+                        type: 'POST',
+                        data: { numero: id },
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.success) {
+                                alert(response.message);
+                                // Atualiza a tabela após remoção
+                                buscarPedidos($('#searchInput').val().trim());
+                            } else {
+                                alert(response.error || 'Erro ao remover o pedido');
+                            }
+                        },
+                        error: function() {
+                            alert('Erro ao comunicar com o servidor');
+                        }
+                    });
+                }
             });
         });
 

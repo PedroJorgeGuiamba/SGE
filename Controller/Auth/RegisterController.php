@@ -58,7 +58,7 @@ class RegisterController {
         }
 
         $roleLower = strtolower(trim($role));
-        $validRoles = ['admin', 'formando', 'formador', 'supervisor'];
+        $validRoles = ['admin', 'formando', 'formador', 'supervisor', 'seguranca'];
         if (empty($roleLower) || !in_array($roleLower, $validRoles)) {
             $this->error = "Por favor, selecione uma função válida (Admin, Formando, Formador, Supervisor).";
             return false;

@@ -85,6 +85,7 @@ include_once '../../Controller/Auth/RegisterController.php';
                                 <option value="Formador">Formador</option>
                                 <option value="Formando">Formando</option>
                                 <option value="Supervisor">Supervisor</option>
+                                <option value="Seguranca">Segurança</option>
                             </select>
                         </div>
                     </div>

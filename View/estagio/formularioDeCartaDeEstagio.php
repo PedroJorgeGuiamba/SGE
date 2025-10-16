@@ -1,26 +1,31 @@
 <?php
-session_start();
-include '../../Controller/Admin/Home.php';
-require_once __DIR__ .'/../../middleware/auth.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
+// require_once __DIR__ . '/../../Controller/Admin/Home.php';
+require_once __DIR__ . '/../../Controller/Geral/FormandoAdimin.php';
+require_once __DIR__ . '/../../middleware/auth.php';
+
+SecurityHeaders::setFull();
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-pt">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulário de Estágio</title>
 
-    <!-- BootStrap Links -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
+    <!-- BootStrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <!-- CSS -->
     <link rel="stylesheet" href="../../Style/home.css">
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+    <!-- Fallback local para jQuery -->
+    <script>window.jQuery || document.write('<script src="../../Scripts/jquery-3.6.0.min.js"><\/script>');</script>
 </head>
 
 <body>
@@ -28,7 +33,7 @@ require_once __DIR__ .'/../../middleware/auth.php';
         <!-- Nav principal -->
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
             <div class="container-fluid">
-                <img src="https://www.itc.ac.mz/wp-content/uploads/2020/07/cropped-LOGO_ITC-09.png">
+                <img src="https://www.itc.ac.mz/wp-content/uploads/2020/07/cropped-LOGO_ITC-09.png" alt="ITC Logo">
                 <div class="nav-modal">
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText"
                         aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,28 +67,34 @@ require_once __DIR__ .'/../../middleware/auth.php';
                         </ul>
                     </div>
                 </div>
+            </div>
         </nav>
 
         <!-- Nav Secundária -->
         <nav>
             <ul class="nav justify-content-center">
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link active" aria-current="page"
-                        href="../../View/Formando/portalDeEstudante.php">Home</a>
+                        href="../../View/Admin/portalDoAdmin.php">Home</a>
+                </li> -->
+                <li class="nav-item">
+                    <a class="nav-link" href="../../View/<?php echo $_SESSION['role'] === 'admin' ? 'Admin/portalDoAdmin.php' : 'Formando/portalDeEstudante.php'; ?>">Home</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Fazer Pedido de Estágio</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="listaDePedidos.php">Pedidos de Estágio</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Verificar tempo de termino de Estágio</a>
-                </li>
+                <?php if ($_SESSION['role'] === 'admin'): ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="listaDePedidos.php">Pedidos de Estágio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="respostaCarta.php">Resposta das Cartas</a>
+                    </li>
+                <?php endif; ?>
+
             </ul>
         </nav>
     </header>
-
 
     <main>
         <div class="formulario">
@@ -121,13 +132,13 @@ require_once __DIR__ .'/../../middleware/auth.php';
                     </div>
                 
                     <div class="form-group col-md-4">
-                        <label for="horaPedido" class="form-label">Hórario do Pedido</label>
+                        <label for="horaPedido" class="form-label">Horário do Pedido</label>
                         <input type="time" name="horaPedido" class="form-control" id="horaPedido">
                         <span class="error_form" id="horaPedido_error_message"></span>
                     </div>
                 
                     <div class="form-group col-md-4">
-                        <label for="empresa" class="form-label">Empresa Onde pretende submeter</label>
+                        <label for="empresa" class="form-label">Empresa Onde Pretende Submeter</label>
                         <input type="text" name="empresa" class="form-control" id="empresa">
                         <span class="error_form" id="empresa_error_message"></span>
                     </div>
@@ -144,7 +155,6 @@ require_once __DIR__ .'/../../middleware/auth.php';
                 
                     <div class="form-group col-md-4">
                         <label for="contactoSecundario" class="form-label">Contacto Secundário</label>
-                        <!-- <input type="text" name="contactoSecundario" class="form-control" id="contactoSecundario"> -->
                         <input type="tel" name="contactoSecundario" pattern="^(\+258)?[ -]?[8][2-7][0-9]{7}$" required
                             class="form-control" placeholder="Ex: +258 84xxxxxxx ou 84xxxxxxx" id="contactoSecundario">
                         <span class="error_form" id="cSecundario_error_message"></span>
@@ -161,29 +171,32 @@ require_once __DIR__ .'/../../middleware/auth.php';
                 <div class="row">
                     <div class="form-group">
                         <div class="col-md-3">
-                            <button type="submit" class="btn btn-success form-control">Register</button>
+                            <button type="submit" class="btn btn-success form-control">Registrar</button>
                         </div>
                     </div>
                 </div>
-
             </form>
         </div>
     </main>
 
-
-    <!-- Scripts do BootStrap -->
+    <!-- Scripts do Bootstrap e jQuery Validation -->
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
-
-    <script src="/pedro/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-        </script>
-    <script>
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
     </script>
     <script>
-        //Selects com valores fornecidos da bd
+        // Verificar se jQuery está carregado
+        if (typeof jQuery === 'undefined') {
+            console.error('jQuery não foi carregado!');
+        } else {
+            console.log('jQuery carregado com sucesso, versão:', jQuery.fn.jquery);
+        }
+
+        // Inicializar tooltips do Bootstrap
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
+        // Selects com valores fornecidos da BD
         $(document).ready(function () {
             carregarDados();
         });
@@ -195,8 +208,9 @@ require_once __DIR__ .'/../../middleware/auth.php';
                 success: function (resposta) {
                     $('#qualificacao').html(resposta);
                 },
-                error: function () {
-                    $('#qualificacao').html('<option>Erro ao carregar</option>');
+                error: function (xhr, status, error) {
+                    console.error('Erro ao carregar qualificações:', status, error);
+                    $('#qualificacao').html('<option>Erro ao carregar qualificações</option>');
                 }
             });
 
@@ -206,13 +220,14 @@ require_once __DIR__ .'/../../middleware/auth.php';
                 success: function (resposta) {
                     $('#turma').html(resposta);
                 },
-                error: function () {
-                    $('#turma').html('<option>Erro ao carregar</option>');
+                error: function (xhr, status, error) {
+                    console.error('Erro ao carregar turmas:', status, error);
+                    $('#turma').html('<option>Erro ao carregar turmas</option>');
                 }
             });
         }
 
-        //Validation
+        // Validação do formulário
         $("#formularioEstagio").validate({
             rules: {
                 codigoFormando: {
@@ -296,8 +311,59 @@ require_once __DIR__ .'/../../middleware/auth.php';
                 error.insertAfter(element);
             }
         });
-
+    
+        // $(document).ready(function () {
+        //     $('#formCartaDeEstagio').submit(function (e) {
+        //         e.preventDefault();
+        //         console.log('Dados enviados:', $(this).serialize());
+        //         $.ajax({
+        //             url: $(this).attr('action'), // e.g., ../../Controller/Estagio/FormularioDeCartaDeEstagio.php
+        //             method: 'POST',
+        //             data: $(this).serialize(),
+        //             dataType: 'json',
+        //             success: function (response) {
+        //                 if (response.success) {
+        //                     alert(response.message);
+        //                     window.location.href = response.redirect; // Redireciona para GerarPdfCarta.php
+        //                 } else {
+        //                     alert(response.message);
+        //                 }
+        //             },
+        //             error: function (xhr, status, error) {
+        //                 console.log('Erro AJAX:', xhr.status, status, error, xhr.responseText);
+        //                 alert('Erro ao processar a requisição: ' + (xhr.responseText || 'Verifique o console para mais detalhes.'));
+        //             }
+        //         });
+        //     });
+        // });
     </script>
+
+    <script>
+$(document).ready(function () {
+    $('#formCartaDeEstagio').submit(function (e) {
+        e.preventDefault();
+        console.log('Dados enviados:', $(this).serialize());
+        $.ajax({
+            url: '../../Controller/Estagio/FormularioDeCartaDeEstagio.php',
+            method: 'POST',
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function (response) {
+                if (response.success) {
+                    alert(response.message);
+                    window.location.href = response.redirect;
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.log('Erro AJAX:', xhr.status, status, error, xhr.responseText);
+                alert('Erro ao processar a requisição: ' + (xhr.responseText || 'Verifique o console para mais detalhes.'));
+            }
+        });
+    });
+});
+</script>
 </body>
 
 </html>

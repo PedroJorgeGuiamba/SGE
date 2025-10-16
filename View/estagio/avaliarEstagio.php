@@ -3,8 +3,8 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
-require_once __DIR__ . '/../../Controller/Admin/Home.php';
 require_once __DIR__ . '/../../middleware/auth.php';
+require_once __DIR__ . '/../../Controller/Geral/SupervisorAdmin.php';
 
 SecurityHeaders::setFull();
 
@@ -81,17 +81,13 @@ $numero = intval($_GET['numero']);
         <nav>
             <ul class="nav justify-content-center">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page"
-                        href="../../View/Formando/portalDeEstudante.php">Home</a>
+                    <a class="nav-link" href="../../View/<?php echo $_SESSION['role'] === 'admin' ? 'Admin/portalDoAdmin.php' : 'Supervisor/portalDoSupervisor.php'; ?>">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Fazer Pedido de Estágio</a>
+                    <a class="nav-link" href="formularioDeCartaDeEstagio.php">Fazer Pedido de Estágio</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="listaDePedidos.php">Pedidos de Estágio</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Verificar tempo de termino de Estágio</a>
                 </li>
             </ul>
         </nav>

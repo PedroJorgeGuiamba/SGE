@@ -1,11 +1,11 @@
 <?php
 session_start();
-include '../../Controller/Admin/Home.php';
+require_once __DIR__ . '/../../Controller/Geral/SupervisorAdmin.php';
 require_once __DIR__ . '/../../middleware/auth.php';
 
 // Verifica se o ID foi passado na URL
 if (!isset($_GET['id_resposta'])) {
-    header('Location: portalDoAdmin.php');
+    header('Location: repostaCarta.php');
     exit();
 }
 
@@ -14,11 +14,10 @@ $id_resposta = intval($_GET['id_resposta']);
 $conector = new Conector();
 $conn = $conector->getConexao();
 
-// Query to fetch resposta_carta and related pedido_carta data
 $sql = "
-    SELECT rc.id_resposta, rc.numero_carta, rc.status_resposta, rc.data_resposta, rc.contato_responsavel, 
+    SELECT rc.id_resposta, rc.numero_carta, rc.status_resposta, rc.data_resposta, rc.contato_responsavel,
             rc.data_inicio_estagio, rc.data_fim_estagio, rc.status_estagio,
-            pc.nome, pc.apelido, pc.codigo_formando, pc.qualificacao, pc.codigo_turma, pc.empresa, 
+            pc.nome, pc.apelido, pc.codigo_formando, pc.qualificacao, pc.codigo_turma, pc.empresa,
             pc.contactoPrincipal, pc.contactoSecundario, pc.email
     FROM resposta_carta rc
     JOIN pedido_carta pc ON rc.numero_carta = pc.numero
@@ -76,7 +75,7 @@ $conn->close();
         <nav>
             <ul class="nav justify-content-center">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="../../View/Admin/portalDoAdmin.php">Home</a>
+                    <a class="nav-link" href="../../View/<?php echo $_SESSION['role'] === 'admin' ? 'Admin/portalDoAdmin.php' : 'Supervisor/portalDoSupervisor.php'; ?>">Home</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="../estagio/formularioDeCartaDeEstagio.php">Fazer Pedido de Estágio</a>

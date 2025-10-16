@@ -1,10 +1,8 @@
 <?php
-// View/estagio/editar_pedido.php
 session_start();
-include '../../Controller/Admin/Home.php';
-require_once __DIR__ . '/../../middleware/auth.php'; // Verifique se o middleware está configurado corretamente
+require_once __DIR__ . '/../../Controller/Geral/SupervisorAdmin.php';
+require_once __DIR__ . '/../../middleware/auth.php';
 
-// Verifica se o ID foi passado na URL
 if (!isset($_GET['numero'])) {
     header('Location: portalDeEstudante.php');
     exit();
@@ -68,7 +66,7 @@ $conn->close();
         <nav>
             <ul class="nav justify-content-center">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="../../View/Admin/portalDoAdmin.php">Home</a>
+                    <a class="nav-link" href="../../View/<?php echo $_SESSION['role'] === 'admin' ? 'Admin/portalDoAdmin.php' : 'Supervisor/portalDoSupervisor.php'; ?>">Home</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="../estagio/formularioDeCartaDeEstagio.php">Fazer Pedido de Estágio</a>

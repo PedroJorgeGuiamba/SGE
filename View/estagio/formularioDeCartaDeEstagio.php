@@ -3,8 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
-// require_once __DIR__ . '/../../Controller/Admin/Home.php';
-require_once __DIR__ . '/../../Controller/Geral/FormandoAdimin.php';
+include '../../Controller/Geral/FormandoAdmin.php';
 require_once __DIR__ . '/../../middleware/auth.php';
 
 SecurityHeaders::setFull();
@@ -73,12 +72,12 @@ SecurityHeaders::setFull();
         <!-- Nav Secundária -->
         <nav>
             <ul class="nav justify-content-center">
-                <!-- <li class="nav-item">
-                    <a class="nav-link active" aria-current="page"
-                        href="../../View/Admin/portalDoAdmin.php">Home</a>
-                </li> -->
                 <li class="nav-item">
-                    <a class="nav-link" href="../../View/<?php echo $_SESSION['role'] === 'admin' ? 'Admin/portalDoAdmin.php' : 'Formando/portalDeEstudante.php'; ?>">Home</a>
+                    <a class="nav-link" href="../../View/<?php echo $_SESSION['role'] === 'admin'
+                        ? 'Admin/portalDoAdmin.php'
+                        : ($_SESSION['role'] === 'supervisor'
+                            ? 'Supervisor/portalDoSupervisor.php'
+                            : 'Formando/portalDeEstudante.php'); ?>">Home</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Fazer Pedido de Estágio</a>

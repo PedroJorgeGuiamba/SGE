@@ -64,7 +64,7 @@ class CadastrarFormando
                     registrarAtividade($_SESSION['sessao_id'], "Cadastrou uma formando: " . $nome, "CRIACAO");
                 }
 
-                echo "formando cadastrada com sucesso!";
+                header("Location: /estagio/View/Admin/portalDoAdmin.php");
             } else {
                 echo "Erro ao cadastrar formando.";
             }

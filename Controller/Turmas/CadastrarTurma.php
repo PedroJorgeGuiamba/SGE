@@ -29,7 +29,7 @@ class CadastrarTurma
                     registrarAtividade($_SESSION['sessao_id'], "Cadastrou uma turma: " . $nome, "CRIACAO");
                 }
 
-                echo "Turma cadastrada com sucesso!";
+                header("Location: /estagio/View/Admin/portalDoAdmin.php");
             } else {
                 echo "Erro ao cadastrar turma.";
             }

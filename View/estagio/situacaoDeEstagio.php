@@ -174,8 +174,8 @@ if ($avaliacao_result_query) {
 
     <section class="dashboard-header text-center">
         <div class="container">
-            <h1 class="display-4 fw-bold"><i class="fas fa-chart-line me-3"></i>Internship Dashboard</h1>
-            <p class="lead">Overview of Internship Data</p>
+            <h1 class="display-4 fw-bold"><i class="fas fa-chart-line me-3"></i>Resumo dos Dados de Estágios</h1>
+            <p class="lead">Visão Geral dos Dados de Estágio</p>
         </div>
     </section>
 

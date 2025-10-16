@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
-include '../../Controller/Admin/Home.php';
+require_once __DIR__ . '/../../Controller/Geral/SupervisorAdmin.php';
 require_once __DIR__ .'/../../middleware/auth.php';
 SecurityHeaders::setFull();
 ?>
@@ -10,7 +10,7 @@ SecurityHeaders::setFull();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulário de Estágio</title>
+    <title>Lista de Pedidos de Cartas de Estágio</title>
 
     <!-- BootStrap Links -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -75,11 +75,7 @@ SecurityHeaders::setFull();
         <nav>
             <ul class="nav justify-content-center">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page"
-                        href="../../View/Formando/portalDeEstudante.php">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="../estagio/formularioDeCartaDeEstagio.php">Fazer Pedido de Estágio</a>
+                    <a class="nav-link" href="../../View/<?php echo $_SESSION['role'] === 'admin' ? 'Admin/portalDoAdmin.php' : 'Supervisor/portalDoSupervisor.php'; ?>">Home</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="listaDePedidos.php">Pedidos de Estágio</a>

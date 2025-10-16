@@ -52,7 +52,7 @@ class CadastrarCurso
                     registrarAtividade($_SESSION['sessao_id'], "Cadastrou um curso: " . $nome, "CRIACAO");
                 }
 
-                echo "Curso cadastrado com sucesso!";
+                header("Location: /estagio/View/Admin/portalDoAdmin.php");
             } else {
                 echo "Erro ao cadastrar o curso.";
             }

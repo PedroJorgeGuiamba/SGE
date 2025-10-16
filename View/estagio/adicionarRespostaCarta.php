@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../../Controller/Admin/Home.php';
+require_once __DIR__ . '/../../Controller/Geral/SupervisorAdmin.php';
 require_once __DIR__ .'/../../middleware/auth.php';
 ?>
 
@@ -68,17 +68,13 @@ require_once __DIR__ .'/../../middleware/auth.php';
         <nav>
             <ul class="nav justify-content-center">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page"
-                        href="../../View/Formando/portalDeEstudante.php">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Fazer Pedido de Estágio</a>
+                    <a class="nav-link" href="../../View/<?php echo $_SESSION['role'] === 'admin' ? 'Admin/portalDoAdmin.php' : 'Supervisor/portalDoSupervisor.php'; ?>">Home</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="listaDePedidos.php">Pedidos de Estágio</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Verificar tempo de termino de Estágio</a>
+                    <a class="nav-link" href="respostaCarta.php">Respostas às Cartas</a>
                 </li>
             </ul>
         </nav>

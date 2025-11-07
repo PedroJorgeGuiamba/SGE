@@ -86,14 +86,15 @@ SecurityHeaders::setFull();
             <table id="respostasTable" class="table table-bordered">
                 <thead>
                     <tr>
+                        <th><input type="checkbox" id="selectAll"></th>
                         <th>Numero da Resposta</th>
                         <th>Numero do Pedido</th>
-                        <th>Status da Resposta</th>
+                        <th>Estado da Resposta</th>
                         <th>Data da Resposta</th>
-                        <th>Contacto do Responsavel</th>
+                        <th>Contacto da Empresa</th>
                         <th>Data do Ínicio do Estágio</th>
                         <th>Data do Fim</th>
-                        <th>Status do Estagio</th>
+                        <th>Estado do Estagio</th>
                         <th>Acções</th>
                     </tr>
                 </thead>
@@ -106,6 +107,7 @@ SecurityHeaders::setFull();
         </div>
         <div class="mt-3">
             <a href="adicionarRespostaCarta.php" class="btn btn-primary">Nova Resposta</a>
+            <button id="deleteSelected" class="btn btn-danger ms-2">Deletar Selecionados</button>
         </div>
     </main>
     <footer>
@@ -148,6 +150,7 @@ SecurityHeaders::setFull();
                         
                         $('#respostasTbody').append(`
                         <tr>
+                            <td><input type="checkbox" class="select-checkbox" data-id="${resposta.id_resposta}"></td>
                             <td>${resposta.id_resposta || 'N/A'}</td>
                             <td>${resposta.numero_carta || 'N/A'}</td>
                             <td>${resposta.status_resposta || 'N/A'}</td>
@@ -208,6 +211,44 @@ SecurityHeaders::setFull();
 
             $('#searchInput').on('input', function() {
                 buscarRespostas($(this).val().trim());
+            });
+
+            $('#selectAll').on('change', function() {
+                var checked = this.checked;
+                $('#respostasTbody .select-checkbox').prop('checked', checked);
+            });
+            $(document).on('change', '.select-checkbox', function() {
+                var allChecked = $('#respostasTbody .select-checkbox').length === $('#respostasTbody .select-checkbox:checked').length;
+                $('#selectAll').prop('checked', allChecked);
+            });
+            $('#deleteSelected').on('click', function() {
+                var selectedIds = [];
+                $('#respostasTbody .select-checkbox:checked').each(function() {
+                    selectedIds.push($(this).data('id'));
+                });
+                if (selectedIds.length === 0) {
+                    alert('Nenhuma resposta selecionada.');
+                    return;
+                }
+                if (confirm('Tem certeza que deseja remover as respostas selecionadas?')) {
+                    $.ajax({
+                        url: '../../Controller/Estagio/remover_resposta.php', // Nota: Pode precisar ajustar o backend para aceitar múltiplos IDs (ex: { numeros: selectedIds })
+                        type: 'POST',
+                        data: { numeros: selectedIds }, // Enviando como array; ajuste o PHP para lidar com isso
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.success) {
+                                alert(response.message);
+                                buscarRespostas($('#searchInput').val().trim());
+                            } else {
+                                alert(response.error || 'Erro ao remover as respostas');
+                            }
+                        },
+                        error: function() {
+                            alert('Erro ao comunicar com o servidor');
+                        }
+                    });
+                }
             });
 
             $(document).on('click', '.editar-btn', function() {

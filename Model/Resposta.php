@@ -77,4 +77,23 @@ class Resposta
 
         return $stmt->execute();
     }
+
+    public function salvarEstadoDoEstagio(): bool
+    {
+        $stmt = $this->conn->prepare("INSERT INTO resposta_carta (numero_carta, status_resposta, status_estagio) VALUES (?, ?, ?)");
+
+        if (!$stmt) {
+            // Erro na preparação da query
+            return false;
+        }
+
+        $stmt->bind_param(
+            "iss",
+            $this->numero,
+            $this->status,
+            $this->statusEstagio
+        );
+
+        return $stmt->execute();
+    }
 }

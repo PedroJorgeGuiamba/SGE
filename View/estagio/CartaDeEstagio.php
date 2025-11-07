@@ -1,9 +1,7 @@
 <?php
 require_once __DIR__ . '/../../Conexao/conector.php';
-// Mostra erros do MySQLi (para debug — remova em produção)
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-// Recebe o parâmetro GET (numero)
 $id = 0;
 if (isset($_GET['numero'])) {
     $id = (int) $_GET['numero'];
@@ -18,7 +16,6 @@ if ($id <= 0) {
 $conexao = new Conector();
 $conn = $conexao->getConexao();
 
-// --- Consulta principal com JOIN ajustado ---
 $sql = "SELECT
             p.*,
             q.descricao AS qualificacao_descricao,
@@ -45,7 +42,6 @@ if ($result->num_rows === 0) {
     if ($res2->num_rows === 0) {
         die("Pedido não encontrado (não existe linha em pedido_carta com numero = $id).");
     } else {
-        // Pedido existe, mas a qualificação não foi encontrada
         $dados = $res2->fetch_assoc();
         $dados['qualificacao_descricao'] = '';
         $dados['qualificacao_nivel'] = '';
@@ -150,7 +146,7 @@ if ($result->num_rows === 0) {
         </p>
 
         <div class="assinatura">
-            <p>A Coordenadora de Estágios,</p>
+            <p>O Coordenador de Estágios,</p>
             <p><b>(Dra. Sheila Momade)</b></p>
             <img src="http://localhost/estagio/Assets/img/Assinatura-removebg-preview.png"
                 alt="Assinatura"

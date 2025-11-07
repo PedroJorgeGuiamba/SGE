@@ -65,17 +65,6 @@ class PedidoDeCarta
     {
         $this->email = $email;
     }
-
-    // public function buscarNomeEApelido(int $codigo): ?array
-    // {
-    //     $stmt = $this->conn->prepare("SELECT nome, apelido FROM formando WHERE codigo = ?");
-    //     $stmt->bind_param("i", $codigo);
-    //     $stmt->execute();
-    //     $result = $stmt->get_result();
-
-    //     return $result->num_rows > 0 ? $result->fetch_assoc() : null;
-    // }
-
     public function buscarNomeEApelido(int $codigo): ?array
     {
         $stmt = $this->conn->prepare("SELECT nome, apelido FROM formando WHERE codigo = ?");

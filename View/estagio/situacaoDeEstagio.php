@@ -16,6 +16,20 @@ if ($pedidos_monthly_query) {
     }
 }
 
+$pedidos_monthly_query_per_qualification = mysqli_query($conn, "SELECT MONTH(p.data_do_pedido) as month, q.descricao as qualificacao_desc, COUNT(*) as count FROM pedido_carta p JOIN qualificacao q ON p.qualificacao = q.id_qualificacao WHERE YEAR(p.data_do_pedido) = YEAR(CURDATE()) GROUP BY MONTH(p.data_do_pedido), q.descricao");
+$pedidos_monthly_per_qualification = [];
+if ($pedidos_monthly_query_per_qualification) {
+    while ($row = mysqli_fetch_assoc($pedidos_monthly_query_per_qualification)) {
+        $qual = $row['qualificacao_desc'];
+        if (!isset($pedidos_monthly_per_qualification[$qual])) {
+            $pedidos_monthly_per_qualification[$qual] = array_fill(0, 12, 0);
+        }
+        $pedidos_monthly_per_qualification[$qual][$row['month'] - 1] = $row['count'];
+    }
+}
+$qualifications = array_keys($pedidos_monthly_per_qualification);
+$pedidos_per_qual_json = json_encode($pedidos_monthly_per_qualification);
+
 // Status resposta pie chart
 $status_resposta_query = mysqli_query($conn, "SELECT status_resposta, COUNT(*) as count FROM resposta_carta GROUP BY status_resposta");
 $status_resposta_labels = [];
@@ -35,6 +49,27 @@ if ($status_estagio_query) {
     while ($row = mysqli_fetch_assoc($status_estagio_query)) {
         $status_estagio_labels[] = $row['status_estagio'];
         $status_estagio_data[] = $row['count'];
+    }
+}
+
+// Status estagio pie chart agrupado por qualificacao
+$status_estagio_qualificacao_query = mysqli_query($conn, "
+    SELECT
+        q.descricao AS qualificacao,
+        r.status_estagio,
+        COUNT(*) AS total
+    FROM resposta_carta r
+    INNER JOIN pedido_carta p ON r.numero_carta = p.numero
+    INNER JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
+    GROUP BY q.descricao, r.status_estagio
+    ORDER BY q.descricao, r.status_estagio
+");
+$status_estagio_qualificacao_labels = [];
+$status_estagio_qualificacao_data = [];
+if ($status_estagio_qualificacao_query) {
+    while ($row = mysqli_fetch_assoc($status_estagio_qualificacao_query)) {
+        $status_estagio_qualificacao_labels[] = $row['qualificacao'] . ' - ' . $row['status_estagio'];
+        $status_estagio_qualificacao_data[] = $row['total'];
     }
 }
 
@@ -190,6 +225,13 @@ if ($avaliacao_result_query) {
                 </div>
             </div>
 
+            <div class="col-lg-6">
+                <div class="chart-container">
+                    <h4 class="chart-title"><i class="fas fa-chart-bar me-2"></i>Cartas de Estágio geradas por mês e por qualificação (<?= date('Y') ?>)</h4>
+                    <canvas id="pedidosPieChart" height="300"></canvas>
+                </div>
+            </div>
+
             <!-- Pie Chart: Status Resposta -->
             <div class="col-lg-6">
                 <div class="chart-container">
@@ -206,13 +248,13 @@ if ($avaliacao_result_query) {
                 </div>
             </div>
 
-            <!-- Pie Chart: Avaliacao Results -->
             <div class="col-lg-6">
                 <div class="chart-container">
-                    <h4 class="chart-title"><i class="fas fa-chart-pie me-2"></i>Distribuição dos Resultados dos Relatórios</h4>
-                    <canvas id="avaliacaoPie" height="300"></canvas>
+                    <h4 class="chart-title"><i class="fas fa-chart-pie me-2"></i>Distribuição dos Estados dos Estágios</h4>
+                    <canvas id="statusEstagioQualificacaoPie" height="300"></canvas>
                 </div>
             </div>
+
         </section>
     </main>
 
@@ -241,6 +283,44 @@ if ($avaliacao_result_query) {
             options: {
                 responsive: true,
                 scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        const ctxPedidosQualificacao = document.getElementById('pedidosPieChart').getContext('2d');
+        const qualifications = <?php echo json_encode($qualifications); ?>;
+        const pedidos_data = <?php echo $pedidos_per_qual_json; ?>;
+        const colors = [
+            'rgba(255, 99, 132, 0.6)',
+            'rgba(54, 162, 235, 0.6)',
+            'rgba(255, 206, 86, 0.6)',
+            'rgba(75, 192, 192, 0.6)',
+            'rgba(153, 102, 255, 0.6)',
+            'rgba(255, 159, 64, 0.6)',
+            'rgba(201, 203, 207, 0.6)'
+        ];
+        const borderColors = colors.map(color => color.replace('0.6', '1'));
+        let datasets = qualifications.map((qual, index) => {
+            return {
+                label: qual,
+                data: pedidos_data[qual],
+                backgroundColor: colors[index % colors.length],
+                borderColor: borderColors[index % colors.length],
+                borderWidth: 2
+            };
+        });
+        new Chart(ctxPedidosQualificacao, {
+            type: 'bar',
+            data: {
+                labels: <?php echo json_encode($months); ?>,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { stacked: true },
+                    y: { stacked: true, beginAtZero: true }
+                },
+                plugins: { legend: { position: 'bottom' } }
             }
         });
 
@@ -280,13 +360,13 @@ if ($avaliacao_result_query) {
             }
         });
 
-        const ctxAvaliacao = document.getElementById('avaliacaoPie').getContext('2d');
-        new Chart(ctxAvaliacao, {
+        const ctxEstagioQualificacao = document.getElementById('statusEstagioQualificacaoPie').getContext('2d');
+        new Chart(ctxEstagioQualificacao, {
             type: 'pie',
             data: {
-                labels: <?php echo json_encode($avaliacao_result_labels); ?>,
+                labels: <?php echo json_encode($status_estagio_qualificacao_labels); ?>,
                 datasets: [{
-                    data: <?php echo json_encode($avaliacao_result_data); ?>,
+                    data: <?php echo json_encode($status_estagio_qualificacao_data); ?>,
                     backgroundColor: ['#198754', '#dc3545'],
                     borderWidth: 2,
                     borderColor: '#fff'
@@ -297,6 +377,8 @@ if ($avaliacao_result_query) {
                 plugins: { legend: { position: 'bottom' } }
             }
         });
+
+        
     </script>
 </body>
 

@@ -1,7 +1,7 @@
 <?php
 session_start();
 include '../../Controller/Admin/Home.php';
-require_once __DIR__ .'/../../middleware/auth.php';
+require_once __DIR__ . '/../../middleware/auth.php';
 require_once __DIR__ . '/../../Conexao/conector.php';
 
 $conector = new Conector();
@@ -54,7 +54,7 @@ if ($formandos_per_curso_query) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <!-- CSS -->
     <link rel="stylesheet" href="../../Style/home.css">
     <style>
@@ -66,13 +66,15 @@ if ($formandos_per_curso_query) {
             --warning-color: #ffc107;
             --danger-color: #dc3545;
             --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             --border-radius: 15px;
         }
+
         body {
             background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
         .dashboard-header {
             background: var(--bg-gradient);
             color: white;
@@ -80,6 +82,7 @@ if ($formandos_per_curso_query) {
             margin-bottom: 2rem;
             box-shadow: var(--card-shadow);
         }
+
         .chart-container {
             background: white;
             border-radius: var(--border-radius);
@@ -87,17 +90,23 @@ if ($formandos_per_curso_query) {
             padding: 2rem;
             margin-bottom: 2rem;
         }
+
         .chart-title {
             text-align: center;
             margin-bottom: 1.5rem;
             font-weight: bold;
             color: #333;
         }
+
         footer {
             background: var(--bg-gradient);
             color: white;
             padding: 1rem 0;
             margin-top: 3rem;
+        }
+
+        header nav ul li.nav-item ul.dropdown-menu li a.dropdown-item {
+            color: black;
         }
     </style>
 </head>
@@ -148,22 +157,22 @@ if ($formandos_per_curso_query) {
                 <li class="nav-item">
                     <a class="nav-link" href="#">Módulos</a>
                 </li>
-                
-                <li class="nav-item" style="color: black;">
+
+                <li class="nav-item">
                     <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button  style="background-color: #094297ff;" class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                             Cadastrar
                         </button>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item" href="../../View/Cursos/CadastrarCurso.php">Cursos</a>
-                            <a class="dropdown-item" href="../../View/Qualificacao/CadastrarQualificacao.php">Qualificacoes</a>
-                            <a class="dropdown-item" href="../../View/Turmas/CadastrarTurma.php">Turmas</a>
-                            <a class="dropdown-item" href="../../View/Formando/CadastrarFormando.php">Formandos</a>
-                            <a class="dropdown-item" href="../../View/Formador/CadastrarFormador.php">Formadores</a>
+                            <a class="dropdown-item" href="../../View/Cursos/CadastrarCurso.php" style="color: black">Cursos</a>
+                            <a class="dropdown-item" href="../../View/Qualificacao/CadastrarQualificacao.php" style="color: black">Qualificacoes</a>
+                            <a class="dropdown-item" href="../../View/Turmas/CadastrarTurma.php" style="color: black">Turmas</a>
+                            <a class="dropdown-item" href="../../View/Formando/CadastrarFormando.php" style="color: black">Formandos</a>
+                            <a class="dropdown-item" href="../../View/Formador/CadastrarFormador.php" style="color: black">Formadores</a>
                         </div>
                     </div>
                 </li>
-                
+
                 <li class="nav-item">
                     <a class="nav-link" href="#">Horário</a>
                 </li>
@@ -173,14 +182,17 @@ if ($formandos_per_curso_query) {
                 <li class="nav-item">
                     <a class="nav-link" href="../estagio/situacaoDeEstagio.php">Situação de Estagio</a>
                 </li>
+                <li>
+                    <a class="nav-link"  href="../Notas/visualizarNotas.php">Notas</a>
+                </li>
             </ul>
         </nav>
     </header>
 
     <section class="dashboard-header text-center">
         <div class="container">
-            <h1 class="display-4 fw-bold"><i class="fas fa-chart-line me-3"></i>General Dashboard</h1>
-            <p class="lead">Overview of System Data</p>
+            <h1 class="display-4 fw-bold"><i class="fas fa-chart-line me-3"></i>Resumo dos Dados Geral</h1>
+            <p class="lead">Dados Gerais do Sistema</p>
         </div>
     </section>
 
@@ -190,7 +202,7 @@ if ($formandos_per_curso_query) {
             <!-- Pie Chart: User Roles -->
             <div class="col-lg-6">
                 <div class="chart-container">
-                    <h4 class="chart-title"><i class="fas fa-chart-pie me-2"></i>User Roles Distribution</h4>
+                    <h4 class="chart-title"><i class="fas fa-chart-pie me-2"></i>Distribuição de Perfil por Utilizador</h4>
                     <canvas id="pieChart" height="300"></canvas>
                 </div>
             </div>
@@ -198,7 +210,7 @@ if ($formandos_per_curso_query) {
             <!-- Bar Chart: Monthly Sessions -->
             <div class="col-lg-6">
                 <div class="chart-container">
-                    <h4 class="chart-title"><i class="fas fa-chart-bar me-2"></i>Sessions per Month (Current Year)</h4>
+                    <h4 class="chart-title"><i class="fas fa-chart-bar me-2"></i>Sessões por mês (<?= date('Y') ?>)</h4>
                     <canvas id="barChart" height="300"></canvas>
                 </div>
             </div>
@@ -206,7 +218,7 @@ if ($formandos_per_curso_query) {
             <!-- Bar Chart: Formandos per Curso -->
             <div class="col-lg-6">
                 <div class="chart-container">
-                    <h4 class="chart-title"><i class="fas fa-chart-bar me-2"></i>Formandos per Curso</h4>
+                    <h4 class="chart-title"><i class="fas fa-chart-bar me-2"></i>Formandos por Curso</h4>
                     <canvas id="formandosChart" height="300"></canvas>
                 </div>
             </div>
@@ -214,13 +226,13 @@ if ($formandos_per_curso_query) {
     </main>
 
 
-        <!-- Rodapé -->
+    <!-- Rodapé -->
     <footer>
         <div class="container-footer">
             <p>© 2019 TRANSCOM . DIREITOS RESERVADOS . DESIGN & DEVELOPMENT <span>TRANSCOM</span></p>
         </div>
     </footer>
-    
+
     <!-- Scripts do BootStrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
@@ -247,7 +259,9 @@ if ($formandos_per_curso_query) {
             options: {
                 responsive: true,
                 plugins: {
-                    legend: { position: 'bottom' }
+                    legend: {
+                        position: 'bottom'
+                    }
                 }
             }
         });
@@ -268,7 +282,11 @@ if ($formandos_per_curso_query) {
             },
             options: {
                 responsive: true,
-                scales: { y: { beginAtZero: true } }
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
             }
         });
 
@@ -288,7 +306,11 @@ if ($formandos_per_curso_query) {
             },
             options: {
                 responsive: true,
-                scales: { y: { beginAtZero: true } }
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
             }
         });
     </script>

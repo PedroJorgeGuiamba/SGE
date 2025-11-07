@@ -1,0 +1,11 @@
+- colocar empresa em Uppercase. - ✅
+- Limitar os pedidos e Cartas para 5 por mês. ✅
+- Alterar a coluna número de pedido para poder ser reiniciada anualmente sem ter que remover dados.
+- Introduzir notificações para o utilizador saber se a carta está disponível. 
+- Tirar a geração das cartas pelos formandos e deixa-los somente inserirem os dados e verificarem o estado. ✅
+- Alterar o campo "Contacto Responsável" para "Contacto da Empresa". ✅
+- Gerar a credencial de estágio se o estágio for aprovado.
+- Adicionar estatísticas para o supervisor (quantos estão a estagiar, quantos terminaram).  ✅
+- Nas estatísticas devo distinguir das cartas geradas o curso e por mês. ✅
+- Actualiza a Distribuição dos Estados dos Estágios onde vem null para pendente. ✅
+- Remover a Distribuição dos Resultados dos Relatórios.✅

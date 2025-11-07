@@ -123,7 +123,7 @@ $numero = intval($_GET['numero']);
                     </div>
                     
                     <div class="form-group col-md-4">
-                        <label for="imagem_doc_path" class="form-label">Documento do Alvara:</label>
+                        <label for="imagem_doc_path" class="form-label">Relatório de Estágio (pdf, word):</label>
                         <input type="file" name="imagem_doc_path" class="form-control" id="imagem_doc_path" accept="image/jpeg,image/png,image/gif,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
                         <span class="error_form" id="imagem_error_message"></span>
                     </div>

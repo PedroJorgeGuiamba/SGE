@@ -19,10 +19,14 @@ $conn = $conexao->getConexao();
 $sql = "SELECT
             p.*,
             q.descricao AS qualificacao_descricao,
-            q.nivel AS qualificacao_nivel
+            q.nivel AS qualificacao_nivel,
+            s.nome_supervisor as nomeS
         FROM pedido_carta p
         LEFT JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
-        WHERE p.numero = ?";
+        -- LEFT JOIN supervisor_estagio se ON se.id_estagio = e.id_estagio
+        -- LEFT JOIN supervisor s ON s.id_supervisor = se.id_supervisor
+        LEFT JOIN supervisor s ON s.id_qualificacao = p.qualificacao
+        WHERE p.id_pedido_carta = ?";
 
 $stmt = $conn->prepare($sql);
 if (!$stmt) {
@@ -34,7 +38,7 @@ $result = $stmt->get_result();
 
 if ($result->num_rows === 0) {
     // Se não houver correspondência, checa se o pedido existe na tabela principal
-    $stmt2 = $conn->prepare("SELECT * FROM pedido_carta WHERE numero = ?");
+    $stmt2 = $conn->prepare("SELECT * FROM pedido_carta WHERE id_pedido_carta = ?");
     $stmt2->bind_param("i", $id);
     $stmt2->execute();
     $res2 = $stmt2->get_result();
@@ -147,7 +151,7 @@ if ($result->num_rows === 0) {
 
         <div class="assinatura">
             <p>O Coordenador de Estágios,</p>
-            <p><b>(Dra. Sheila Momade)</b></p>
+            <p><b>(Dr. <?= htmlspecialchars($dados['nomeS'] ?? '') ?>)</b></p>
             <img src="http://localhost/estagio/Assets/img/Assinatura-removebg-preview.png"
                 alt="Assinatura"
                 style="width:100px; height:auto;">

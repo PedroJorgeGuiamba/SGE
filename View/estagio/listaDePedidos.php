@@ -97,6 +97,7 @@ SecurityHeaders::setFull();
             <table id="pedidosTable" class="table table-bordered">
                 <thead>
                     <tr>
+                        <th><input type="checkbox" id="selectAll"></th>
                         <th>Numero</th>
                         <th>Nome</th>
                         <th>Apelido</th>
@@ -122,6 +123,8 @@ SecurityHeaders::setFull();
         </div>
         <div class="mt-3">
             <a href="formularioDeCartaDeEstagio.php" class="btn btn-primary">Novo Pedido</a>
+            <button type="submit" id="printSelected" class="btn btn-secondary ms-2">Gerar todos selecionados (ZIP)</button>
+            <button id="deleteSelected" class="btn btn-danger ms-2">Deletar Selecionados</button>
         </div>
     </main>
 
@@ -158,6 +161,7 @@ SecurityHeaders::setFull();
                 pageData.forEach(pedido => {
                     $('#pedidosTbody').append(`
                         <tr>
+                            <td><input type="checkbox" class="select-checkbox" value="${pedido.id_pedido_carta}"></td>
                             <td>${pedido.numero}</td>
                             <td>${pedido.nome}</td>
                             <td>${pedido.apelido}</td>
@@ -171,7 +175,10 @@ SecurityHeaders::setFull();
                             <td>${pedido.contactoSecundario}</td>
                             <td>${pedido.email}</td>
                             <td>
-                                <button class="btn btn-sm btn-primary gerar-pdf-btn" data-id="${pedido.numero}" title="Gerar PDF">
+                                <button class="btn btn-sm btn-primary gerar-pdf-btn" data-id="${pedido.id_pedido_carta}" title="Gerar PDF">
+                                    <i class="fas fa-file-pdf"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger gerar-pdf-completo-btn" data-id="${pedido.id_pedido_carta}" title="Gerar PDF">
                                     <i class="fas fa-file-pdf"></i>
                                 </button>
                                 <button class="btn btn-sm btn-warning editar-btn" data-id="${pedido.numero}" title="Editar">
@@ -226,6 +233,11 @@ SecurityHeaders::setFull();
                 window.location.href = '../../Controller/Estagio/GerarPdfCarta.php?numero=' + id;
             });
 
+            $(document).on('click','.gerar-pdf-completo-btn', function(){
+                var id = $(this).data('id');
+                window.location.href = '../../Controller/Estagio/GerarPdfCompleto.php?id_pedido_carta=' + id;
+            } )
+
             $(document).on('click', '.editar-btn', function() {
                 var id = $(this).data('id');
                 window.location.href = 'editarPedido.php?numero=' + id;
@@ -239,7 +251,7 @@ SecurityHeaders::setFull();
                     $.ajax({
                         url: '../../Controller/Estagio/remover_pedido.php',
                         type: 'POST',
-                        data: { numero: id },
+                        data: { id_pedido_carta: id },
                         dataType: 'json',
                         success: function(response) {
                             if (response.success) {
@@ -255,6 +267,47 @@ SecurityHeaders::setFull();
                         }
                     });
                 }
+            });
+
+            $('#selectAll').on('change', function() {
+                $('.select-checkbox').prop('checked', this.checked);
+            });
+
+            // Atualiza o "Select All" quando desmarcar um checkbox
+            $(document).on('change', '.select-checkbox', function() {
+                const allChecked = $('.select-checkbox').length === $('.select-checkbox:checked').length;
+                $('#selectAll').prop('checked', allChecked);
+            });
+
+            // Botão GERAR TODOS SELECIONADOS (ZIP)
+            $('#printSelected').on('click', function(e) {
+                e.preventDefault();
+
+                const selectedIds = [];
+                $('.select-checkbox:checked').each(function() {
+                    selectedIds.push($(this).data('id')); // ou .val() se puseres value=
+                });
+
+                if (selectedIds.length === 0) {
+                    alert('Selecione pelo menos um pedido.');
+                    return;
+                }
+
+                const $form = $('<form>', {
+                    method: 'POST',
+                    action: '../../Controller/Estagio/GerarPdfCompleto.php'
+                });
+
+                selectedIds.forEach(id => {
+                    $form.append($('<input>', {
+                        type: 'hidden',
+                        name: 'ids[]',
+                        value: id
+                    }));
+                });
+
+                $('body').append($form);
+                $form.submit(); // <--- ESTAVA A FALTAR ISTO!!
             });
         });
 

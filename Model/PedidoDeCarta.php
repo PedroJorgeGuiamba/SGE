@@ -6,6 +6,7 @@ class PedidoDeCarta
     private $conn;
 
     private $codigoFormando;
+    private $numero;
     private $qualificacao;
     private $turma;
     private $dataPedido;
@@ -26,6 +27,8 @@ class PedidoDeCarta
     {
         $this->codigoFormando = $codigoFormando;
     }
+
+    public function setNumero($numero){$this->numero = $numero;}
 
     public function setQualificacao(int $qualificacao)
     {
@@ -83,7 +86,7 @@ class PedidoDeCarta
 
     public function salvar(string $nome, string $apelido): bool
     {
-        $stmt = $this->conn->prepare("INSERT INTO pedido_carta (codigo_formando, qualificacao, codigo_turma, data_do_pedido, hora_do_pedido, empresa, contactoPrincipal, contactoSecundario, email, nome, apelido) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $this->conn->prepare("INSERT INTO pedido_carta (numero, codigo_formando, qualificacao, codigo_turma, data_do_pedido, hora_do_pedido, empresa, contactoPrincipal, contactoSecundario, email, nome, apelido) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         if (!$stmt) {
             // Erro na preparação da query
@@ -91,7 +94,8 @@ class PedidoDeCarta
         }
 
         $stmt->bind_param(
-            "iiisssiisss",
+            "iiiisssiisss",
+            $this->numero,
             $this->codigoFormando,
             $this->qualificacao,
             $this->turma,

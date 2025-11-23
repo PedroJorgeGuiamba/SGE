@@ -40,7 +40,18 @@ class EditarResposta
                     $id_resposta,
                     $numero_carta
                 );
-                
+
+                if($status_resposta = "Aceito"){
+                    $sqlEstagio = "INSERT INTO estagio (id_resposta, codigo_formando, data_inicio, data_fim, status) VALUES (?, ?, ?, ?, ?)";
+                    $stmtEstagio = $conn->prepare($sqlEstagio);
+                    $stmtEstagio->bind_param("iisss",
+                    $id_resposta,
+                    $codigoFormando,
+                    $data_inicio_estagio,
+                    $data_fim_estagio,
+                    $status_estagio);
+                }
+
                 if ($stmt->execute()) {
                     echo json_encode(['success' => true, 'message' => 'Resposta atualizado com sucesso!']);
                 } else {

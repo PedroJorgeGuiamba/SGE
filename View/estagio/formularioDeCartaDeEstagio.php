@@ -134,25 +134,11 @@ SecurityHeaders::setFull();
 
                 <div class="row">
                     <div class="form-group col-md-4">
-                        <label for="dataPedido" class="form-label">Data do Pedido</label>
-                        <input type="date" name="dataPedido" class="form-control" id="dataPedido">
-                        <span class="error_form" id="dataPedido_error_message"></span>
-                    </div>
-
-                    <div class="form-group col-md-4">
-                        <label for="horaPedido" class="form-label">Horário do Pedido</label>
-                        <input type="time" name="horaPedido" class="form-control" id="horaPedido">
-                        <span class="error_form" id="horaPedido_error_message"></span>
-                    </div>
-
-                    <div class="form-group col-md-4">
                         <label for="empresa" class="form-label">Empresa Onde Pretende Submeter</label>
                         <input type="text" name="empresa" class="form-control" id="empresa">
                         <span class="error_form" id="empresa_error_message"></span>
                     </div>
-                </div>
 
-                <div class="row">
                     <div class="form-group col-md-4">
                         <label for="contactoPrincipal" class="form-label">Contacto Principal</label>
                         <input type="tel" name="contactoPrincipal" class="form-control" id="contactoPrincipal"

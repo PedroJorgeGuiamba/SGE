@@ -169,6 +169,7 @@ if ($formandos_per_curso_query) {
                             <a class="dropdown-item" href="../../View/Turmas/CadastrarTurma.php" style="color: black">Turmas</a>
                             <a class="dropdown-item" href="../../View/Formando/CadastrarFormando.php" style="color: black">Formandos</a>
                             <a class="dropdown-item" href="../../View/Formador/CadastrarFormador.php" style="color: black">Formadores</a>
+                            <a class="dropdown-item" href="../../View/Supervisor/CadastrarSupervisor.php" style="color: black">Supervisores</a>
                         </div>
                     </div>
                 </li>

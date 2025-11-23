@@ -1,18 +1,18 @@
 <?php
-if (!isset($_GET['numero']) || (int)$_GET['numero'] <= 0) {
+if (!isset($_GET['id_pedido_carta']) || (int)$_GET['id_pedido_carta'] <= 0) {
     die("<b>Erro:</b> Número do pedido não informado ou inválido.");
 }
 
-$id = (int) $_GET['numero'];
+$id = (int) $_GET['id_pedido_carta'];
 
-$url = "http://localhost/estagio/View/estagio/CartaDeEstagio.php?numero=$id";
+$url = "http://localhost/estagio/View/estagio/PacoteEstagioCompleto.php?id_pedido_carta=$id";
 
 // Caminho para salvar o PDF temporário
 $pdfDir = __DIR__ . "/../../Temp";
 if (!file_exists($pdfDir)) {
     mkdir($pdfDir, 0777, true);
 }
-$pdfFile = "$pdfDir/Carta_Estagio_$id.pdf";
+$pdfFile = "$pdfDir/Pacote_Completo_Estagio_$id.pdf";
 
 // Caminho do executável wkhtmltopdf
 $wkhtmltopdfPath = "C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe";
@@ -29,7 +29,7 @@ exec($cmd . " 2>&1", $output, $returnCode);
 
 if ($returnCode === 0 && file_exists($pdfFile)) {
     header('Content-Type: application/pdf');
-    header("Content-Disposition: inline; filename=\"Carta_Estagio_$id.pdf\"");
+    header("Content-Disposition: inline; filename=\"Pacote_Estagio_Completo_$id.pdf\"");
     readfile($pdfFile);
 
     unlink($pdfFile);
@@ -40,3 +40,4 @@ if ($returnCode === 0 && file_exists($pdfFile)) {
     echo "<pre>" . htmlspecialchars(implode("\n", $output)) . "</pre>";
 }
 ?>
+

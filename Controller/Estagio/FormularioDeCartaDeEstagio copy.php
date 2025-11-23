@@ -11,12 +11,6 @@ class FormularioDeCartaDeEstagio
     public function cartaDeEstagio()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            
-            $conexao = new Conector();
-            $conn = $conexao->getConexao();
-
-            $conn->query("LOCK TABLES pedido_carta WRITE");
-
             try {
                 $pedido = new PedidoDeCarta();
 
@@ -32,6 +26,10 @@ class FormularioDeCartaDeEstagio
                     return;
                 }
 
+                $conexao = new Conector();
+                $conn = $conexao->getConexao();
+
+                // Verifica limite mensal de 5 pedidos
                 $sqlLimite = "
                     SELECT COUNT(*) AS total 
                     FROM pedido_carta 
@@ -46,12 +44,15 @@ class FormularioDeCartaDeEstagio
                 $resultado = $stmtLimite->get_result()->fetch_assoc();
 
                 if ($resultado['total'] >= 5) {
-                    echo "<script>alert('⚠️ Limite mensal de 5 pedidos atingido. Tente novamente no próximo mês.'); window.location.href='/estagio/View/Estagio/formularioDeCartaDeEstagio.php';</script>";
+                    echo "<script>alert('Limite mensal de 5 pedidos atingido. Tente novamente no próximo mês.'); window.location.href='/estagio/View/Estagio/formularioDeCartaDeEstagio.php';</script>";
                     return;
                 }
 
-                $anoAtual = date('Y');;
+                // === CÁLCULO DO NÚMERO SEQUENCIAL DO ANO (REINICIA TODO ANO) ===
+                // $anoAtual = date('Y');
+                $anoAtual = 2028;
 
+                $conn->query("LOCK TABLES pedido_carta WRITE");
 
                 $sql = "SELECT COALESCE(MAX(numero), 0) AS ultimo_numero 
                         FROM pedido_carta 
@@ -62,21 +63,21 @@ class FormularioDeCartaDeEstagio
                 $stmt->bind_param("i", $anoAtual);
                 $stmt->execute();
                 $resultado = $stmt->get_result()->fetch_assoc();
+                
+                $numeroCarta = $resultado['ultimo_numero'] + 1; // ← 1, 2, 3... reinicia todo ano
 
-                $novoSequencial = $resultado['ultimo_numero'] + 1;
-
-
-                $pedido->setNumero($novoSequencial);
+                // === PREPARA OS DADOS DO PEDIDO ===
+                $pedido->setNumero($numeroCarta); // ← guarda o número sequencial inteiro
                 $pedido->setCodigoFormando($codigoFormando);
                 $pedido->setTurma($codigoTurma);
                 $pedido->setQualificacao($codigoQualificacao);
+                $pedido->setDataPedido($_POST['dataPedido'] ?? date('Y-m-d'));
+                $pedido->setHoraPedido($_POST['horaPedido'] ?? date('H:i:s'));
                 $pedido->setEmpresa($empresa);
                 $pedido->setContactoPrincipal(trim($_POST['contactoPrincipal'] ?? ''));
                 $pedido->setContactoSecundario(trim($_POST['contactoSecundario'] ?? ''));
                 $pedido->setEmail(trim($_POST['email'] ?? ''));
-                $pedido->setHoraPedido(date("h:i"));
-                $pedido->setDataPedido(date('Y-m-d'));
-                
+
                 $nome = $dadosFormando['nome'];
                 $apelido = $dadosFormando['apelido'];
 
@@ -84,41 +85,49 @@ class FormularioDeCartaDeEstagio
                 $resposta->setStatus('Pendente');
                 $resposta->setStatusEstagio('Pendente');
 
-                $conexao = new Conector();
-                $conn = $conexao->getConexao();
+                // === SALVA O PEDIDO E CRIA RESPOSTA ===
                 if ($pedido->salvar($nome, $apelido)) {
                     if (isset($_SESSION['sessao_id'])) {
                         registrarAtividade($_SESSION['sessao_id'], "pedido de carta de estágio realizado", "CRIACAO");
                     }
-                    $sql = "SELECT id_pedido_carta FROM pedido_carta ORDER BY numero DESC LIMIT 1";
-                    $result = $conn->query($sql);
-                    $lastIdFromQuery = $result && $result->num_rows > 0 ? $result->fetch_assoc()['id_pedido_carta'] : 0;
 
-                    $resposta->setNumero($lastIdFromQuery);
-                    
+                    // CORREÇÃO DEFINITIVA: usa o ID real do registo inserido
+                    $idPedidoReal = $conn->insert_id; // ← Este é o valor que a FK espera!
+
+                    $resposta->setNumero($idPedidoReal); // ← Agora a foreign key aceita!
+
                     if ($resposta->salvarEstadoDoEstagio()) {
                         if (isset($_SESSION['sessao_id'])) {
                             registrarAtividade($_SESSION['sessao_id'], "resposta de carta de estágio realizado", "CRIACAO");
                         }
                     }
-                    
-                    $mensagem = "O seu pedido foi processado com sucesso. O pedido possui o #$lastIdFromQuery. Ainda está pendente de verificação por um administrador, Aguarde pela nootificação avisando que está disponível.";
+
+                    // Número bonito para mostrar ao utilizador e no PDF
+                    $numeroBonito = $anoAtual . '/' . sprintf("%04d", $numeroCarta); // ex: 2025/0001
+
+                    $mensagem = "O seu pedido foi processado com sucesso. Número da carta: <strong>$numeroBonito</strong>. Aguarde aprovação.";
                     $stmt_notificacao = $conn->prepare("INSERT INTO notificacao (id_utilizador, mensagem) VALUES (?, ?)");
                     $stmt_notificacao->bind_param("is", $_SESSION['usuario_id'], $mensagem);
                     $stmt_notificacao->execute();
 
+                    // Liberta o lock
                     $conn->query("UNLOCK TABLES");
 
-                    if($_SESSION['role'] != 'formando'){
-                        header("Location: GerarPdfCarta.php?numero=$lastIdFromQuery");
-                    }else{
-                        header("Location: /estagio/View/Estagio/formularioDeCartaDeEstagio.php");
+                    // Redireciona com o número bonito
+                    if ($_SESSION['role'] != 'formando') {
+                        header("Location: GerarPdfCarta.php?numero=" . urlencode($numeroBonito));
+                    } else {
+                        header("Location: /estagio/View/Estagio/formularioDeCartaDeEstagio.php?sucesso=1");
                     }
+                    exit();
 
                 } else {
+                    $conn->query("UNLOCK TABLES");
                     echo "Erro ao enviar pedido.";
                 }
+
             } catch (Exception $e) {
+                $conn->query("UNLOCK TABLES");
                 echo "Erro no sistema: " . $e->getMessage();
             }
         } else {

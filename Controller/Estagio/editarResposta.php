@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../Conexao/conector.php';
+require_once __DIR__ . '/../../Model/Estagio.php';
 
 class EditarResposta
 {
@@ -8,6 +9,8 @@ class EditarResposta
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
+                $estagio = new Estagio();
+
                 $id_resposta = filter_var( $_POST['id_resposta'], FILTER_SANITIZE_NUMBER_INT);
                 $numero_carta = filter_var($_POST['numero_carta'], FILTER_SANITIZE_NUMBER_INT);
                 $status_resposta = trim($_POST['status_resposta']);
@@ -41,25 +44,51 @@ class EditarResposta
                     $numero_carta
                 );
 
+                if (!$stmt->execute()) {
+                    echo json_encode(['success' => false, 'message' => 'Erro ao atualizar resposta: ' . $stmt->error]);
+                    return;
+                }
+                $stmt->close();
+
                 if($status_resposta = "Aceito"){
-                    $sqlEstagio = "INSERT INTO estagio (id_resposta, codigo_formando, data_inicio, data_fim, status) VALUES (?, ?, ?, ?, ?)";
-                    $stmtEstagio = $conn->prepare($sqlEstagio);
-                    $stmtEstagio->bind_param("iisss",
-                    $id_resposta,
-                    $codigoFormando,
-                    $data_inicio_estagio,
-                    $data_fim_estagio,
-                    $status_estagio);
+                    $sql = "SELECT
+                                p.*,
+                                s.id_supervisor as id_s,
+                                e.id_empresa as id_e
+                            FROM pedido_carta p
+                            LEFT JOIN supervisor s ON s.id_qualificacao = p.qualificacao
+                            LEFT JOIN empresa e ON e.nome = p.empresa
+                            WHERE p.id_pedido_carta = ?";
+
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param("i", $numero_carta);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+
+                    if ($result->num_rows === 0) {
+                        die("Pedido não encontrado.");
+                    }
+
+                    $dados = $result->fetch_assoc();
+                    $empresa = htmlspecialchars($dados['id_e'] ?? '');
+                    $codigo = htmlspecialchars($dados['codigo_formando'] ?? '');
+                    $supervisor = $dados['id_s'];
+
+                    $estagio->setStatus($status_estagio);
+                    $estagio->setId_resposta($id_resposta);
+                    $estagio->setDataI($data_inicio_estagio);
+                    $estagio->setDataF($data_fim_estagio);
+                    $estagio->setCodigo($codigo);
+                    $estagio->setId_supervisor($supervisor);
+                    $estagio->setId_empresa($empresa);
+
+                    if (method_exists($estagio, 'salvarNoEdit')) {
+                        $estagio->salvar();
+                    }
                 }
 
-                if ($stmt->execute()) {
-                    echo json_encode(['success' => true, 'message' => 'Resposta atualizado com sucesso!']);
-                } else {
-                    echo json_encode(['success' => false, 'message' => 'Erro ao atualizar Resposta: ' . $conn->error]);
-                }
+                echo json_encode(['success' => true, 'message' => 'Resposta atualizado com sucesso!']);
                 
-                $stmt->close();
-                $conn->close();
             } catch (Exception $e) {
                 error_log('Erro em editarResposta.php: ' . $e->getMessage());
                 echo json_encode(['success' => false, 'message' => 'Exceção capturada: ' . $e->getMessage()]);

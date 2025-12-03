@@ -2,6 +2,7 @@
 session_start();
 
 require_once __DIR__ . '/../../Model/Resposta.php';
+require_once __DIR__ . '/../../Model/Estagio.php';
 require_once __DIR__ . '/../../Helpers/Actividade.php';
 require_once __DIR__ . '/../../Conexao/conector.php';
 
@@ -13,6 +14,7 @@ class RespostaCarta
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $resposta = new Resposta();
+                $estagio = new Estagio();
 
                 $numeroRaw = $_POST['numero'] ?? '';
                 $numero = filter_var($numeroRaw, FILTER_SANITIZE_NUMBER_INT);
@@ -85,6 +87,41 @@ class RespostaCarta
                 if ($resposta->salvar()) {
                     if (isset($_SESSION['sessao_id'])) {
                         registrarAtividade($_SESSION['sessao_id'], "resposta de carta de estágio realizado", "CRIACAO");
+                    }
+
+                    $sql = "SELECT id_resposta FROM resposta_carta ORDER BY numero DESC LIMIT 1";
+                    $result = $conn->query($sql);
+                    $lastIdFromQuery = $result && $result->num_rows > 0 ? $result->fetch_assoc()['id_resposta'] : 0;
+
+                    if($status == 'Aceito'){
+                        $estagio->setStatus($status);
+                        $estagio->setId_resposta($lastIdFromQuery);
+                        $estagio->setDataI($dataInicio);
+                        $estagio->setDataF($dataFim);
+                        
+                        $sql = "SELECT
+                                    p.*,
+                                    s.id_supervisor as id_s
+                                FROM pedido_carta p
+                                LEFT JOIN supervisor s ON s.id_qualificacao = p.qualificacao
+                                WHERE p.id_pedido_carta = ?";
+
+                        $stmt = $conn->prepare($sql);
+                        $stmt->bind_param("i", $id);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+
+                        if ($result->num_rows === 0) {
+                            die("Pedido não encontrado.");
+                        }
+
+                        $dados = $result->fetch_assoc();
+                        $codigo = htmlspecialchars($dados['codigo_formando'] ?? '');
+                        $supervisor = $dados['id_s'];
+                        
+                        $estagio->setCodigo($codigo);
+                        $estagio->setId_supervisor($supervisor);
+                        
                     }
 
                     $_SESSION['flash_success'] = 'resposta de carta enviado com sucesso!';

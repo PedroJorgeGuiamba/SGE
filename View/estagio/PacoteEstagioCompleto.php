@@ -41,11 +41,11 @@ $dados = $result->fetch_assoc();
 $nomeCompleto = htmlspecialchars($dados['nome'] . ' ' . $dados['apelido']);
 $qualificacao = htmlspecialchars($dados['qualificacao_descricao'] ?? '');
 $nivel = htmlspecialchars($dados['qualificacao_nivel'] ?? '');
-$empresa = htmlspecialchars($dados['empresa'] ?? 'Ministério de Educação e Cultura');
+$empresa = htmlspecialchars($dados['empresa'] ?? '');
 $codigo = htmlspecialchars($dados['codigo_formando'] ?? '');
-$dataFormatada = date('j \\d\\e F \\d\\e Y', strtotime($dados['data_do_pedido'] ?? '2025-05-13'));
-$dataCurta = date('j de F de Y', strtotime($dados['data_do_pedido'] ?? '2025-05-13'));
-$ano = date('Y', strtotime($dados['data_do_pedido'] ?? '2025-05-13'));
+$dataFormatada = date('j \\d\\e F \\d\\e Y', strtotime($dados['data_do_pedido'] ?? ''));
+$dataCurta = date('j de F de Y', strtotime($dados['data_do_pedido'] ?? ''));
+$ano = date('Y', strtotime($dados['data_do_pedido'] ?? ''));
 $ref = $dados['numero'];
 $coordenador = $dados['nomeS'];
 $area = $dados['area'];
@@ -95,11 +95,11 @@ $email = htmlspecialchars($dados['email'] ?? '');
     <h3>INSTITUTO DE TRANSPORTES E COMUNICAÇÕES</h3>
 </header>
 
-<p>À<br><b><?= $empresa ?></b><br>Maputo</p>
+<p>À<br><b><?= $empresa ?></b><br><span class="underline">Maputo</span></p>
 
 <p class="ref">
     <b>N. Ref:</b> <?= $ref ?>/ITC/<?= $ano ?><br>
-    <b>Maputo,</b> <?= $dataCurta ?>
+    <b>Maputo,</b> <?= htmlspecialchars(date('j \d\e F \d\e Y', strtotime($dados['data_do_pedido'] ?? date('Y-m-d')))) ?>
 </p>
 
 <p class="center bold">CREDENCIAL</p>
@@ -122,7 +122,7 @@ $email = htmlspecialchars($dados['email'] ?? '');
     <h3>INSTITUTO DE TRANSPORTES E COMUNICAÇÕES</h3>
 </header>
 
-<p>Ao Supervisor<br>Do Estágio Curricular<br>Do Estudante <b><?= $nomeCompleto ?></b><br>Na Instituição <?= $empresa ?></p>
+<p>Ao <span class="bold">Supervisor</span><br>Do Estágio Curricular<br>Do Estudante <b><?= $nomeCompleto ?></b><br>Na Instituição <?= $empresa ?></p>
 
 <p class="center bold">Termos de referência de estágio curricular para Técnico de Administração de Sistemas e Redes</p>
 
@@ -180,7 +180,7 @@ $email = htmlspecialchars($dados['email'] ?? '');
 
 <p>À Direcção de Recursos Humanos<br>Da empresa <?= $empresa ?><br>Maputo</p>
 
-<p class="assunto">Assunto: Solicitação de agendamento de visita de Supervisão de formando em estágio</p>
+<p class="assunto"><b>Assunto:</b> Solicitação de agendamento de visita de Supervisão de formando em estágio</p>
 
 <p><b>N. Ref:</b> <?= $ref ?> -1032/GETFC/ITC/<?= $ano ?></p>
 
@@ -209,11 +209,11 @@ $email = htmlspecialchars($dados['email'] ?? '');
 <p>À<br><b><?= $empresa ?></b><br>Ex.mo Sr. Direcção de Recursos Humanos<br><b>MAPUTO</b></p>
 
 <p class="ref">
-    <b>N. Ref:</b> <?= $ref ?> - IGETFC/ITC/<?= $ano ?><br>
-    <b>Maputo,</b> <?= $dataCurta ?>
+    <b>N. Ref: <?= $ref ?> - GETFC</b>/ITC/<?= $ano ?><br>
+    <b>Maputo,</b> <?= htmlspecialchars(date('j \d\e F \d\e Y', strtotime($dados['data_do_pedido'] ?? date('Y-m-d')))) ?>
 </p>
 
-<p class="assunto bold underline">ASSUNTO: Estágio Profissional</p>
+<p><span class="assunto bold">ASSUNTO:</span> <span class="underline">Estágio Profissional</span></p>
 
 <p>Ex.mo Senhor,</p>
 
@@ -233,7 +233,7 @@ $email = htmlspecialchars($dados['email'] ?? '');
 
 <p>Em conformidade com o plano do processo docente da qualificação que enviamos em anexo, o Estágio Profissional é um componente muito importante das actividades práticas e é realizado no fim de cada nível da qualificação.</p>
 
-<p>Sendo assim, vimos solicitar a aceitação do nosso aluno <b><?= $nomeCompleto ?></b>, com o código <b><?= $codigo ?></b>, para estagiar na área de <b><?= $qualificacao ?> (Nível <?= $nivel ?>).</p>
+<p>Sendo assim, vimos solicitar a aceitação do nosso aluno <b><?= $nomeCompleto ?></b>, com o código <b><?= $codigo ?></b>, para estagiar na área de <b><?= $qualificacao ?> (Nível <?= $nivel ?>).</b></p>
 
 <p>Os objectivos do Estágio Profissional são os seguintes:</p>
 

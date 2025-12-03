@@ -15,13 +15,32 @@ $conector = new Conector();
 $conn = $conector->getConexao();
 
 $sql = "
-    SELECT rc.id_resposta, rc.numero_carta, rc.status_resposta, rc.data_resposta, rc.contato_responsavel,
-            rc.data_inicio_estagio, rc.data_fim_estagio, rc.status_estagio,
-            pc.nome, pc.apelido, pc.codigo_formando, pc.qualificacao, pc.codigo_turma, pc.empresa,
-            pc.contactoPrincipal, pc.contactoSecundario, pc.email
-    FROM resposta_carta rc
-    JOIN pedido_carta pc ON rc.numero_carta = pc.numero
-    WHERE rc.id_resposta = ?";
+    SELECT 
+    rc.id_resposta,
+    rc.numero_carta,                    -- este é o id_pedido_carta
+    rc.status_resposta,
+    rc.data_resposta,
+    rc.contato_responsavel,
+    rc.data_inicio_estagio,
+    rc.data_fim_estagio,
+    rc.status_estagio,
+    
+    pc.nome,
+    pc.apelido,
+    pc.codigo_formando,
+    pc.codigo_turma,
+    pc.qualificacao,
+    pc.empresa,
+    pc.contactoPrincipal,
+    pc.contactoSecundario,
+    pc.email,
+    pc.numero AS numero_sequencial,     -- número do tipo 2025/003
+    pc.data_do_pedido,
+    pc.hora_do_pedido
+
+FROM resposta_carta rc
+JOIN pedido_carta pc ON rc.numero_carta = pc.id_pedido_carta
+WHERE rc.id_resposta = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id_resposta);
 $stmt->execute();

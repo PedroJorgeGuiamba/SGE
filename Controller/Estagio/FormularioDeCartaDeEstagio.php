@@ -5,6 +5,7 @@ require_once __DIR__ . '/../../Model/PedidoDeCarta.php';
 require_once __DIR__ . '/../../Helpers/Actividade.php';
 require_once __DIR__ . '/../../Conexao/conector.php';
 require_once __DIR__ . '/../../Model/Resposta.php';
+require_once __DIR__ . '/../../Model/Empresa.php';
 
 class FormularioDeCartaDeEstagio
 {
@@ -19,6 +20,7 @@ class FormularioDeCartaDeEstagio
 
             try {
                 $pedido = new PedidoDeCarta();
+                $empresaM = new Empresa();
 
                 $codigoFormando = isset($_POST['codigoFormando']) ? (int) $_POST['codigoFormando'] : null;
                 $codigoTurma = isset($_POST['turma']) ? (int) $_POST['turma'] : null;
@@ -76,7 +78,8 @@ class FormularioDeCartaDeEstagio
                 $pedido->setEmail(trim($_POST['email'] ?? ''));
                 $pedido->setHoraPedido(date("h:i"));
                 $pedido->setDataPedido(date('Y-m-d'));
-                
+                $empresaM->setNome($empresa);
+                $empresaM->setAbr($empresa);
                 $nome = $dadosFormando['nome'];
                 $apelido = $dadosFormando['apelido'];
 
@@ -90,6 +93,23 @@ class FormularioDeCartaDeEstagio
                     if (isset($_SESSION['sessao_id'])) {
                         registrarAtividade($_SESSION['sessao_id'], "pedido de carta de estágio realizado", "CRIACAO");
                     }
+
+                    // Verificar se a empresa já existe pelo nome OU abreviatura
+                    $sqlVerificarEmpresa = "SELECT id_empresa FROM empresa WHERE nome = ? OR abreviatura = ?";
+                    $stmtVerificar = $conn->prepare($sqlVerificarEmpresa);
+                    $stmtVerificar->bind_param("ss", $empresa, $empresa);
+                    $stmtVerificar->execute();
+                    $resultVerificar = $stmtVerificar->get_result();
+                    if ($resultVerificar->num_rows == 0) {
+
+                        
+                        if($empresaM->salvar()){
+                            if (isset($_SESSION['sessao_id'])) {
+                                registrarAtividade($_SESSION['sessao_id'], "Empresa registrada com sucesso", "CRIACAO");
+                            }
+                        }
+                    }
+
                     $sql = "SELECT id_pedido_carta FROM pedido_carta ORDER BY numero DESC LIMIT 1";
                     $result = $conn->query($sql);
                     $lastIdFromQuery = $result && $result->num_rows > 0 ? $result->fetch_assoc()['id_pedido_carta'] : 0;
@@ -118,6 +138,7 @@ class FormularioDeCartaDeEstagio
                 } else {
                     echo "Erro ao enviar pedido.";
                 }
+
             } catch (Exception $e) {
                 echo "Erro no sistema: " . $e->getMessage();
             }

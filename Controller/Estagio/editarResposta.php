@@ -83,7 +83,18 @@ class EditarResposta
                     $estagio->setId_empresa($empresa);
 
                     if (method_exists($estagio, 'salvarNoEdit')) {
-                        $estagio->salvar();
+//                        $estagio->salvar();
+
+                        if($estagio->salvar()){
+                            $sqlEstagio = "SELECT id_estagio FROM estagio ORDER BY id_estagio DESC LIMIT 1";
+                            $result = $conn->query($sqlEstagio);
+                            $lastIdFromQuery = $result && $result->num_rows > 0 ? $result->fetch_assoc()['id_estagio'] : 0;
+
+                            $sqlINSERT = "INSERT INTO supervisor_estagio(id_estagio, id_supervisor) VALUES(?,?)";
+                            $stmtINSERT = $conn->prepare($sqlINSERT);
+                            $stmtINSERT->bind_param("ii", $lastIdFromQuery, $supervisor);
+                            $stmtINSERT->execute();
+                        }
                     }
                 }
 

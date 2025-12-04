@@ -94,20 +94,17 @@ class RespostaCarta
                     $lastIdFromQuery = $result && $result->num_rows > 0 ? $result->fetch_assoc()['id_resposta'] : 0;
 
                     if($status == 'Aceito'){
-                        $estagio->setStatus($status);
-                        $estagio->setId_resposta($lastIdFromQuery);
-                        $estagio->setDataI($dataInicio);
-                        $estagio->setDataF($dataFim);
-                        
                         $sql = "SELECT
-                                    p.*,
-                                    s.id_supervisor as id_s
-                                FROM pedido_carta p
-                                LEFT JOIN supervisor s ON s.id_qualificacao = p.qualificacao
-                                WHERE p.id_pedido_carta = ?";
+                                p.*,
+                                s.id_supervisor as id_s,
+                                e.id_empresa as id_e
+                            FROM pedido_carta p
+                            LEFT JOIN supervisor s ON s.id_qualificacao = p.qualificacao
+                            LEFT JOIN empresa e ON e.nome = p.empresa
+                            WHERE p.id_pedido_carta = ?";
 
                         $stmt = $conn->prepare($sql);
-                        $stmt->bind_param("i", $id);
+                        $stmt->bind_param("i", $numero);
                         $stmt->execute();
                         $result = $stmt->get_result();
 
@@ -116,11 +113,30 @@ class RespostaCarta
                         }
 
                         $dados = $result->fetch_assoc();
+                        $empresa = htmlspecialchars($dados['id_e'] ?? '');
                         $codigo = htmlspecialchars($dados['codigo_formando'] ?? '');
                         $supervisor = $dados['id_s'];
-                        
+
+                        $estagio->setStatus($status);
+                        $estagio->setId_resposta($lastIdFromQuery);
+                        $estagio->setDataI($dataInicio);
+                        $estagio->setDataF($dataFim);
                         $estagio->setCodigo($codigo);
                         $estagio->setId_supervisor($supervisor);
+                        $estagio->setId_empresa($empresa);
+
+                        if (method_exists($estagio, 'salvarNoEdit')) {
+                            if($estagio->salvar()){
+                                $sqlEstagio = "SELECT id_estagio FROM estagio ORDER BY id_estagio DESC LIMIT 1";
+                                $result = $conn->query($sqlEstagio);
+                                $lastIdFromQueryINSERT = $result && $result->num_rows > 0 ? $result->fetch_assoc()['id_estagio'] : 0;
+
+                                $sqlINSERT = "INSERT INTO supervisor_estagio(id_estagio, id_supervisor) VALUES(?,?)";
+                                $stmtINSERT = $conn->prepare($sqlINSERT);
+                                $stmtINSERT->bind_param("ii", $lastIdFromQueryINSERT, $supervisor);
+                                $stmtINSERT->execute();
+                            }
+                        }
                         
                     }
 

@@ -1,0 +1,7 @@
+# Pasta de logs de segurança
+# Contém:
+# - security.log: log principal de eventos de segurança (rotacionado automaticamente)
+# - security_errors.log: log de erros de segurança críticos
+# - security_*.log.gz: logs rotacionados e comprimidos (por data/hora)
+
+Esta pasta será criada automaticamente quando a aplicação inicia.

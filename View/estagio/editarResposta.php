@@ -2,6 +2,10 @@
 session_start();
 require_once __DIR__ . '/../../Controller/Geral/SupervisorAdmin.php';
 require_once __DIR__ . '/../../middleware/auth.php';
+require_once __DIR__ . '/../../Conexao/conector.php';
+require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
+
+SecurityHeaders::setFull();
 
 // Verifica se o ID foi passado na URL
 if (!isset($_GET['id_resposta'])) {
@@ -59,7 +63,7 @@ $conn->close();
 ?>
 
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-pt" data-bs-theme="<?php echo $_SESSION['theme'] ?? 'light'; ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -81,6 +85,11 @@ $conn->close();
                     </button>
                     <div class="collapse navbar-collapse" id="navbarText">
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <button id="themeToggle" class="btn btn-outline-secondary position-fixed bottom-0 end-0 m-3" style="z-index: 1050;">
+                                    <i class="fas fa-moon"></i> <!-- ícone muda com JS -->
+                                </button>
+                            </li>
                             <li class="nav-item">
                                 <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger">Logout</a>
                             </li>
@@ -107,54 +116,55 @@ $conn->close();
         <h2 class="mb-4">Editar Resposta do Pedido de Estágio</h2>
 
         <form id="formEditarResposta" action="../../Controller/Estagio/editarResposta.php" method="POST">
-                <input type="hidden" name="id_resposta" value="<?php echo htmlspecialchars($record['id_resposta']); ?>">
-                <input type="hidden" name="numero_carta" value="<?php echo htmlspecialchars($record['numero_carta']); ?>">
+            <input type="hidden" name="id_resposta" value="<?php echo htmlspecialchars($record['id_resposta']); ?>">
+            <input type="hidden" name="numero_carta" value="<?php echo htmlspecialchars($record['numero_carta']); ?>">
 
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="status_resposta" class="form-label">Status da Resposta</label>
-                        <select class="form-select" id="status_resposta" name="status_resposta" required>
-                            <option value="Pendente" <?php echo ($record['status_resposta'] ?? '') === 'Pendente' ? 'selected' : ''; ?>>Pendente</option>
-                            <option value="Aceito" <?php echo ($record['status_resposta'] ?? '') === 'Aceito' ? 'selected' : ''; ?>>Aceito</option>
-                            <option value="Recusado" <?php echo ($record['status_resposta'] ?? '') === 'Recusado' ? 'selected' : ''; ?>>Recusado</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="data_resposta" class="form-label">Data da Resposta</label>
-                        <input type="date" class="form-control" id="data_resposta" name="data_resposta" value="<?php echo htmlspecialchars($record['data_resposta'] ?? ''); ?>">
-                    </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="status_resposta" class="form-label">Status da Resposta</label>
+                    <select class="form-select" id="status_resposta" name="status_resposta" required>
+                        <option value="Pendente" <?php echo ($record['status_resposta'] ?? '') === 'Pendente' ? 'selected' : ''; ?>>Pendente</option>
+                        <option value="Aceito" <?php echo ($record['status_resposta'] ?? '') === 'Aceito' ? 'selected' : ''; ?>>Aceito</option>
+                        <option value="Recusado" <?php echo ($record['status_resposta'] ?? '') === 'Recusado' ? 'selected' : ''; ?>>Recusado</option>
+                    </select>
                 </div>
+                <div class="col-md-6">
+                    <label for="data_resposta" class="form-label">Data da Resposta</label>
+                    <input type="date" class="form-control" id="data_resposta" name="data_resposta" value="<?php echo htmlspecialchars($record['data_resposta'] ?? ''); ?>">
+                </div>
+            </div>
 
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="contato_responsavel" class="form-label">Contato do Responsável</label>
-                        <input type="text" class="form-control" id="contato_responsavel" name="contato_responsavel" value="<?php echo htmlspecialchars($record['contato_responsavel'] ?? ''); ?>">
-                    </div>
-                    <div class="col-md-6">
-                        <label for="data_inicio_estagio" class="form-label">Data de Início do Estágio</label>
-                        <input type="date" class="form-control" id="data_inicio_estagio" name="data_inicio_estagio" value="<?php echo htmlspecialchars($record['data_inicio_estagio'] ?? ''); ?>">
-                    </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="contato_responsavel" class="form-label">Contato do Responsável</label>
+                    <input type="text" class="form-control" id="contato_responsavel" name="contato_responsavel" value="<?php echo htmlspecialchars($record['contato_responsavel'] ?? ''); ?>">
                 </div>
+                <div class="col-md-6">
+                    <label for="data_inicio_estagio" class="form-label">Data de Início do Estágio</label>
+                    <input type="date" class="form-control" id="data_inicio_estagio" name="data_inicio_estagio" value="<?php echo htmlspecialchars($record['data_inicio_estagio'] ?? ''); ?>">
+                </div>
+            </div>
 
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="data_fim_estagio" class="form-label">Data de Fim do Estágio</label>
-                        <input type="date" class="form-control" id="data_fim_estagio" name="data_fim_estagio" value="<?php echo htmlspecialchars($record['data_fim_estagio'] ?? ''); ?>">
-                    </div>
-                    <div class="col-md-6">
-                        <label for="status_estagio" class="form-label">Status do Estágio</label>
-                        <select class="form-select" id="status_estagio" name="status_estagio">
-                            <option value="" <?php echo empty($record['status_estagio']) ? 'selected' : ''; ?>>Selecione</option>
-                            <option value="Concluido" <?php echo ($record['status_estagio'] ?? '') === 'Concluido' ? 'selected' : ''; ?>>Concluído</option>
-                            <option value="Nao Concluido" <?php echo ($record['status_estagio'] ?? '') === 'Nao Concluido' ? 'selected' : ''; ?>>Não Concluído</option>
-                        </select>
-                    </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="data_fim_estagio" class="form-label">Data de Fim do Estágio</label>
+                    <input type="date" class="form-control" id="data_fim_estagio" name="data_fim_estagio" value="<?php echo htmlspecialchars($record['data_fim_estagio'] ?? ''); ?>">
                 </div>
+                <div class="col-md-6">
+                    <label for="status_estagio" class="form-label">Status do Estágio</label>
+                    <select class="form-select" id="status_estagio" name="status_estagio">
+                        <option value="" <?php echo empty($record['status_estagio']) ? 'selected' : ''; ?>>Selecione</option>
+                        <option value="Concluido" <?php echo ($record['status_estagio'] ?? '') === 'Concluido' ? 'selected' : ''; ?>>Concluído</option>
+                        <option value="Nao Concluido" <?php echo ($record['status_estagio'] ?? '') === 'Nao Concluido' ? 'selected' : ''; ?>>Não Concluído</option>
+                    </select>
+                </div>
+            </div>
 
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                 <a href="respostaCarta.php" class="btn btn-secondary me-md-2">Cancelar</a>
                 <button type="submit" class="btn btn-primary">Atualizar Pedido</button>
             </div>
+            
         </form>
     </main>
 
@@ -194,5 +204,6 @@ $conn->close();
             });
         });
     </script>
+    <script src="../../Assets/JS/tema.js"></script>
 </body>
 </html>

@@ -11,14 +11,14 @@ class EditarResposta
             try {
                 $estagio = new Estagio();
 
-                $id_resposta = filter_var( $_POST['id_resposta'], FILTER_SANITIZE_NUMBER_INT);
-                $numero_carta = filter_var($_POST['numero_carta'], FILTER_SANITIZE_NUMBER_INT);
-                $status_resposta = trim($_POST['status_resposta']);
-                $data_resposta = trim($_POST['data_resposta']);
-                $contato_responsavel = trim($_POST['contato_responsavel']);
-                $data_inicio_estagio = trim($_POST['data_inicio_estagio']);
-                $data_fim_estagio = trim($_POST['data_fim_estagio']);
-                $status_estagio = trim($_POST['status_estagio']);
+                $id_resposta = filter_var( $_POST['id_resposta'] ?? null, FILTER_SANITIZE_NUMBER_INT);
+                $numero_carta = filter_var($_POST['numero_carta']  ?? null, FILTER_SANITIZE_NUMBER_INT);
+                $status_resposta = !empty(trim($_POST['status_resposta'] ?? '')) ? trim($_POST['status_resposta']) : null;
+                $contato_responsavel = !empty(trim($_POST['contato_responsavel'] ?? '')) ? trim($_POST['contato_responsavel']) : null;
+                $status_estagio = !empty(trim($_POST['status_estagio'] ?? '')) ? trim($_POST['status_estagio']) : null;
+                $data_resposta = !empty(trim($_POST['data_resposta'] ?? '')) ? trim($_POST['data_resposta']) : null;
+                $data_inicio_estagio = !empty(trim($_POST['data_inicio_estagio'] ?? '')) ? trim($_POST['data_inicio_estagio']) : null;
+                $data_fim_estagio = !empty(trim($_POST['data_fim_estagio'] ?? '')) ? trim($_POST['data_fim_estagio']) : null;
                 
                 $conexao = new Conector();
                 $conn = $conexao->getConexao();

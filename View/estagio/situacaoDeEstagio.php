@@ -2,7 +2,9 @@
 session_start();
 include '../../Controller/Admin/Home.php';
 include '../../Conexao/conector.php';
-require_once __DIR__ .'/../../middleware/auth.php';
+require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
+
+SecurityHeaders::setFull();
 
 $conector = new Conector();
 $conn = $conector->getConexao();
@@ -86,7 +88,7 @@ if ($avaliacao_result_query) {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-pt" data-bs-theme="<?php echo $_SESSION['theme'] ?? 'light'; ?>">
 
 <head>
     <meta charset="UTF-8">
@@ -98,8 +100,9 @@ if ($avaliacao_result_query) {
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="../../Assets/CSS/chart.css">
     <!-- Custom CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary-color: #0d6efd;
@@ -113,28 +116,8 @@ if ($avaliacao_result_query) {
             --border-radius: 15px;
         }
         body {
-            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+            /* background: linear-gradient(to bottom, #f8f9fa, #e9ecef); */
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .dashboard-header {
-            background: var(--bg-gradient);
-            color: white;
-            padding: 2rem 0;
-            margin-bottom: 2rem;
-            box-shadow: var(--card-shadow);
-        }
-        .chart-container {
-            background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--card-shadow);
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-        .chart-title {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            font-weight: bold;
-            color: #333;
         }
         footer {
             background: var(--bg-gradient);
@@ -178,6 +161,11 @@ if ($avaliacao_result_query) {
                             <li class="nav-item">
                                 <a class="nav-link"
                                     href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://simplesharebuttons.com">Linkedin</a>
+                            </li>
+                            <li class="nav-item">
+                                <button id="themeToggle" class="btn btn-outline-secondary position-fixed bottom-0 end-0 m-3" style="z-index: 1050;">
+                                    <i class="fas fa-moon"></i> <!-- ícone muda com JS -->
+                                </button>
                             </li>
                             <li class="nav-item">
                                 <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger">Logout</a>
@@ -257,7 +245,8 @@ if ($avaliacao_result_query) {
 
         </section>
     </main>
-
+    
+    <script src="../../Assets/JS/tema.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
         </script>

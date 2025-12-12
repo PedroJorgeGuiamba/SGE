@@ -1,0 +1,2 @@
+# Esta pasta guarda arquivos sensíveis de configuração
+# O arquivo .security_salt será criado automaticamente ao primeiro uso do SecurityLogger

@@ -3,6 +3,9 @@ session_start();
 include '../../Controller/Admin/Home.php';
 require_once __DIR__ . '/../../middleware/auth.php';
 require_once __DIR__ . '/../../Conexao/conector.php';
+require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
+
+SecurityHeaders::setFull();
 
 $conector = new Conector();
 $conn = $conector->getConexao();
@@ -41,7 +44,7 @@ if ($formandos_per_curso_query) {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-pt" data-bs-theme="<?php echo $_SESSION['theme'] ?? 'light'; ?>">
 
 <head>
     <meta charset="UTF-8">
@@ -57,6 +60,7 @@ if ($formandos_per_curso_query) {
 
     <!-- CSS -->
     <link rel="stylesheet" href="../../Style/home.css">
+    <link rel="stylesheet" href="../../Assets/CSS/chart.css">
     <style>
         :root {
             --primary-color: #0d6efd;
@@ -68,34 +72,6 @@ if ($formandos_per_curso_query) {
             --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             --border-radius: 15px;
-        }
-
-        body {
-            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .dashboard-header {
-            background: var(--bg-gradient);
-            color: white;
-            padding: 2rem 0;
-            margin-bottom: 2rem;
-            box-shadow: var(--card-shadow);
-        }
-
-        .chart-container {
-            background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--card-shadow);
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .chart-title {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            font-weight: bold;
-            color: #333;
         }
 
         footer {
@@ -139,6 +115,11 @@ if ($formandos_per_curso_query) {
                             <!-- LinkedIn -->
                             <li class="nav-item">
                                 <a class="nav-link" href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://simplesharebuttons.com">Linkedin</a>
+                            </li>
+                            <li class="nav-item">
+                                <button id="themeToggle" class="btn btn-outline-secondary position-fixed bottom-0 end-0 m-3" style="z-index: 1050;">
+                                    <i class="fas fa-moon"></i> <!-- ícone muda com JS -->
+                                </button>
                             </li>
                             <li class="nav-item">
                                 <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger">Logout</a>
@@ -243,8 +224,11 @@ if ($formandos_per_curso_query) {
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
     </script>
+    <script src="../../Assets/JS/tema.js"></script>
     <script>
         // Pie Chart: User Roles
+        const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+        const borderColor = isDark ? '#333333' : '#ffffff';
         const ctxPie = document.getElementById('pieChart').getContext('2d');
         new Chart(ctxPie, {
             type: 'pie',
@@ -254,7 +238,7 @@ if ($formandos_per_curso_query) {
                     data: <?php echo json_encode($user_roles_data); ?>,
                     backgroundColor: ['#0dcaf0', '#198754', '#ffc107', '#dc3545'],
                     borderWidth: 2,
-                    borderColor: '#fff'
+                    borderColor: borderColor,
                 }]
             },
             options: {

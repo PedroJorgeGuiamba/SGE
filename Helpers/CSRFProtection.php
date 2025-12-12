@@ -33,9 +33,9 @@ class CSRFProtection {
     public static function validateToken($token) {
         self::initialize();
         
-        error_log("DEBUG CSRF Validation - Session ID: " . session_id());
-        error_log("DEBUG CSRF Validation - Input Token: " . ($token ?: 'EMPTY'));
-        error_log("DEBUG CSRF Validation - Session Token: " . ($_SESSION['csrf_token'] ?? 'NOT SET'));
+        error_log("DEBUG CSRF Validation - Session ID: ");
+        error_log("DEBUG CSRF Validation - Input Token: ");
+        error_log("DEBUG CSRF Validation - Session Token: ");
         
         // ✅ Verificações rigorosas
         if (!isset($_SESSION['csrf_token']) || empty($_SESSION['csrf_token'])) {

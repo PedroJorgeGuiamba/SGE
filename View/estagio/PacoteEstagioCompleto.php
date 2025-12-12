@@ -55,7 +55,7 @@ $email = htmlspecialchars($dados['email'] ?? '');
 ?>
 
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-pt">
 <head>
     <meta charset="utf-8">
     <title>Pacote Completo Estágio - <?= $nomeCompleto ?></title>

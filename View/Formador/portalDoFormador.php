@@ -2,10 +2,13 @@
 session_start();
 include '../../Controller/Formador/Home.php';
 require_once __DIR__ .'/../../middleware/auth.php';
+require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
+
+SecurityHeaders::setFull();
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-pt" data-bs-theme="<?php echo $_SESSION['theme'] ?? 'light'; ?>">
 
 <head>
     <meta charset="UTF-8">

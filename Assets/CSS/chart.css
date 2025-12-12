@@ -1,0 +1,58 @@
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --success-color: #198754;
+    --info-color: #0dcaf0;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    --border-radius: 15px;
+}
+
+body {
+    /* background: linear-gradient(to bottom, #f8f9fa, #e9ecef); */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+[data-bs-theme="dark"] .bg-light {
+    background-color: #333 !important;
+}
+[data-bs-theme="dark"] .text-dark {
+    color: #f8f9fa !important;
+}
+
+.dashboard-header {
+    background: var(--bg-gradient);
+    color: white;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+    box-shadow: var(--card-shadow);
+}
+
+.chart-container {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    transition: background 0.3s ease, box-shadow 0.3s ease; /* Transição suave ao trocar tema */
+}
+
+/* Modo escuro */
+[data-bs-theme="dark"] .chart-container{
+    background: #212529;                /* Cor de fundo escura (bg-dark do Bootstrap) */
+    /* Ou usa #2c3034, #343a40, etc. — escolhe o que preferires */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* Sombra mais suave no escuro */
+}
+
+.chart-title {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+[data-bs-theme="dark"] .chart-title{
+    color:white;
+}

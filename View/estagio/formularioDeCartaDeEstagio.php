@@ -10,7 +10,7 @@ SecurityHeaders::setFull();
 ?>
 
 <!DOCTYPE html>
-<html lang="pt-pt">
+<html lang="pt-pt"  data-bs-theme="<?php echo $_SESSION['theme'] ?? 'light'; ?>">
 
 <head>
     <meta charset="UTF-8">
@@ -68,6 +68,11 @@ SecurityHeaders::setFull();
                                 <a class="nav-link" href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://simplesharebuttons.com">
                                     <i class="fa-brands fa-linkedin-in" style="color: #3a4c91;"></i>
                                 </a>
+                            </li>
+                            <li class="nav-item">
+                                <button id="themeToggle" class="btn btn-outline-secondary position-fixed bottom-0 end-0 m-3" style="z-index: 1050;">
+                                    <i class="fas fa-moon"></i> <!-- ícone muda com JS -->
+                                </button>
                             </li>
                             <li class="nav-item">
                                 <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger">Logout</a>
@@ -178,6 +183,7 @@ SecurityHeaders::setFull();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
     </script>
+    <script src="../../Assets/JS/tema.js"></script>
     <script>
         // Verificar se jQuery está carregado
         if (typeof jQuery === 'undefined') {

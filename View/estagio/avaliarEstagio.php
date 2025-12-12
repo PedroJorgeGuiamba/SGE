@@ -18,7 +18,7 @@ $numero = intval($_GET['numero']);
 ?>
 
 <!DOCTYPE html>
-<html lang="pt-pt">
+<html lang="pt-pt"  data-bs-theme="<?php echo $_SESSION['theme'] ?? 'light'; ?>">
 
 <head>
     <meta charset="UTF-8">
@@ -67,6 +67,11 @@ $numero = intval($_GET['numero']);
                             <li class="nav-item">
                                 <a class="nav-link"
                                     href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://simpleshare.buttons.com">Linkedin</a>
+                            </li>
+                            <li class="nav-item">
+                                <button id="themeToggle" class="btn btn-outline-secondary position-fixed bottom-0 end-0 m-3" style="z-index: 1050;">
+                                    <i class="fas fa-moon"></i> <!-- ícone muda com JS -->
+                                </button>
                             </li>
                             <li class="nav-item">
                                 <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger">Logout</a>

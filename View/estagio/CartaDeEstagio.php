@@ -1,5 +1,8 @@
 <?php
 require_once __DIR__ . '/../../Conexao/conector.php';
+require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
+
+SecurityHeaders::setFull();
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 $id = 0;
@@ -58,7 +61,7 @@ if ($result->num_rows === 0) {
 ?>
 
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-pt">
 <head>
     <meta charset="utf-8">
     <title>Carta de Estágio - <?= htmlspecialchars($dados['nome'] . ' ' . $dados['apelido']) ?></title>

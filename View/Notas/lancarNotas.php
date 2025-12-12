@@ -1,11 +1,18 @@
 <?php
 // Form para criar nova avaliação
-require_once __DIR__ . '/../../Conexao/db.php';
+require_once __DIR__ . '/../../Conexao/conector.php';
+require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
+require_once __DIR__ . '/../../middleware/auth.php';
+
+SecurityHeaders::setFull();
+
+$conexao = new Conector();
+$conn = $conexao->getConexao();
 
 // Carrega listas para selects
-$formandos = $mysqli->query("SELECT id_formando, nome, apelido FROM formando ORDER BY nome");
-$modulos = $mysqli->query("SELECT id_modulo, descricao, codigo FROM modulo ORDER BY descricao");
-$tentativas = $mysqli->query("SELECT id_tentativa, descricao FROM tipo_tentativa ORDER BY ordem");
+$formandos = $conn->query("SELECT id_formando, nome, apelido FROM formando ORDER BY nome");
+$modulos = $conn->query("SELECT id_modulo, descricao, codigo FROM modulo ORDER BY descricao");
+$tentativas = $conn->query("SELECT id_tentativa, descricao FROM tipo_tentativa ORDER BY ordem");
 ?>
 <!doctype html>
 <html lang="pt">

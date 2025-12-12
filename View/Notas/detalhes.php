@@ -1,5 +1,10 @@
 <?php
 require_once __DIR__ . '/../../Conexao/db.php';
+require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
+require_once __DIR__ . '/../../middleware/auth.php';
+
+SecurityHeaders::setFull();
+
 $id = intval($_GET['id'] ?? 0);
 if (!$id) die('ID inválido');
 

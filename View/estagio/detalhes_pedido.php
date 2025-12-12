@@ -2,6 +2,9 @@
 
 require_once __DIR__ . '/../../Conexao/conector.php';
 require_once __DIR__ .'/../../middleware/auth.php';
+require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
+
+SecurityHeaders::setFull();
 
 $conexao = new Conector();
 $conn = $conexao->getConexao();
@@ -29,7 +32,7 @@ $stmt->close();
 $conn->close();
 ?>
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-pt" data-bs-theme="<?php echo $_SESSION['theme'] ?? 'light'; ?>">
 <head>
     <meta charset="UTF-8">
     <title>Detalhes do Pedido</title>

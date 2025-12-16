@@ -9,3 +9,6 @@
 - Nas estatísticas devo distinguir das cartas geradas o curso e por mês. ✅
 - Actualiza a Distribuição dos Estados dos Estágios onde vem null para pendente. ✅
 - Remover a Distribuição dos Resultados dos Relatórios.✅
+- Rever cores por tippo de resposta(aceite - verde; Recusa - vermelho, Pendente - amarelo)
+- Colocar as últimas cartas geradas no inicio(por forma descendente) e remover cartas ou ocultar cartas já geradas
+- Adicionar funcionalidade para upload de relatórios para posterior avaliação. 

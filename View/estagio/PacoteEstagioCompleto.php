@@ -21,10 +21,13 @@ $sql = "SELECT
             q.descricao AS qualificacao_descricao,
             q.nivel AS qualificacao_nivel,
             s.nome_supervisor as nomeS,
-            s.area as area
+            s.area as area,
+            c.codigo_qualificacao as cq,
+            c.nome as curso
         FROM pedido_carta p
         LEFT JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
         LEFT JOIN supervisor s ON s.id_qualificacao = p.qualificacao
+        LEFT JOIN curso c ON c.codigo_qualificacao = q.id_qualificacao
         WHERE p.id_pedido_carta = ?";
 
 $stmt = $conn->prepare($sql);
@@ -44,6 +47,15 @@ $nivel = htmlspecialchars($dados['qualificacao_nivel'] ?? '');
 $empresa = htmlspecialchars($dados['empresa'] ?? '');
 $codigo = htmlspecialchars($dados['codigo_formando'] ?? '');
 $dataFormatada = date('j \\d\\e F \\d\\e Y', strtotime($dados['data_do_pedido'] ?? ''));
+
+// Formata a data em português: "15 de dezembro de 2025"
+// $dataFormatada = $dados['data_do_pedido'] ?? date('Y-m-d');
+// // Formata a data em português: "15 de dezembro de 2025"
+// $dt = new DateTime($dataFormatada);
+// $formatter = new IntlDateFormatter('pt_BR', IntlDateFormatter::LONG, IntlDateFormatter::NONE);
+// $formatter->setPattern('d \'de\' MMMM \'de\' yyyy');
+// $dataPedido = ucfirst($formatter->format($dt));
+
 $dataCurta = date('j de F de Y', strtotime($dados['data_do_pedido'] ?? ''));
 $ano = date('Y', strtotime($dados['data_do_pedido'] ?? ''));
 $ref = $dados['numero'];
@@ -52,6 +64,7 @@ $area = $dados['area'];
 $contacto1 = htmlspecialchars($dados['contactoPrincipal'] ?? '');
 $contacto2 = htmlspecialchars($dados['contactoSecundario'] ?? '');
 $email = htmlspecialchars($dados['email'] ?? '');
+$curso = htmlspecialchars($dados['curso']);
 ?>
 
 <!DOCTYPE html>
@@ -99,12 +112,12 @@ $email = htmlspecialchars($dados['email'] ?? '');
 
 <p class="ref">
     <b>N. Ref:</b> <?= $ref ?>/ITC/<?= $ano ?><br>
-    <b>Maputo,</b> <?= htmlspecialchars(date('j \d\e F \d\e Y', strtotime($dados['data_do_pedido'] ?? date('Y-m-d')))) ?>
+    <b>Maputo,</b> <?= $dataFormatada?>
 </p>
 
 <p class="center bold">CREDENCIAL</p>
 
-<p>Sirvo-me pela presente, para enviar o senhor <b><?= $nomeCompleto ?></b>, estudante do curso de <b><?= $qualificacao ?></b>, neste instituto para se apresentar ao Departamento de Recursos Humanos da Empresa Supracitada, a fim de realizar o estágio académico no departamento de TIC.</p>
+<p>Sirvo-me pela presente, para enviar o senhor <b><?= $nomeCompleto ?></b>, estudante do curso de <b><?= $curso ?></b>, neste instituto para se apresentar ao Departamento de Recursos Humanos da Empresa Supracitada, a fim de realizar o estágio académico no departamento de TIC.</p>
 
 <p>Sem outro assunto de momento, agradecemos o privilégio que a V. Exas. nos concedem em receber os nossos estudantes, permitindo assim adquirir conhecimentos e contribuindo para a melhoria de suas qualidades profissionais.</p>
 
@@ -210,7 +223,7 @@ $email = htmlspecialchars($dados['email'] ?? '');
 
 <p class="ref">
     <b>N. Ref: <?= $ref ?> - GETFC</b>/ITC/<?= $ano ?><br>
-    <b>Maputo,</b> <?= htmlspecialchars(date('j \d\e F \d\e Y', strtotime($dados['data_do_pedido'] ?? date('Y-m-d')))) ?>
+    <b>Maputo,</b> <?= $dataFormatada ?>
 </p>
 
 <p><span class="assunto bold">ASSUNTO:</span> <span class="underline">Estágio Profissional</span></p>
@@ -233,7 +246,7 @@ $email = htmlspecialchars($dados['email'] ?? '');
 
 <p>Em conformidade com o plano do processo docente da qualificação que enviamos em anexo, o Estágio Profissional é um componente muito importante das actividades práticas e é realizado no fim de cada nível da qualificação.</p>
 
-<p>Sendo assim, vimos solicitar a aceitação do nosso aluno <b><?= $nomeCompleto ?></b>, com o código <b><?= $codigo ?></b>, para estagiar na área de <b><?= $qualificacao ?> (Nível <?= $nivel ?>).</b></p>
+<p>Sendo assim, vimos solicitar a aceitação do nosso aluno <b><?= $nomeCompleto ?></b>, com o código <b><?= $codigo ?></b>, para estagiar na área de <b><?= $curso ?>.</b></p>
 
 <p>Os objectivos do Estágio Profissional são os seguintes:</p>
 

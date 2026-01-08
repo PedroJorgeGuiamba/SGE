@@ -158,7 +158,9 @@ SecurityHeaders::setFull();
                             class="form-control" placeholder="Ex: +258 84xxxxxxx ou 84xxxxxxx" id="contactoSecundario">
                         <span class="error_form" id="cSecundario_error_message"></span>
                     </div>
-
+                </div>
+                
+                <div class="row">
                     <div class="form-group col-md-4">
                         <label for="email" class="form-label">Email Pessoal</label>
                         <input type="email" name="email" class="form-control" id="email"
@@ -166,7 +168,7 @@ SecurityHeaders::setFull();
                         <span class="error_form" id="email_error_message"></span>
                     </div>
                 </div>
-
+                
                 <div class="row">
                     <div class="form-group">
                         <div class="col-md-3">
@@ -177,6 +179,12 @@ SecurityHeaders::setFull();
             </form>
         </div>
     </main>
+
+    <footer>
+        <div class="container-footer">
+            <p> &copy; <?php echo date("Y"); ?> - TRANSCOM . DIREITOS RESERVADOS . DESIGN & DEVELOPMENT <span>TRANSCOM</span></p>
+        </div>
+    </footer>
 
     <!-- Scripts do Bootstrap e jQuery Validation -->
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>

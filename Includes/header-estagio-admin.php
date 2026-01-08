@@ -1,19 +1,16 @@
 <?php
 session_start();
-include '../../Controller/Supervisor/Home.php';
-require_once __DIR__ .'/../../middleware/auth.php';
-require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
-
+require_once __DIR__ . '/../Helpers/SecurityHeaders.php';
+require_once __DIR__ . '/../Controller/Geral/SupervisorAdmin.php';
+require_once __DIR__ .'/../middleware/auth.php';
 SecurityHeaders::setFull();
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-pt" data-bs-theme="<?php echo $_SESSION['theme'] ?? 'light'; ?>">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal do Supervisor</title>
+    <title>ITC</title>
 
     <!-- BootStrap Links -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -22,8 +19,15 @@ SecurityHeaders::setFull();
     <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
     <!-- CSS -->
     <link rel="stylesheet" href="../../Style/home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        button {
+            padding-bottom: 110px;
+        }
+    </style>
 </head>
-
 <body>
     <header>
         <!-- Nav principal -->
@@ -37,74 +41,46 @@ SecurityHeaders::setFull();
                     </button>
                     <div class="collapse navbar-collapse" id="navbarText">
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                            <!-- Instagram -->
                             <li class="nav-item">
-                                <a class="nav-link" aria-current="page"
-                                    href="https://www.instagram.com/itc.ac">Instagram</a>
+                                <a class="nav-link" aria-current="page" href="https://www.instagram.com/itc.ac">Instagram</a>
                             </li>
-                            <!-- Facebook -->
                             <li class="nav-item">
-                                <a class="nav-link" aria-current="page"
-                                    href="https://pt-br.facebook.com/itc.transcom">Facebook</a>
+                                <a class="nav-link" aria-current="page" href="https://pt-br.facebook.com/itc.transcom">Facebook</a>
                             </li>
-                            <!-- Google -->
                             <li class="nav-item">
-                                <a class="nav-link"
-                                    href="https://plus.google.com/share?url=https://simplesharebuttons.com">Google</a>
+                                <a class="nav-link" href="https://plus.google.com/share?url=https://simplesharebuttons.com">Google</a>
                             </li>
-                            <!-- LinkedIn -->
                             <li class="nav-item">
-                                <a class="nav-link"
-                                    href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://simplesharebuttons.com">Linkedin</a>
+                                <a class="nav-link" href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://simplesharebuttons.com">Linkedin</a>
                             </li>
-
+                            <li class="nav-item">
+                                <button id="themeToggle" class="btn btn-outline-secondary position-fixed bottom-0 end-0 m-3" style="z-index: 1050;">
+                                    <i class="fas fa-moon"></i> <!-- ícone muda com JS -->
+                                </button>
+                            </li>
                             <li class="nav-item">
                                 <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger">Logout</a>
                             </li>
                         </ul>
                     </div>
                 </div>
+            </div>
         </nav>
-
         <!-- Nav Secundária -->
         <nav>
             <ul class="nav justify-content-center">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    <a class="nav-link" href="../../View/<?php echo $_SESSION['role'] === 'admin' ? 'Admin/portalDoAdmin.php' : 'Supervisor/portalDoSupervisor.php'; ?>">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="../estagio/formularioDeCartaDeEstagio.php">Fazer Pedido de Estágio</a>
+                    <a class="nav-link" href="formularioDeCartaDeEstagio.php">Fazer Pedido de Estágio</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="../estagio/listaDePedidos.php">Pedidos de Estágio</a>
+                    <a class="nav-link" href="listaDePedidos.php">Pedidos de Estágio</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="../estagio/respostaCarta.php">Respostas Das Cartas de Estagio</a>
+                    <a class="nav-link" href="respostaCarta.php">Respostas Das Cartas de Estagio</a>
                 </li>
-            </ul>
             </ul>
         </nav>
     </header>
-
-    <main>
-        <!-- Rodapé -->
-        <footer>
-            <div class="container-footer">
-                <p> &copy; <?php echo date("Y"); ?> - TRANSCOM . DIREITOS RESERVADOS . DESIGN & DEVELOPMENT <span>TRANSCOM</span></p>
-            </div>
-        </footer>
-    </main>
-
-    <!-- Scripts do BootStrap -->
-    <script src="/pedro/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/ js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-        </script>
-    <script>
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-    </script>
-    <script src="../../Assets/JS/tema.js"></script>
-</body>
-
-</html>

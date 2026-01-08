@@ -57,7 +57,6 @@ SecurityHeaders::setLogin();
                     <button type="submit" class="btn btn-success form-control">Validar</button>
                 </div>
                 <div class="col-md-3 mt-2">
-                    <!-- <button type="button" class="btn btn-secondary form-control" onclick="location.href='../Login.php';">Reenviar</button> -->
                     <a href="../Login.php" class="btn btn-secondary form-control">Reenviar</a>
                 </div>
             </div>

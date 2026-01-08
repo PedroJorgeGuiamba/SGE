@@ -1,13 +1,4 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
-require_once __DIR__ . '/../../middleware/auth.php';
-require_once __DIR__ . '/../../Controller/Geral/SupervisorAdmin.php';
-
-SecurityHeaders::setFull();
-
 // Verificar se o parâmetro numero existe
 if (!isset($_GET['numero']) || !is_numeric($_GET['numero']) || intval($_GET['numero']) <= 0) {
     $_SESSION['flash_error'] = 'ID da resposta inválido ou não fornecido.';
@@ -16,88 +7,7 @@ if (!isset($_GET['numero']) || !is_numeric($_GET['numero']) || intval($_GET['num
 }
 $numero = intval($_GET['numero']);
 ?>
-
-<!DOCTYPE html>
-<html lang="pt-pt"  data-bs-theme="<?php echo $_SESSION['theme'] ?? 'light'; ?>">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulário de Avaliação de Estágio</title>
-
-    <!-- BootStrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <!-- CSS -->
-    <link rel="stylesheet" href="../../Style/home.css">
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Fallback local para jQuery -->
-    <script>window.jQuery || document.write('<script src="../../Scripts/jquery-3.6.0.min.js"><\/script>');</script>
-</head>
-
-<body>
-    <header>
-        <!-- Nav principal -->
-        <nav class="navbar navbar-expand-lg bg-body-tertiary">
-            <div class="container-fluid">
-                <img src="https://www.itc.ac.mz/wp-content/uploads/2020/07/cropped-LOGO_ITC-09.png" alt="ITC Logo">
-                <div class="nav-modal">
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText"
-                        aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarText">
-                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                            <!-- Instagram -->
-                            <li class="nav-item">
-                                <a class="nav-link" aria-current="page"
-                                    href="https://www.instagram.com/itc.ac">Instagram</a>
-                            </li>
-                            <!-- Facebook -->
-                            <li class="nav-item">
-                                <a class="nav-link" aria-current="page"
-                                    href="https://pt-br.facebook.com/itc.transcom">Facebook</a>
-                            </li>
-                            <!-- Google -->
-                            <li class="nav-item">
-                                <a class="nav-link"
-                                    href="https://plus.google.com/share?url=https://simpleshare.buttons.com">Google</a>
-                            </li>
-                            <!-- LinkedIn -->
-                            <li class="nav-item">
-                                <a class="nav-link"
-                                    href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://simpleshare.buttons.com">Linkedin</a>
-                            </li>
-                            <li class="nav-item">
-                                <button id="themeToggle" class="btn btn-outline-secondary position-fixed bottom-0 end-0 m-3" style="z-index: 1050;">
-                                    <i class="fas fa-moon"></i> <!-- ícone muda com JS -->
-                                </button>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger">Logout</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </nav>
-
-        <!-- Nav Secundária -->
-        <nav>
-            <ul class="nav justify-content-center">
-                <li class="nav-item">
-                    <a class="nav-link" href="../../View/<?php echo $_SESSION['role'] === 'admin' ? 'Admin/portalDoAdmin.php' : 'Supervisor/portalDoSupervisor.php'; ?>">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="formularioDeCartaDeEstagio.php">Fazer Pedido de Estágio</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="listaDePedidos.php">Pedidos de Estágio</a>
-                </li>
-            </ul>
-        </nav>
-    </header>
-
+<?php require_once __DIR__ . '/../../Includes/header-estagio-admin.php' ?>
     <main>
         <div class="formulario">
 
@@ -144,6 +54,12 @@ $numero = intval($_GET['numero']);
             </form>
         </div>
     </main>
+
+    <footer>
+        <div class="container-footer">
+            <p> &copy; <?php echo date("Y"); ?> - TRANSCOM . DIREITOS RESERVADOS . DESIGN & DEVELOPMENT <span>TRANSCOM</span></p>
+        </div>
+    </footer>
 
     <!-- Scripts do Bootstrap e jQuery Validation -->
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>

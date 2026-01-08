@@ -242,7 +242,7 @@ SecurityHeaders::setFull();
         <!-- Rodapé -->
         <footer>
             <div class="container-footer">
-                <p>© 2019 TRANSCOM . DIREITOS RESERVADOS . DESIGN & DEVELOPMENT <span>TRANSCOM</span></p>
+                <p> &copy; <?php echo date("Y"); ?> - TRANSCOM . DIREITOS RESERVADOS . DESIGN & DEVELOPMENT <span>TRANSCOM</span></p>
             </div>
         </footer>
     </main>

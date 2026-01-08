@@ -1,30 +1,46 @@
-<?php
-session_start();
-include '../../Controller/Supervisor/Home.php';
-require_once __DIR__ .'/../../middleware/auth.php';
-require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
-
-SecurityHeaders::setFull();
-?>
-
 <!DOCTYPE html>
 <html lang="pt-pt" data-bs-theme="<?php echo $_SESSION['theme'] ?? 'light'; ?>">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal do Supervisor</title>
+    <title>ITC</title>
 
-    <!-- BootStrap Links -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
-    <!-- CSS -->
-    <link rel="stylesheet" href="../../Style/home.css">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <link rel="stylesheet" href="../../Assets/CSS/chart.css">
+    <!-- Custom CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --info-color: #0dcaf0;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --border-radius: 15px;
+        }
+        body {
+            /* background: linear-gradient(to bottom, #f8f9fa, #e9ecef); */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        footer {
+            background: var(--bg-gradient);
+            color: white;
+            padding: 1rem 0;
+            margin-top: 3rem;
+        }
+    </style>
 </head>
 
 <body>
+
     <header>
         <!-- Nav principal -->
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
@@ -57,7 +73,11 @@ SecurityHeaders::setFull();
                                 <a class="nav-link"
                                     href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://simplesharebuttons.com">Linkedin</a>
                             </li>
-
+                            <li class="nav-item">
+                                <button id="themeToggle" class="btn btn-outline-secondary position-fixed bottom-0 end-0 m-3" style="z-index: 1050;">
+                                    <i class="fas fa-moon"></i> <!-- ícone muda com JS -->
+                                </button>
+                            </li>
                             <li class="nav-item">
                                 <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger">Logout</a>
                             </li>
@@ -70,41 +90,18 @@ SecurityHeaders::setFull();
         <nav>
             <ul class="nav justify-content-center">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    <a class="nav-link active" aria-current="page"
+                        href="../../View/Admin/portalDoAdmin.php">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="../estagio/formularioDeCartaDeEstagio.php">Fazer Pedido de Estágio</a>
+                    <a class="nav-link" href="formularioDeCartaDeEstagio.php">Fazer Pedido de Estágio</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="../estagio/listaDePedidos.php">Pedidos de Estágio</a>
+                    <a class="nav-link" href="listaDePedidos.php">Pedidos de Estágio</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="../estagio/respostaCarta.php">Respostas Das Cartas de Estagio</a>
+                    <a class="nav-link" href="respostaCarta.php">Resposta das Cartas</a>
                 </li>
-            </ul>
             </ul>
         </nav>
     </header>
-
-    <main>
-        <!-- Rodapé -->
-        <footer>
-            <div class="container-footer">
-                <p> &copy; <?php echo date("Y"); ?> - TRANSCOM . DIREITOS RESERVADOS . DESIGN & DEVELOPMENT <span>TRANSCOM</span></p>
-            </div>
-        </footer>
-    </main>
-
-    <!-- Scripts do BootStrap -->
-    <script src="/pedro/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/ js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-        </script>
-    <script>
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-    </script>
-    <script src="../../Assets/JS/tema.js"></script>
-</body>
-
-</html>

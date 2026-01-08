@@ -478,13 +478,13 @@
             </div>
         </section>
 
-        <!-- Rodapé -->
-        <footer>
-            <div class="container-footer">
-                <p>© 2019 TRANSCOM . DIREITOS RESERVADOS . DESIGN & DEVELOPMENT <span>TRANSCOM</span></p>
-            </div>
-        </footer>
     </main>
+    <!-- Rodapé -->
+    <footer>
+        <div class="container-footer">
+            <p> &copy; <?php echo date("Y"); ?> - TRANSCOM . DIREITOS RESERVADOS . DESIGN & DEVELOPMENT <span>TRANSCOM</span></p>
+        </div>
+    </footer>
     <!-- Scripts do BootStrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"

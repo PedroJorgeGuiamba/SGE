@@ -5,3 +5,5 @@ Assets/img/*
 uploads/avaliacaoEstagios/*
 
 !uploads/avaliacaoEstagios/.gitkeep
+
+Assets/Estrutura/*

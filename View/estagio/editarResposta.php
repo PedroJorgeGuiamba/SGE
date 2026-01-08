@@ -1,12 +1,5 @@
 <?php
-session_start();
-require_once __DIR__ . '/../../Controller/Geral/SupervisorAdmin.php';
-require_once __DIR__ . '/../../middleware/auth.php';
 require_once __DIR__ . '/../../Conexao/conector.php';
-require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
-
-SecurityHeaders::setFull();
-
 // Verifica se o ID foi passado na URL
 if (!isset($_GET['id_resposta'])) {
     header('Location: repostaCarta.php');
@@ -62,55 +55,7 @@ $stmt->close();
 $conn->close();
 ?>
 
-<!DOCTYPE html>
-<html lang="pt-pt" data-bs-theme="<?php echo $_SESSION['theme'] ?? 'light'; ?>">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Resposta do Pedido de Estágio</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="../../Style/home.css">
-</head>
-<body>
-    <header>
-        <!-- Nav principal -->
-        <nav class="navbar navbar-expand-lg bg-body-tertiary">
-            <div class="container-fluid">
-                <img src="https://www.itc.ac.mz/wp-content/uploads/2020/07/cropped-LOGO_ITC-09.png" alt="Logo ITC">
-                <div class="nav-modal">
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarText">
-                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                            <li class="nav-item">
-                                <button id="themeToggle" class="btn btn-outline-secondary position-fixed bottom-0 end-0 m-3" style="z-index: 1050;">
-                                    <i class="fas fa-moon"></i> <!-- ícone muda com JS -->
-                                </button>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger">Logout</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </nav>
-
-        <!-- Nav Secundária -->
-        <nav>
-            <ul class="nav justify-content-center">
-                <li class="nav-item">
-                    <a class="nav-link" href="../../View/<?php echo $_SESSION['role'] === 'admin' ? 'Admin/portalDoAdmin.php' : 'Supervisor/portalDoSupervisor.php'; ?>">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="../estagio/formularioDeCartaDeEstagio.php">Fazer Pedido de Estágio</a>
-                </li>
-            </ul>
-        </nav>
-    </header>
+<?php require_once __DIR__ . '/../../Includes/header-estagio-admin.php' ?>
 
     <main class="container mt-4">
         <h2 class="mb-4">Editar Resposta do Pedido de Estágio</h2>
@@ -170,7 +115,7 @@ $conn->close();
 
     <footer>
         <div class="container-footer">
-            <p>© 2019 TRANSCOM. DIREITOS RESERVADOS. DESIGN & DEVELOPMENT <span>TRANSCOM</span></p>
+            <p> &copy; <?php echo date("Y"); ?> - TRANSCOM. DIREITOS RESERVADOS. DESIGN & DEVELOPMENT <span>TRANSCOM</span></p>
         </div>
     </footer>
 

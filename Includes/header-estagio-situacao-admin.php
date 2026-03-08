@@ -33,7 +33,7 @@
         footer {
             background: var(--bg-gradient);
             color: white;
-            padding: 1rem 0;
+            padding: 50px;
             margin-top: 3rem;
         }
     </style>

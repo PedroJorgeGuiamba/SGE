@@ -13,8 +13,13 @@ class Resposta
     private $dataFim;
     private $statusEstagio;
 
-    public function __construct()
+    public function __construct($conn = null)
     {
+        if ($conn instanceof mysqli) {
+            $this->conn = $conn;
+            return;
+        }
+
         $conexao = new Conector();
         $this->conn = $conexao->getConexao();
     }

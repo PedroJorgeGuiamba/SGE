@@ -46,7 +46,7 @@ function terminarSessao()
     session_start();
 
     if (!isset($_SESSION['sessao_id'])) {
-        header("Location: ../View/Login.php");
+        header("Location: ../View/Auth/Login.php");
         exit();
     }
 
@@ -66,7 +66,7 @@ function terminarSessao()
     session_destroy();
     
     setcookie("token_sessao", "", time() - 3600, "/");
-    header("Location: /estagio/View/Login.php");
+    header("Location: /estagio/View/Auth/Login.php");
     exit();
 }
 

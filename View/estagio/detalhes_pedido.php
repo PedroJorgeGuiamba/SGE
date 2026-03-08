@@ -90,5 +90,6 @@ $conn->close();
         <a href="formularioDeCartaDeEstagio.php" class="btn btn-primary">Novo Pedido</a>
         <a href="/pdf/generate_pdf.php?numero=<?php echo htmlspecialchars($pedido['numero'], ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-success" target="_blank">Gerar PDF</a>
     </div>
+    <?php require_once __DIR__ . '/../../Includes/footer.php'?>
 </body>
 </html>

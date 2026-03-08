@@ -4,6 +4,6 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 if (!isset($_SESSION['email']) or $_SESSION['role'] !== 'seguranca') {
-    header("Location: ../../View/Login.php");
+    header("Location: ../../View/Auth/Login.php");
     exit();
 }

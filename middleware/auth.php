@@ -11,6 +11,6 @@ require_once __DIR__ . '/../Helpers/auth.php';
 
 $auth = new AuthMiddleware();
 if (!$auth->verificarAutenticacao()) {
-    header("Location: /estagio/View/Login.php");
+    header("Location: /estagio/View/Auth/Login.php");
     exit();
 }

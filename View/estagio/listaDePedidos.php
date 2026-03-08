@@ -1,11 +1,10 @@
 <?php require_once __DIR__ . '/../../Includes/header-estagio-admin.php' ?>
 
-
     <main class="container mt-4">
 
         <h2 class="mb-4">Lista de Todos os Pedidos</h2>
 
-        <input type="text" id="searchInput" class="form-control mb-3" placeholder="Pesquisar por empresa">
+        <input type="text" id="searchInput" class="form-control mb-3" placeholder="Pesquisar por Empresa, Nome, Email ou Apelido">
         <div class="table-responsive">
             <table id="pedidosTable" class="table table-bordered">
                 <thead>
@@ -23,7 +22,7 @@
                         <th>Contacto Principal</th>
                         <th>Contacto Secundário</th>
                         <th>Email</th>
-                        <th>Ações</th>
+                        <th>Acções</th>
                     </tr>
                 </thead>
                 <tbody id="pedidosTbody">
@@ -41,23 +40,8 @@
         </div>
     </main>
 
-    <footer>
-        <div class="container-footer">
-            <p> &copy; <?php echo date("Y"); ?> - TRANSCOM . DIREITOS RESERVADOS . DESIGN & DEVELOPMENT <span>TRANSCOM</span></p>
-        </div>
-    </footer>
-
     <!-- Scripts do BootStrap -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-    </script>
-    <script>
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-    </script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="../../Assets/JS/tema.js"></script>
+    <?php require_once __DIR__ . '/../../Includes/footer.php'?>
 
     <script>
         $(document).ready(function() {
@@ -79,8 +63,8 @@
                             <td>${pedido.nome}</td>
                             <td>${pedido.apelido}</td>
                             <td>${pedido.codigo_formando}</td>
-                            <td>${pedido.qualificacao}</td>
-                            <td>${pedido.codigo_turma}</td>
+                            <td>${pedido.qualificacao_descricao ?? pedido.qualificacao}</td>
+                            <td>${pedido.turma}</td>
                             <td>${pedido.data_do_pedido.split('-').reverse().join('/')}</td>
                             <td>${pedido.hora_do_pedido}</td>
                             <td>${pedido.empresa}</td>
@@ -88,13 +72,10 @@
                             <td>${pedido.contactoSecundario}</td>
                             <td>${pedido.email}</td>
                             <td>
-                                <button class="btn btn-sm btn-primary gerar-pdf-btn" data-id="${pedido.id_pedido_carta}" title="Gerar PDF">
+                                <button class="btn btn-sm btn-primary gerar-pdf-completo-btn" data-id="${pedido.id_pedido_carta}" title="Gerar PDF">
                                     <i class="fas fa-file-pdf"></i>
                                 </button>
-                                <button class="btn btn-sm btn-danger gerar-pdf-completo-btn" data-id="${pedido.id_pedido_carta}" title="Gerar PDF">
-                                    <i class="fas fa-file-pdf"></i>
-                                </button>
-                                <button class="btn btn-sm btn-warning editar-btn" data-id="${pedido.numero}" title="Editar">
+                                <button class="btn btn-sm btn-warning editar-btn" data-id="${pedido.numero}" title="Editar" >
                                     <i class="fas fa-edit"></i>
                                 </button>
                                 <button class="btn btn-sm btn-danger remover-btn" data-id="${pedido.numero}" title="Remover">
@@ -128,7 +109,7 @@
             }
 
             function buscarPedidos(pesquisa = '') {
-                $.get('../../Controller/Estagio/search_pedidos.php', { empresa: pesquisa }, function(data) {
+                $.get('../../Controller/Estagio/search_pedidos.php', { termo: pesquisa }, function(data) {
                     pedidosData = data;
                     currentPage = 1;
                     renderTable();
@@ -198,29 +179,75 @@
 
                 const selectedIds = [];
                 $('.select-checkbox:checked').each(function() {
-                    selectedIds.push($(this).data('id')); // ou .val() se puseres value=
+                    selectedIds.push($(this).val());
                 });
+
+                console.log('[ZIP] IDs selecionados:', selectedIds);
 
                 if (selectedIds.length === 0) {
                     alert('Selecione pelo menos um pedido.');
                     return;
                 }
 
-                const $form = $('<form>', {
+                // Monta FormData com ids[]
+                const formData = new FormData();
+                selectedIds.forEach(id => formData.append('ids[]', id));
+
+                // Feedback visual
+                const $btn = $(this);
+                $btn.prop('disabled', true).text('A gerar ZIP...');
+
+                // Usa fetch com blob — evita navegação para página branca
+                fetch('../../Controller/Estagio/GerarPdfCompleto.php', {
                     method: 'POST',
-                    action: '../../Controller/Estagio/GerarPdfCompleto.php'
-                });
+                    body: formData
+                })
+                .then(response => {
+                    console.log('[ZIP] Status HTTP:', response.status);
+                    console.log('[ZIP] Content-Type:', response.headers.get('Content-Type'));
 
-                selectedIds.forEach(id => {
-                    $form.append($('<input>', {
-                        type: 'hidden',
-                        name: 'ids[]',
-                        value: id
-                    }));
-                });
+                    const contentType = response.headers.get('Content-Type') || '';
 
-                $('body').append($form);
-                $form.submit(); // <--- ESTAVA A FALTAR ISTO!!
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error('Servidor devolveu erro ' + response.status + ':\n' + text);
+                        });
+                    }
+
+                    // Se o servidor devolveu HTML (erro PHP), mostra no console e alerta
+                    if (contentType.includes('text/html')) {
+                        return response.text().then(text => {
+                            console.error('[ZIP] Servidor devolveu HTML (erro PHP):\n', text);
+                            throw new Error('O servidor devolveu um erro PHP. Veja o console para detalhes.');
+                        });
+                    }
+
+                    return response.blob();
+                })
+                .then(blob => {
+                    console.log('[ZIP] Blob recebido:', blob.size, 'bytes | tipo:', blob.type);
+
+                    if (blob.size === 0) {
+                        throw new Error('O ficheiro ZIP recebido está vazio (0 bytes).');
+                    }
+
+                    // Dispara download do ZIP
+                    const url = URL.createObjectURL(blob);
+                    const a   = document.createElement('a');
+                    a.href     = url;
+                    a.download = 'Pacotes_Estagio.zip';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                })
+                .catch(err => {
+                    console.error('[ZIP] Erro:', err);
+                    alert('Erro ao gerar ZIP:\n' + err.message + '\n\nVeja o console (F12) para mais detalhes.');
+                })
+                .finally(() => {
+                    $btn.prop('disabled', false).text('Gerar todos selecionados (ZIP)');
+                });
             });
         });
 

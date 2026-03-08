@@ -112,6 +112,12 @@ SecurityHeaders::setFull();
     <main>
         <div class="formulario">
             <form action="../../Controller/Estagio/FormularioDeCartaDeEstagio.php" method="post" id="formularioEstagio">
+                <?php if (isset($_GET['erros'])): ?>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($_GET['erros']); ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <?php endif; ?>
                 <div class="row">
                     <div class="form-group col-md-4">
                         <label for="codigoFormando" class="form-label">Código do Formando</label>
@@ -180,30 +186,8 @@ SecurityHeaders::setFull();
         </div>
     </main>
 
-    <footer>
-        <div class="container-footer">
-            <p> &copy; <?php echo date("Y"); ?> - TRANSCOM . DIREITOS RESERVADOS . DESIGN & DEVELOPMENT <span>TRANSCOM</span></p>
-        </div>
-    </footer>
-
-    <!-- Scripts do Bootstrap e jQuery Validation -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-    </script>
-    <script src="../../Assets/JS/tema.js"></script>
+    <?php require_once __DIR__ . '/../../Includes/footer.php'?>
     <script>
-        // Verificar se jQuery está carregado
-        if (typeof jQuery === 'undefined') {
-            console.error('jQuery não foi carregado!');
-        } else {
-            console.log('jQuery carregado com sucesso, versão:', jQuery.fn.jquery);
-        }
-
-        // Inicializar tooltips do Bootstrap
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-
         // Selects com valores fornecidos da BD
         $(document).ready(function() {
             carregarDados();
@@ -235,6 +219,11 @@ SecurityHeaders::setFull();
             });
         }
 
+        $.validator.addMethod('telefone_mz', function(value, element) {
+            if (this.optional(element)) return true;
+            return /^(\+258)?[ -]?[8][2-7][0-9]{7}$/.test(value);
+        }, 'Número inválido. Ex: +258 84xxxxxxx ou 84xxxxxxx');
+
         // Validação do formulário
         $("#formularioEstagio").validate({
             rules: {
@@ -261,11 +250,11 @@ SecurityHeaders::setFull();
                 },
                 contactoPrincipal: {
                     required: true,
-                    pattern: /^(\+258)?[ -]?[8][2-7][0-9]{7}$/
+                    telefone_mz: true
                 },
                 contactoSecundario: {
                     required: true,
-                    pattern: /^(\+258)?[ -]?[8][2-7][0-9]{7}$/
+                    telefone_mz: true
                 },
                 email: {
                     required: true,
@@ -295,12 +284,12 @@ SecurityHeaders::setFull();
                     minlength: "O nome deve ter pelo menos 2 caracteres."
                 },
                 contactoPrincipal: {
-                    required: "Informe um contacto válido.",
-                    pattern: "Número inválido. Ex: +258 84xxxxxxx"
+                    required: "Campo obrigatório.",
+                    telefone_mz: "Número inválido. Ex: +258 84xxxxxxx"
                 },
                 contactoSecundario: {
-                    required: "Informe o contacto secundário.",
-                    pattern: "Número inválido. Ex: +258 84xxxxxxx"
+                    required: "Campo obrigatório.",
+                    telefone_mz: "Número inválido. Ex: +258 84xxxxxxx"
                 },
                 email: {
                     required: "Informe o e-mail.",

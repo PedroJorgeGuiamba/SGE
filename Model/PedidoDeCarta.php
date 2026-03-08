@@ -16,8 +16,13 @@ class PedidoDeCarta
     private $contactoSecundario;
     private $email;
 
-    public function __construct()
+    public function __construct($conn = null)
     {
+        if ($conn instanceof mysqli) {
+            $this->conn = $conn;
+            return;
+        }
+
         $conexao = new Conector();
         $this->conn = $conexao->getConexao();
     }
@@ -110,5 +115,9 @@ class PedidoDeCarta
         );
 
         return $stmt->execute();
+    }
+
+    public function LastInsertId($conn){
+        return $conn->insert_id;
     }
 }

@@ -30,7 +30,7 @@ class Supervisor{
         }
 
         $stmt->bind_param(
-            "sii",
+            "siis",
             $this->nome,
             $this->id_qualificacao,
             $this->user,

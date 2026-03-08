@@ -1,12 +1,15 @@
-<?php
-include '../../Controller/Cursos/CadastrarCurso.php';
-?>
-
 <?php require_once __DIR__ . '/../../Includes/header-admin.php' ?>
 
     <main>
         <div class="formulario">
             <form action="../../Controller/Cursos/CadastrarCurso.php" method="post">
+                <?php if (isset($_GET['erros'])): ?>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($_GET['erros']); ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <?php endif; ?>
+                
                 <div class="row">
                     <div class="form-group col-md-4">
                         <label for="codigoCurso" class="form-label">Código do Curso</label>
@@ -49,19 +52,7 @@ include '../../Controller/Cursos/CadastrarCurso.php';
         </div>
     </main>
 
-    <footer>
-        <div class="container-footer">
-            <p> &copy; <?php echo date("Y"); ?> - TRANSCOM . DIREITOS RESERVADOS . DESIGN & DEVELOPMENT <span>TRANSCOM</span></p>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-        </script>
-    <script>
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-    </script>
+    <?php require_once __DIR__ . '/../../Includes/footer.php'?>
     <script>
         $(document).ready(function () {
             carregarDados();

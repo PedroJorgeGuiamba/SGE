@@ -4,17 +4,32 @@ require_once __DIR__ . '/../../Conexao/conector.php';
 $conexao = new Conector();
 $conn = $conexao->getConexao();
 
-$pesquisa = $_GET['numero'] ?? '';
+$pesquisa = trim($_GET['numero'] ?? '');
 
-// Se estiver vazio, retorna todas as respostas
-if (empty($pesquisa)) {
-    $sql = "SELECT * FROM resposta_carta";
+if ($pesquisa === '') {
+    $sql = "
+        SELECT
+            rc.*,
+            pc.numero AS numero_pedido
+        FROM resposta_carta rc
+        LEFT JOIN pedido_carta pc ON rc.numero_carta = pc.id_pedido_carta
+        ORDER BY rc.id_resposta DESC
+    ";
     $result = $conn->query($sql);
 } else {
-    // Corrigido: usar LIKE apenas para strings, para números usar =
-    $sql = "SELECT * FROM resposta_carta WHERE numero = ?";
+    $sql = "
+        SELECT
+            rc.*,
+            pc.numero AS numero_pedido
+        FROM resposta_carta rc
+        LEFT JOIN pedido_carta pc ON rc.numero_carta = pc.id_pedido_carta
+        WHERE rc.numero_carta = ? OR pc.numero = ?
+        ORDER BY rc.id_resposta DESC
+    ";
+
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $pesquisa);
+    $pesquisaInt = (int) $pesquisa;
+    $stmt->bind_param("ii", $pesquisaInt, $pesquisaInt);
     $stmt->execute();
     $result = $stmt->get_result();
 }

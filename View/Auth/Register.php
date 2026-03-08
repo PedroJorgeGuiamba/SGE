@@ -50,17 +50,19 @@ include_once '../../Controller/Auth/RegisterController.php';
 
     <div class="container custom-container">
         <h2>
-            REGISTER
+            REGISTER USER
         </h2>
 
         <hr />
-        
-        <?php if (isset($_GET['error']) || isset($error)): ?>
-            <div class="alert alert-danger"><?= htmlspecialchars($_GET['error'] ?? $error) ?></div>
-        <?php endif; ?>
 
         <form method="post">
             <?= CSRFProtection::getTokenField() ?>
+            <?php if (isset($_GET['erros'])): ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($_GET['erros']); ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <?php endif; ?>
             <div class="card mb-3">
                 <div class="card-body">
                     <div class="row">

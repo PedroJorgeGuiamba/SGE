@@ -1,5 +1,4 @@
 <?php
-require_once __DIR__ . '/../Conexao/conector.php';
 
 class Estagio{
     private $id_resposta;
@@ -20,10 +19,7 @@ class Estagio{
     public function setStatus($st){$this->status = $st;}
     public function setObs($o){$this->observacoes = $o;}
 
-    public function salvar(){
-        $conexao = new Conector();
-        $conn = $conexao->getConexao();
-
+    public function salvar($conn){
         $sql = "INSERT INTO estagio (
                 codigo_formando,
                 id_empresa,
@@ -47,9 +43,7 @@ class Estagio{
         return $resultado;
     }
 
-    public function salvarNoEdit(){
-        $conexao = new Conector();
-        $conn = $conexao->getConexao();
+    public function salvarNoEdit($conn){
 
         $sql = "INSERT INTO estagio (
                 codigo_formando,

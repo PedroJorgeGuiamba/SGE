@@ -26,9 +26,9 @@ class SecurityHeaders {
     private static function getCSP() {
         return  "default-src 'self'; " .
                 "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://code.jquery.com https://cdn.datatables.net; " .
-                "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://getbootstrap.com https://cdnjs.cloudflare.com https://cdn.datatables.net; " .
+                "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://getbootstrap.com https://cdnjs.cloudflare.com https://cdn.datatables.net  https://cdn.boxicons.com; " .
                 "img-src 'self' data: https:; " .
-                "font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " .
+                "font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.boxicons.com; " .
                 "connect-src 'self' http://localhost; " .
                 "frame-ancestors 'none'; " .
                 "base-uri 'self'; " .
@@ -44,29 +44,5 @@ class SecurityHeaders {
                 "connect-src 'self' http://localhost; " .
                 "frame-ancestors 'none'";
     }
-    
-    // private static function getCSP() {
-    //     // Content Security Policy restritiva
-    //     return "default-src 'self'; " .
-    //             "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " .
-    //             "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " .
-    //             "img-src 'self' data: https:; " .
-    //             "font-src 'self' https://cdn.jsdelivr.net; " .
-    //             "connect-src 'self'; " .
-    //             "frame-ancestors 'none'; " .
-    //             "base-uri 'self'; " .
-    //             "form-action 'self'";
-    // }
-    
-    // private static function getLoginCSP() {
-    //     // CSP mais flexível para login (permite CDNs)
-    //     return "default-src 'self'; " .
-    //             "script-src 'self' https://cdn.jsdelivr.net; " .
-    //             "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " .
-    //             "img-src 'self' data: https:; " .
-    //             "font-src 'self' https://cdn.jsdelivr.net; " .
-    //             "connect-src 'self'; " .
-    //             "frame-ancestors 'none'";
-    // }
 }
 ?>

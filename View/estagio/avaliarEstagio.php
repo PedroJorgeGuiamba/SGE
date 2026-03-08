@@ -55,17 +55,7 @@ $numero = intval($_GET['numero']);
         </div>
     </main>
 
-    <footer>
-        <div class="container-footer">
-            <p> &copy; <?php echo date("Y"); ?> - TRANSCOM . DIREITOS RESERVADOS . DESIGN & DEVELOPMENT <span>TRANSCOM</span></p>
-        </div>
-    </footer>
-
-    <!-- Scripts do Bootstrap e jQuery Validation -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-    </script>
+    <?php require_once __DIR__ . '/../../Includes/footer.php'?>
     <script>
         // Verificar se jQuery está carregado
         if (typeof jQuery === 'undefined') {
@@ -73,10 +63,6 @@ $numero = intval($_GET['numero']);
         } else {
             console.log('jQuery carregado com sucesso, versão:', jQuery.fn.jquery);
         }
-
-        // Inicializar tooltips do Bootstrap
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
         // Validação do formulário
         $("#formularioAvaliacao").validate({
@@ -131,31 +117,4 @@ $numero = intval($_GET['numero']);
     </script>
 
 </body>
-
 </html>
-<!-- <script>
-$(document).ready(function () {
-$('#formularioAvaliacao').submit(function (e) {
-    e.preventDefault();
-    console.log('Dados enviados:', $(this).serialize());
-    $.ajax({
-        url: '../../Controller/Estagio/avaliarEstagio.php',
-        method: 'POST',
-        data: $(this).serialize(),
-        dataType: 'json',
-        success: function (response) {
-            if (response.success) {
-                alert(response.message);
-                window.location.href = response.redirect;
-            } else {
-                alert(response.message);
-            }
-        },
-        error: function (xhr, status, error) {
-            console.log('Erro AJAX:', xhr.status, status, error, xhr.responseText);
-            alert('Erro ao processar a requisição: ' + (xhr.responseText || 'Verifique o console para mais detalhes.'));
-        }
-    });
-});
-});
-</script> -->

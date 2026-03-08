@@ -8,15 +8,11 @@ class Empresa{
     public function setNome($nome){$this->nome = $nome;}
     public function setAbr($abreviatura){$this->abreviatura = $abreviatura;}
 
-    public function salvar(){
+    public function salvar($conn){
         if (empty($this->nome)) {
             error_log("Tentativa de salvar empresa sem nome");
             return false;
         }
-
-        $conexao = new Conector();
-        $conn = $conexao->getConexao();
-
         $sql = "INSERT INTO empresa (nome, abreviatura, email) VALUES (?, ?, NULL)";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ss", $this->nome, $this->abreviatura);

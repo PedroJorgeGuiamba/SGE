@@ -50,22 +50,6 @@ class Formando extends Pessoa{
         $dataNascimento = $this->getDataDeNascimento()->format('Y-m-d');
         $dataEmissao = $this->getDataDeEmissao()->format('Y-m-d');
 
-        // $stmt->bind_param(
-        //     "issssssssiis",
-        //     $this->codigo,
-        //     $this->getNome(),
-        //     $this->getApelido(),
-        //     $dataNascimento,
-        //     $this->getNaturalidade(),
-        //     $this->getTipoDeDocumento(),
-        //     $this->getNumeroDeDocumento(),
-        //     $this->getLocalEmitido(),
-        //     $dataEmissao,
-        //     $this->getNUIT(),
-        //     $this->getTelefone(),
-        //     $this->getEmail()
-        // );
-
         $nome = $this->getNome();
         $apelido = $this->getApelido();
         $dataNascimento = $this->getDataDeNascimento()->format('Y-m-d');

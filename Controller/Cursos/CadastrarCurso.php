@@ -10,10 +10,13 @@ class CadastrarCurso
 {
     public function cadastrarCurso()
     {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            
-            var_dump($_POST['qualificacao']); // Log para depuração
-        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("LOCATION: /estagio/View/Cursos/CadastrarCurso.php?erros=" . urlencode("Método da Requisição Inválido"));
+            exit();
+        }
+        try{
+            $curso = new Curso();
+
             $codigo = isset($_POST['codigoCurso']) ? (int) $_POST['codigoCurso'] : null;
             $nome = trim($_POST['nomeCurso'] ?? '');
             $descricao = trim($_POST['descricaoCurso'] ?? '');
@@ -23,52 +26,45 @@ class CadastrarCurso
 
             // Validação
             if ($codigo === null || $codigo <= 0) {
-                echo "Erro: O código do curso deve ser um número válido.";
-                return;
+                header("LOCATION: /estagio/View/Cursos/CadastrarCurso.php?erros=" . urlencode("Erro: O código do curso deve ser um número válido."));
+                exit();
             }
             if (empty($nome)) {
-                echo "Erro: O nome do curso é obrigatório.";
-                return;
+                header("LOCATION: /estagio/View/Cursos/CadastrarCurso.php?erros=" . urlencode("Erro: O nome do curso é obrigatório."));
+                exit();
             }
             if (empty($sigla)) {
-                echo "Erro: A sigla do curso é obrigatória.";
-                return;
+                header("LOCATION: /estagio/View/Cursos/CadastrarCurso.php?erros=" . urlencode("Erro: A sigla do curso é obrigatória."));
+                exit();
             }
             if ($id_qualificacao === null || $id_qualificacao <= 0) {
-                echo "Erro: Selecione uma qualificação válida (valor recebido: " . ($_POST['qualificacao'] ?? 'indefinido') . ").";
-                return;
+                header("LOCATION: /estagio/View/Cursos/CadastrarCurso.php?erros=" . urlencode("Erro: Selecione uma qualificação válida (valor recebido: " . ($_POST['qualificacao'] ?? 'indefinido') . ")."));
+                exit();
             }
 
-            $curso = new Curso();
             $curso->setCodigo($codigo);
             $curso->setNome($nome);
             $curso->setDescricao($descricao);
             $curso->setSigla($sigla);
             $curso->setIdQualificacao($id_qualificacao);
 
-            if ($curso->salvar()) {
-
-                if (isset($_SESSION['sessao_id'])) {
-                    registrarAtividade($_SESSION['sessao_id'], "Cadastrou um curso: " . $nome, "CRIACAO");
-                }
-
-                header("Location: /estagio/View/Admin/portalDoAdmin.php");
-            } else {
-                echo "Erro ao cadastrar o curso.";
+            if (!$curso->salvar()) {
+                header("LOCATION: /estagio/View/Cursos/CadastrarCurso.php?erros=" . urlencode("Erro ao cadastrar o curso."));
+                exit();
             }
-            
-        
-        } else {
-            echo "Método inválido.";
-        }
 
-        return $curso;
+            if (isset($_SESSION['sessao_id'])) {
+                registrarAtividade($_SESSION['sessao_id'], "Cadastrou um curso: " . $nome, "CRIACAO");
+            }
+
+            header("Location: /estagio/View/Admin/portalDoAdmin.php");
+            exit;
+        }catch(Exception $e){
+            header("LOCATION: /estagio/View/Cursos/CadastrarCurso.php?erros=" . urlencode("ERRO DO SISTEMA: $e"));
+            exit();
+        }
     }
 }
 
-$erros = '';
 $curso = new CadastrarCurso();
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $erros = $curso->cadastrarCurso();
-}
-
+$curso->cadastrarCurso();

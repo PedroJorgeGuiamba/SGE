@@ -3,8 +3,31 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+require_once __DIR__ . '/../../Conexao/conector.php';
 // ─── LOG ──────────────────────────────────────────────────────────────────────
 $logFile = __DIR__ . "/../../Temp/debug_gerar_pdf.log";
+
+function gravarDataLevantamento(int $id): void
+{
+    try {
+        $conexao = new Conector();
+        $conn    = $conexao->getConexao();
+
+        date_default_timezone_set('Africa/Maputo');
+        $hoje = date('Y-m-d');
+
+        $stmt = $conn->prepare(
+            "UPDATE pedido_carta SET data_de_levantamento = ? WHERE id_pedido_carta = ?"
+        );
+        $stmt->bind_param("si", $hoje, $id);
+        $stmt->execute();
+
+        logMsg("data_de_levantamento gravada para ID $id: $hoje");
+    } catch (Exception $e) {
+        // Não interrompe o envio do PDF — apenas regista o erro
+        logMsg("ERRO ao gravar data_de_levantamento para ID $id: " . $e->getMessage());
+    }
+}
 
 function logMsg(string $msg): void {
     global $logFile;
@@ -89,6 +112,9 @@ if (!empty($_POST['ids']) && is_array($_POST['ids'])) {
         if ($bytes === null) {
             die("<b>Erro:</b> Não foi possível gerar o PDF para o ID {$ids[0]}. Verifique o log em Temp/debug_gerar_pdf.log");
         }
+
+        gravarDataLevantamento($ids[0]);
+
         header('Content-Type: application/pdf');
         header("Content-Disposition: inline; filename=\"Pacote_Estagio_Completo_{$ids[0]}.pdf\"");
         header('Content-Length: ' . strlen($bytes));
@@ -143,6 +169,11 @@ if (!empty($_POST['ids']) && is_array($_POST['ids'])) {
         exit;
     }
 
+    foreach ($idsGerados as $id) {
+        gravarDataLevantamento($id);
+    }
+
+
     $zipName = "Pacotes_Estagio_" . date('Ymd_His') . ".zip";
     logMsg("Enviando ZIP ($zipName) com " . filesize($zipFile) . " bytes.");
 
@@ -164,6 +195,9 @@ if (!empty($_GET['id_pedido_carta']) && (int)$_GET['id_pedido_carta'] > 0) {
     if ($bytes === null) {
         die("<b>Erro:</b> Não foi possível gerar o PDF para o ID $id.<br><i>Verifique o log em <code>Temp/debug_gerar_pdf.log</code></i>");
     }
+
+    gravarDataLevantamento($id);
+    
     header('Content-Type: application/pdf');
     header("Content-Disposition: inline; filename=\"Pacote_Estagio_Completo_$id.pdf\"");
     header('Content-Length: ' . strlen($bytes));

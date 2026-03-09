@@ -7,12 +7,15 @@ $conn = $conexao->getConexao();
 $termo = $_GET['termo'] ?? '';
 $termo = trim($termo);
 
+$filtroBase = "p.data_de_levantamento IS NULL";
+
 // Se estiver vazio, retorna todos os pedidos
 if ($termo === '') {
     $sql    = "SELECT p.*, q.descricao AS qualificacao_descricao, t.nome AS turma
                 FROM pedido_carta p
                 LEFT JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
                 LEFT JOIN turma t ON t.codigo_qualificacao = q.id_qualificacao
+                WHERE $filtroBase
                 ORDER BY p.id_pedido_carta DESC";
     $result = $conn->query($sql);
 } else {

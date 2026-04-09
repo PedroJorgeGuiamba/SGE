@@ -5,6 +5,7 @@ use Models\Pessoa;
 class Formando extends Pessoa{
     private $conn;
     private int $codigo;
+    private int $userId;
     public function __construct(
         string $nome,
         string $apelido,
@@ -17,12 +18,14 @@ class Formando extends Pessoa{
         DateTime $dataDeEmissao,
         int $NUIT,
         int $Telefone,
-        string $email
+        string $email,
+        int $userId
     ) {
         parent::__construct($nome, $apelido,  $dataDeNascimento,$naturalidade, $tipoDeDocumento, $numeroDeDocumento, $localEmitido, $dataDeEmissao, $NUIT, $Telefone, $email);
         $conexao = new Conector();
         $this->conn = $conexao->getConexao();
         $this->codigo = $codigo;
+        $this->userId = $userId;
     }
 
     public function setCodigo(int $codigo): void
@@ -32,13 +35,22 @@ class Formando extends Pessoa{
 
     public function getCodigo(): int
     {
-        return $this->codigo;
+        return $this->userId;
+    }
+    public function setUserId(int $userId): void
+    {
+        $this->userId = $userId;
+    }
+
+    public function getUserId(): int
+    {
+        return $this->userId;
     }
 
     public function salvar(): bool
     {
         $stmt = $this->conn->prepare(
-            "INSERT INTO formando (codigo, nome, apelido, dataDeNascimento, naturalidade, tipoDeDocumento, numeroDeDocumento, localEmitido, dataDeEmissao, NUIT, telefone, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            "INSERT INTO formando (codigo, nome, apelido, dataDeNascimento, naturalidade, tipoDeDocumento, numeroDeDocumento, localEmitido, dataDeEmissao, NUIT, telefone, email, usuario_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
 
         if (!$stmt) {
@@ -63,7 +75,7 @@ class Formando extends Pessoa{
         $email = $this->getEmail();
 
         $stmt->bind_param(
-            "issssssssiis",
+            "issssssssiisi",
             $this->codigo,
             $nome,
             $apelido,
@@ -75,7 +87,8 @@ class Formando extends Pessoa{
             $dataEmissao,
             $nuit,
             $telefone,
-            $email
+            $email,
+            $this->userId
         );
 
         $result = $stmt->execute();

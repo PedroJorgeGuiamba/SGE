@@ -1,3 +1,28 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+require_once __DIR__ . '/../Controller/Geral/SupervisorAdmin.php';
+require_once __DIR__ . '/../middleware/auth.php';
+require_once __DIR__ . '/../Helpers/SecurityHeaders.php';
+require_once __DIR__ . '/../Helpers/NotificationHelper.php';
+require_once __DIR__ . '/../Conexao/conector.php';
+
+SecurityHeaders::setFull();
+
+// Inicializar conexão se não existir
+if (!isset($conn) || $conn === null) {
+    $conector = new Conector();
+    $conn = $conector->getConexao();
+}
+
+$userId = NotificationHelper::sanitizeUserId($_SESSION['usuario_id'] ?? 0);
+
+NotificationHelper::handleAction($conn, $userId, $_POST ?? []);
+
+$unreadCount = NotificationHelper::getUnreadCount($conn, $userId);
+$notifications = NotificationHelper::getNotifications($conn, $userId);
+?>
 <!DOCTYPE html>
 <html lang="pt-pt" data-bs-theme="<?php echo $_SESSION['theme'] ?? 'light'; ?>">
 
@@ -12,6 +37,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js -->
     <link rel="stylesheet" href="../../Assets/CSS/chart.css">
+    <link rel="stylesheet" href="../../Assets/CSS/notifications.css">
     <!-- Custom CSS -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -23,13 +49,15 @@
             --warning-color: #ffc107;
             --danger-color: #dc3545;
             --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             --border-radius: 15px;
         }
+
         body {
             /* background: linear-gradient(to bottom, #f8f9fa, #e9ecef); */
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
         footer {
             background: var(--bg-gradient);
             color: white;
@@ -78,6 +106,7 @@
                                     <i class="fas fa-moon"></i> <!-- ícone muda com JS -->
                                 </button>
                             </li>
+                            <?php include __DIR__ . '/notification-widget.php'; ?>
                             <li class="nav-item">
                                 <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger">Logout</a>
                             </li>
@@ -97,10 +126,25 @@
                     <a class="nav-link" href="formularioDeCartaDeEstagio.php">Fazer Pedido de Estágio</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="formularioDeCredencialDeEstagio.php">Solicitar Credencial de Estágio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="formularioDeVisita.php">Solicitar Visita de Estágio</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="listaDePedidos.php">Pedidos de Estágio</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="listaDePedidosCredencial.php">Pedidos de Credencial</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="listaDePedidosVisita.php">Pedidos de Visita</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="respostaCarta.php">Resposta das Cartas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="relatorio.php">Gerar Relatórios</a>
                 </li>
             </ul>
         </nav>

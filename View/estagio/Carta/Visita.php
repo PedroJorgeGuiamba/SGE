@@ -23,5 +23,3 @@
     <p><b>(Dr. <?= $coordenador  ?>)</b></p>
     <img src="http://localhost/estagio/Assets/img/Assinatura-removebg-preview.png" style="width:120px; margin-top:10px;">
 </div>
-
-<div class="page-break"></div>

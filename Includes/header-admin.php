@@ -5,8 +5,23 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once __DIR__ . '/../Controller/Admin/Home.php';
 require_once __DIR__ . '/../middleware/auth.php';
 require_once __DIR__ . '/../Helpers/SecurityHeaders.php';
+require_once __DIR__ . '/../Helpers/NotificationHelper.php';
+require_once __DIR__ . '/../Conexao/conector.php';
 
 SecurityHeaders::setFull();
+
+// Inicializar conexão se não existir
+if (!isset($conn) || $conn === null) {
+    $conector = new Conector();
+    $conn = $conector->getConexao();
+}
+
+$userId = NotificationHelper::sanitizeUserId($_SESSION['usuario_id'] ?? 0);
+
+NotificationHelper::handleAction($conn, $userId, $_POST ?? []);
+
+$unreadCount = NotificationHelper::getUnreadCount($conn, $userId);
+$notifications = NotificationHelper::getNotifications($conn, $userId);
 ?>
 
 <!DOCTYPE html>
@@ -27,6 +42,7 @@ SecurityHeaders::setFull();
     <!-- CSS -->
     <link rel="stylesheet" href="../../Style/home.css">
     <link rel="stylesheet" href="../../Assets/CSS/chart.css">
+    <link rel="stylesheet" href="../../Assets/CSS/notifications.css">
     <style>
         :root {
             --primary-color: #0d6efd;
@@ -88,6 +104,7 @@ SecurityHeaders::setFull();
                                     <i class="fas fa-moon"></i> <!-- ícone muda com JS -->
                                 </button>
                             </li>
+                            <?php include __DIR__ . '/notification-widget.php'; ?>
                             <li class="nav-item">
                                 <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger">Logout</a>
                             </li>
@@ -130,7 +147,7 @@ SecurityHeaders::setFull();
                     <a class="nav-link" href="../estagio/situacaoDeEstagio.php">Situação de Estagio</a>
                 </li>
                 <li>
-                    <a class="nav-link"  href="../Notas/visualizarNotas.php">Notas</a>
+                    <a class="nav-link" href="../Notas/visualizarNotas.php">Notas</a>
                 </li>
             </ul>
         </nav>

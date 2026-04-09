@@ -29,12 +29,12 @@
                 </tbody>
             </table>
             <nav>
-            <ul class="pagination justify-content-center mt-3" id="pagination"></ul>
-        </nav>
-
+                <ul class="pagination justify-content-center mt-3" id="pagination"></ul>
+            </nav>
         </div>
         <div class="mt-3">
             <a href="formularioDeCartaDeEstagio.php" class="btn btn-primary">Novo Pedido</a>
+            <a href="HistoricoDePedidos.php" class="btn btn-success">Histórico de Pedidos</a>
             <button type="submit" id="printSelected" class="btn btn-secondary ms-2">Gerar todos selecionados (ZIP)</button>
             <button id="deleteSelected" class="btn btn-danger ms-2">Deletar Selecionados</button>
         </div>
@@ -75,10 +75,10 @@
                                 <button class="btn btn-sm btn-primary gerar-pdf-completo-btn" data-id="${pedido.id_pedido_carta}" title="Gerar PDF">
                                     <i class="fas fa-file-pdf"></i>
                                 </button>
-                                <button class="btn btn-sm btn-warning editar-btn" data-id="${pedido.numero}" title="Editar" >
+                                <button class="btn btn-sm btn-warning editar-btn" data-id="${pedido.id_pedido_carta}" title="Editar" >
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="btn btn-sm btn-danger remover-btn" data-id="${pedido.numero}" title="Remover">
+                                <button class="btn btn-sm btn-danger remover-btn" data-id="${pedido.id_pedido_carta}" title="Remover">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </td>

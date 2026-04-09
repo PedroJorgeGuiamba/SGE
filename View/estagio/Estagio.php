@@ -106,70 +106,7 @@ $curso = htmlspecialchars($dados['curso']);
 <body>
 
 <?php
-$pacotesPorCurso = [
-    'Suporte Informático' => [
-        'TermoDeReferenciaSuporte.php',
-    ],
-    'Suporte Informatico' => [
-        'TermoDeReferenciaSuporte.php',
-    ],
-    'Administração de Redes' => [
-        'TermoDeReferenciaSuporte.php',
-        'TermoDeReferenciaRedes.php',
-    ],
-    'Administracao de Redes' => [
-        'TermoDeReferenciaSuporte.php',
-        'TermoDeReferenciaRedes.php',
-    ],
-    'Programação de Aplicações Web' => [
-        'TermoDeReferenciaSuporte.php',
-        'TermoDeReferenciaProgramacaoAplicacoesWeb.php',
-    ],
-    'Programação de Aplicações WEB' => [
-        'TermoDeReferenciaSuporte.php',
-        'TermoDeReferenciaProgramacaoAplicacoesWeb.php',
-    ],
-    'Programacao de Aplicacoes Web' => [
-        'TermoDeReferenciaSuporte.php',
-        'TermoDeReferenciaProgramacaoAplicacoesWeb.php',
-    ],
-    'Programacao de Aplicacoes WEB' => [
-        'TermoDeReferenciaSuporte.php',
-        'TermoDeReferenciaProgramacaoAplicacoesWeb.php',
-    ],
-    'Construção Cívil' => [
-        'TermoDeReferenciaConstrucaoCivil.php',
-    ],
-    'Construção Civil' => [
-        'TermoDeReferenciaConstrucaoCivil.php',
-    ],
-    'Construcao Civil' => [
-        'TermoDeReferenciaConstrucaoCivil.php',
-    ],
-    'Contabilidade e Auditoria' => [
-        'TermoDeReferenciaContabilidadeEAuditoria.php',
-    ],
-    'Contabilidade & Auditoria' => [
-        'TermoDeReferenciaContabilidadeEAuditoria.php',
-    ],
-    'Electricidade Industrial' => [
-        'TermoDeReferenciaElectricidadeIndustrial.php',
-    ],
-    'Eletricidade Industrial' => [
-        'TermoDeReferenciaElectricidadeIndustrial.php',
-    ],
-];
-
-if (isset($pacotesPorCurso[$curso])) {
-    require_once __DIR__ . '/Carta/Credencial.php';
-
-    foreach ($pacotesPorCurso[$curso] as $termoFile) {
-        require_once __DIR__ . '/Carta/' . $termoFile;
-    }
-
-    require_once __DIR__ . '/Carta/Visita.php';
     require_once __DIR__ . '/Carta/PedidoDeEstagio.php';
-}
 ?>
 </body>
 </html>

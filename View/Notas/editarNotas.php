@@ -1,9 +1,21 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
+}
 require_once __DIR__ . '/../../Conexao/conector.php';
 require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
+require_once __DIR__ . '/../../Helpers/NotificationHelper.php';
 require_once __DIR__ . '/../../middleware/auth.php';
 
 SecurityHeaders::setFull();
+
+$conector = new Conector();
+$conn = $conector->getConexao();
+
+$userId = NotificationHelper::sanitizeUserId($_SESSION['usuario_id'] ?? 0);
+NotificationHelper::handleAction($conn, $userId, $_POST ?? []);
+$unreadCount = NotificationHelper::getUnreadCount($conn, $userId);
+$notifications = NotificationHelper::getNotifications($conn, $userId);
 
 $id = intval($_GET['id'] ?? 0);
 if (!$id) {
@@ -39,6 +51,13 @@ $tentativas = $mysqli->query("SELECT id_tentativa, descricao FROM tipo_tentativa
 </head>
 
 <body class="bg-light">
+  <!-- Notification Widget -->
+  <nav class="navbar navbar-expand-lg bg-white border-bottom">
+    <div class="container-fluid">
+      <span class="navbar-text me-auto">Notificações</span>
+      <?php include __DIR__ . '/../../Includes/notification-widget.php'; ?>
+    </div>
+  </nav>
 
   <div class="container py-5">
     <div class="card shadow-lg border-0 rounded-4">

@@ -6,6 +6,8 @@ require_once __DIR__ . '/../../Helpers/Actividade.php';
 require_once __DIR__ . '/../../Conexao/conector.php';
 require_once __DIR__ . '/../../Model/Resposta.php';
 require_once __DIR__ . '/../../Model/Empresa.php';
+require_once __DIR__ . '/../../Helpers/CSRFProtection.php';
+
 
 class FormularioDeCartaDeEstagio
 {
@@ -15,10 +17,13 @@ class FormularioDeCartaDeEstagio
             header("LOCATION: /estagio/View/estagio/formularioDeCartaDeEstagio.php?erros=" . urlencode("Metodo da Requisicao Invalido"));
             exit();
         }
-
+            
         $conn = null;
-
+            
         try {
+            $token = $_POST['csrf_token'] ?? '';
+            CSRFProtection::validateToken($token);
+            
             date_default_timezone_set('Africa/Maputo');
 
             $conexao = new Conector();
@@ -29,10 +34,27 @@ class FormularioDeCartaDeEstagio
             $empresaM = new Empresa();
             $resposta = new Resposta($conn);
 
-            $codigoFormando = isset($_POST['codigoFormando']) ? (int) $_POST['codigoFormando'] : null;
-            $codigoTurma = isset($_POST['turma']) ? (int) $_POST['turma'] : null;
-            $codigoQualificacao = isset($_POST['qualificacao']) ? (int) $_POST['qualificacao'] : null;
-            $empresa = strtoupper(trim($_POST['empresa'] ?? ''));
+            $fromPreview = isset($_POST['fromPreview']) && $_POST['fromPreview'] === '1';
+
+            if ($fromPreview) {
+                if (empty($_SESSION['preview_pedido'])) {
+                    header("LOCATION: /estagio/View/estagio/formularioDeCartaDeEstagio.php?erros=" 
+                        . urlencode("Sessão expirada. Preencha o formulário novamente."));
+                    exit();
+                }
+                $dados = $_SESSION['preview_pedido'];
+                unset($_SESSION['preview_pedido']);
+            } else {
+                $dados = $_POST;
+            }
+
+            $codigoFormando      = isset($dados['codigoFormando']) ? (int) $dados['codigoFormando'] : null;
+            $codigoTurma         = isset($dados['turma'])          ? (int) $dados['turma']          : null;
+            $codigoQualificacao  = isset($dados['qualificacao'])   ? (int) $dados['qualificacao']   : null;
+            $empresa             = strtoupper(trim($dados['empresa'] ?? ''));
+            $contactoPrincipal   = isset($dados['contactoPrincipal']);
+            $contactoSecundario  = isset($dados['contactoSecundario']);
+            $email               = trim($dados['email']);
 
             $dadosFormando = $pedido->buscarNomeEApelido((int) $codigoFormando);
             if ($dadosFormando === null) {
@@ -43,8 +65,8 @@ class FormularioDeCartaDeEstagio
                 SELECT COUNT(*) AS total
                 FROM pedido_carta
                 WHERE codigo_formando = ?
-                  AND MONTH(data_do_pedido) = MONTH(CURRENT_DATE())
-                  AND YEAR(data_do_pedido) = YEAR(CURRENT_DATE())
+                    AND MONTH(data_do_pedido) = MONTH(CURRENT_DATE())
+                    AND YEAR(data_do_pedido) = YEAR(CURRENT_DATE())
             ";
             $stmtLimite = $conn->prepare($sqlLimite);
             $stmtLimite->bind_param("i", $codigoFormando);
@@ -73,9 +95,9 @@ class FormularioDeCartaDeEstagio
             $pedido->setTurma((int) $codigoTurma);
             $pedido->setQualificacao((int) $codigoQualificacao);
             $pedido->setEmpresa($empresa);
-            $pedido->setContactoPrincipal(trim($_POST['contactoPrincipal'] ?? ''));
-            $pedido->setContactoSecundario(trim($_POST['contactoSecundario'] ?? ''));
-            $pedido->setEmail(trim($_POST['email'] ?? ''));
+            $pedido->setContactoPrincipal($contactoPrincipal);
+            $pedido->setContactoSecundario($contactoSecundario);
+            $pedido->setEmail($email);
             $pedido->setHoraPedido(date("H:i:s"));
             $pedido->setDataPedido(date('Y-m-d'));
 

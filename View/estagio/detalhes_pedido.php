@@ -1,13 +1,20 @@
 <?php
-
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once __DIR__ . '/../../Conexao/conector.php';
-require_once __DIR__ .'/../../middleware/auth.php';
+require_once __DIR__ . '/../../middleware/auth.php';
 require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
+require_once __DIR__ . '/../../Helpers/NotificationHelper.php';
 
 SecurityHeaders::setFull();
 
-$conexao = new Conector();
-$conn = $conexao->getConexao();
+$conector = new Conector();
+$conn = $conector->getConexao();
+$userId = NotificationHelper::sanitizeUserId($_SESSION['usuario_id'] ?? 0);
+NotificationHelper::handleAction($conn, $userId, $_POST ?? []);
+$unreadCount = NotificationHelper::getUnreadCount($conn, $userId);
+$notifications = NotificationHelper::getNotifications($conn, $userId);
 
 // Receber o numero da URL
 $numero = isset($_GET['numero']) ? intval($_GET['numero']) : 0;
@@ -33,12 +40,23 @@ $conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="pt-pt" data-bs-theme="<?php echo $_SESSION['theme'] ?? 'light'; ?>">
+
 <head>
     <meta charset="UTF-8">
     <title>Detalhes do Pedido</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../Assets/CSS/notifications.css">
 </head>
+
 <body class="container mt-4">
+    <!-- Notification Widget -->
+    <nav class="navbar navbar-expand-lg bg-white border-bottom mb-4">
+        <div class="container-fluid">
+            <span class="navbar-text me-auto">Notificações</span>
+            <?php include __DIR__ . '/../../Includes/notification-widget.php'; ?>
+        </div>
+    </nav>
     <h2 class="mb-4">Detalhes do Pedido #<?php echo htmlspecialchars($pedido['numero'], ENT_QUOTES, 'UTF-8'); ?></h2>
     <table class="table table-bordered">
         <tr>
@@ -90,6 +108,7 @@ $conn->close();
         <a href="formularioDeCartaDeEstagio.php" class="btn btn-primary">Novo Pedido</a>
         <a href="/pdf/generate_pdf.php?numero=<?php echo htmlspecialchars($pedido['numero'], ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-success" target="_blank">Gerar PDF</a>
     </div>
-    <?php require_once __DIR__ . '/../../Includes/footer.php'?>
+    <?php require_once __DIR__ . '/../../Includes/footer.php' ?>
 </body>
+
 </html>

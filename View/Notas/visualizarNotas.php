@@ -1,6 +1,20 @@
 <?php
-// Lista avaliacoes
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
+}
 require_once __DIR__ . '/../../Conexao/db.php';
+require_once __DIR__ . '/../../Conexao/conector.php';
+require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
+require_once __DIR__ . '/../../Helpers/NotificationHelper.php';
+require_once __DIR__ . '/../../middleware/auth.php';
+
+SecurityHeaders::setFull();
+$conector = new Conector();
+$conn = $conector->getConexao();
+$userId = NotificationHelper::sanitizeUserId($_SESSION['usuario_id'] ?? 0);
+NotificationHelper::handleAction($conn, $userId, $_POST ?? []);
+$unreadCount = NotificationHelper::getUnreadCount($conn, $userId);
+$notifications = NotificationHelper::getNotifications($conn, $userId);
 
 $query = "
 SELECT ac.id_avaliacao, f.nome, f.apelido, m.descricao AS modulo, 
@@ -31,9 +45,18 @@ $res = $mysqli->query($query);
 
   <!-- CSS personalizado -->
   <link rel="stylesheet" href="../../Style/home.css">
+  <!-- Notifications CSS -->
+  <link rel="stylesheet" href="../../Assets/CSS/notifications.css">
 </head>
 
 <body class="bg-light">
+  <!-- Notification Widget -->
+  <nav class="navbar navbar-expand-lg bg-white border-bottom">
+    <div class="container-fluid">
+      <span class="navbar-text me-auto">Notificações</span>
+      <?php include __DIR__ . '/../../Includes/notification-widget.php'; ?>
+    </div>
+  </nav>
 
   <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">

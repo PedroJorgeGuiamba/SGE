@@ -14,19 +14,22 @@ header("X-XSS-Protection: 1; mode=block");
 
 session_start();
 
-class AuthConfirmationController {
+class AuthConfirmationController
+{
     private $conn;
     private $criptografia;
     private $error;
 
-    public function __construct() {
+    public function __construct()
+    {
         $conexao = new Conector();
         $this->conn = $conexao->getConexao();
         $this->criptografia = new Criptografia();
         $this->error = '';
     }
 
-    public function verificar() {
+    public function verificar()
+    {
         if ($_SERVER["REQUEST_METHOD"] !== "POST") {
             $this->error = "Método inválido.";
             return $this->error;
@@ -68,7 +71,7 @@ class AuthConfirmationController {
             $this->error = "ID de usuário inválido.";
             return $this->error;
         }
-        
+
         $sql = "SELECT * FROM user_otps WHERE user_id = ? ORDER BY created_at DESC LIMIT 1";
         $stmt = $this->conn->prepare($sql);
 
@@ -152,7 +155,7 @@ class AuthConfirmationController {
         $role = strtolower($user['role']);
         switch ($role) {
             case 'formando':
-                header("Location: /estagio/View/Formando/portalDeEstudante.php");
+                header("Location: /estagio/View/Auth/ConfirmacaoFormando.php");
                 break;
             case 'supervisor':
                 header("Location: /estagio/View/Supervisor/portalDoSupervisor.php");
@@ -174,31 +177,33 @@ class AuthConfirmationController {
         exit();
     }
 
-    public function getError() {
+    public function getError()
+    {
         return $this->error;
     }
 
-    private function getUserById($user_id) {
+    private function getUserById($user_id)
+    {
         $sql = "SELECT id, email, role FROM usuarios WHERE id = ?";
         $stmt = $this->conn->prepare($sql);
-        
+
         if (!$stmt) {
             error_log("Erro prepare getUserById: " . $this->conn->error);
             return null;
         }
-        
+
         $stmt->bind_param("i", $user_id);
-        
+
         if (!$stmt->execute()) {
             error_log("Erro execute getUserById: " . $stmt->error);
             $stmt->close();
             return null;
         }
-        
+
         $result = $stmt->get_result();
         $user = $result->fetch_assoc();
         $stmt->close();
-        
+
         return $user;
     }
 }
@@ -207,4 +212,3 @@ $confirm = new AuthConfirmationController();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $error = $confirm->verificar();
 }
-?>

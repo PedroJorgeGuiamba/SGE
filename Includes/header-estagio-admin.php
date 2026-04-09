@@ -1,12 +1,31 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once __DIR__ . '/../Helpers/SecurityHeaders.php';
 require_once __DIR__ . '/../Controller/Geral/SupervisorAdmin.php';
-require_once __DIR__ .'/../middleware/auth.php';
+require_once __DIR__ . '/../middleware/auth.php';
+require_once __DIR__ . '/../Helpers/NotificationHelper.php';
+require_once __DIR__ . '/../Conexao/conector.php';
+
 SecurityHeaders::setFull();
+
+// Inicializar conexão se não existir
+if (!isset($conn) || $conn === null) {
+    $conector = new Conector();
+    $conn = $conector->getConexao();
+}
+
+$userId = NotificationHelper::sanitizeUserId($_SESSION['usuario_id'] ?? 0);
+
+NotificationHelper::handleAction($conn, $userId, $_POST ?? []);
+
+$unreadCount = NotificationHelper::getUnreadCount($conn, $userId);
+$notifications = NotificationHelper::getNotifications($conn, $userId);
 ?>
 <!DOCTYPE html>
 <html lang="pt-pt" data-bs-theme="<?php echo $_SESSION['theme'] ?? 'light'; ?>">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,12 +40,17 @@ SecurityHeaders::setFull();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="../../Assets/CSS/notifications.css">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         button {
             padding-bottom: 110px;
         }
     </style>
 </head>
+
 <body>
     <header>
         <!-- Nav principal -->
@@ -57,6 +81,7 @@ SecurityHeaders::setFull();
                                     <i class="fas fa-moon"></i> <!-- ícone muda com JS -->
                                 </button>
                             </li>
+                            <?php include __DIR__ . '/notification-widget.php'; ?>
                             <li class="nav-item">
                                 <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger">Logout</a>
                             </li>
@@ -75,10 +100,25 @@ SecurityHeaders::setFull();
                     <a class="nav-link" href="formularioDeCartaDeEstagio.php">Fazer Pedido de Estágio</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="formularioDeCredencialDeEstagio.php">Solicitar Credencial de Estágio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="formularioDeVisita.php">Solicitar Visita de Estágio</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="listaDePedidos.php">Pedidos de Estágio</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="listaDePedidosCredencial.php">Pedidos de Credencial</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="listaDePedidosVisita.php">Pedidos de Visita</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="respostaCarta.php">Respostas Das Cartas de Estagio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="relatorio.php">Gerar Relatórios</a>
                 </li>
             </ul>
         </nav>

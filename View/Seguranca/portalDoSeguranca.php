@@ -1,7 +1,23 @@
 <?php
 session_start();
 include '../../Controller/Seguranca/Home.php';
-require_once __DIR__ .'/../../middleware/auth.php';
+require_once __DIR__ . '/../../middleware/auth.php';
+require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
+require_once __DIR__ . '/../../Helpers/NotificationHelper.php';
+require_once __DIR__ . '/../../Conexao/conector.php';
+
+SecurityHeaders::setFull();
+
+$conector = new Conector();
+$conn = $conector->getConexao();
+$userId = NotificationHelper::sanitizeUserId($_SESSION['usuario_id'] ?? 0);
+NotificationHelper::handleAction($conn, $userId, $_POST ?? []);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+$unreadCount = NotificationHelper::getUnreadCount($conn, $userId);
+$notifications = NotificationHelper::getNotifications($conn, $userId);
 ?>
 
 <!DOCTYPE html>
@@ -19,6 +35,7 @@ require_once __DIR__ .'/../../middleware/auth.php';
     <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
     <!-- CSS -->
     <link rel="stylesheet" href="../../Style/home.css">
+    <link rel="stylesheet" href="../../Assets/CSS/notifications.css">
 </head>
 
 <body>
@@ -55,6 +72,7 @@ require_once __DIR__ .'/../../middleware/auth.php';
                                     href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://simplesharebuttons.com">Linkedin</a>
                             </li>
 
+                            <?php include __DIR__ . '/../../Includes/notification-widget.php'; ?>
                             <li class="nav-item">
                                 <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger">Logout</a>
                             </li>
@@ -100,20 +118,20 @@ require_once __DIR__ .'/../../middleware/auth.php';
                         <input type="date" name="dataPedido" class="form-control" id="dataPedido">
                         <span class="error_form" id="dataPedido_error_message"></span>
                     </div>
-                
+
                     <div class="form-group col-md-4">
                         <label for="horaPedido" class="form-label">Horário do Pedido</label>
                         <input type="time" name="horaPedido" class="form-control" id="horaPedido">
                         <span class="error_form" id="horaPedido_error_message"></span>
                     </div>
-                
+
                     <div class="form-group col-md-4">
                         <label for="empresa" class="form-label">Empresa Onde Pretende Submeter</label>
                         <input type="text" name="empresa" class="form-control" id="empresa">
                         <span class="error_form" id="empresa_error_message"></span>
                     </div>
                 </div>
-                
+
                 <div class="row">
                     <div class="form-group col-md-4">
                         <label for="contactoPrincipal" class="form-label">Contacto Principal</label>
@@ -122,14 +140,14 @@ require_once __DIR__ .'/../../middleware/auth.php';
                             placeholder="Ex: +258 84xxxxxxx ou 84xxxxxxx">
                         <span class="error_form" id="cPrincipal_error_message"></span>
                     </div>
-                
+
                     <div class="form-group col-md-4">
                         <label for="contactoSecundario" class="form-label">Contacto Secundário</label>
                         <input type="tel" name="contactoSecundario" pattern="^(\+258)?[ -]?[8][2-7][0-9]{7}$" required
                             class="form-control" placeholder="Ex: +258 84xxxxxxx ou 84xxxxxxx" id="contactoSecundario">
                         <span class="error_form" id="cSecundario_error_message"></span>
                     </div>
-                
+
                     <div class="form-group col-md-4">
                         <label for="email" class="form-label">Email Pessoal</label>
                         <input type="email" name="email" class="form-control" id="email"
@@ -149,7 +167,7 @@ require_once __DIR__ .'/../../middleware/auth.php';
         </div>
         <!-- Rodapé -->
     </main>
-    
+
     <footer>
         <div class="container-footer">
             <p>© 2019 TRANSCOM . DIREITOS RESERVADOS . DESIGN & DEVELOPMENT <span>TRANSCOM</span></p>
@@ -159,7 +177,7 @@ require_once __DIR__ .'/../../middleware/auth.php';
     <script src="/pedro/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/ js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-        </script>
+    </script>
     <script>
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))

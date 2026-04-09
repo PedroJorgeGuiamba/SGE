@@ -3,14 +3,28 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
+require_once __DIR__ . '/../../Helpers/NotificationHelper.php';
+require_once __DIR__ . '/../../Conexao/conector.php';
+require_once __DIR__ . '/../../Helpers/CSRFProtection.php';
 include '../../Controller/Geral/FormandoAdmin.php';
 require_once __DIR__ . '/../../middleware/auth.php';
 
 SecurityHeaders::setFull();
+
+$conector = new Conector();
+$conn = $conector->getConexao();
+$userId = NotificationHelper::sanitizeUserId($_SESSION['usuario_id'] ?? 0);
+NotificationHelper::handleAction($conn, $userId, $_POST ?? []);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+$unreadCount = NotificationHelper::getUnreadCount($conn, $userId);
+$notifications = NotificationHelper::getNotifications($conn, $userId);
 ?>
 
 <!DOCTYPE html>
-<html lang="pt-pt"  data-bs-theme="<?php echo $_SESSION['theme'] ?? 'light'; ?>">
+<html lang="pt-pt" data-bs-theme="<?php echo $_SESSION['theme'] ?? 'light'; ?>">
 
 <head>
     <meta charset="UTF-8">
@@ -21,6 +35,7 @@ SecurityHeaders::setFull();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <!-- CSS -->
     <link rel="stylesheet" href="../../Style/home.css">
+    <link rel="stylesheet" href="../../Assets/CSS/notifications.css">
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Fallback local para jQuery -->
@@ -74,6 +89,7 @@ SecurityHeaders::setFull();
                                     <i class="fas fa-moon"></i> <!-- ícone muda com JS -->
                                 </button>
                             </li>
+                            <?php include __DIR__ . '/../../Includes/notification-widget.php'; ?>
                             <li class="nav-item">
                                 <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger">Logout</a>
                             </li>
@@ -96,9 +112,21 @@ SecurityHeaders::setFull();
                 <li class="nav-item">
                     <a class="nav-link" href="#">Fazer Pedido de Estágio</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="formularioDeCredencialDeEstagio.php">Solicitar Credencial de Estágio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="formularioDeVisita.php">Solicitar Visita de Estágio</a>
+                </li>
                 <?php if ($_SESSION['role'] === 'admin'): ?>
                     <li class="nav-item">
                         <a class="nav-link" href="listaDePedidos.php">Pedidos de Estágio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="listaDePedidosCredencial.php">Pedidos de Credencial</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="listaDePedidosVisita.php">Pedidos de Visita</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="respostaCarta.php">Resposta das Cartas</a>
@@ -111,7 +139,9 @@ SecurityHeaders::setFull();
 
     <main>
         <div class="formulario">
-            <form action="../../Controller/Estagio/FormularioDeCartaDeEstagio.php" method="post" id="formularioEstagio">
+            <!-- <form action="../../Controller/Estagio/FormularioDeCartaDeEstagio.php" method="post" id="formularioEstagio"> -->
+            <form action="../../View/Estagio/previewCartaDeEstagio.php" method="post" id="formularioEstagio">
+                <?php echo CSRFProtection::getTokenField(); ?>
                 <?php if (isset($_GET['erros'])): ?>
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($_GET['erros']); ?>
@@ -165,7 +195,7 @@ SecurityHeaders::setFull();
                         <span class="error_form" id="cSecundario_error_message"></span>
                     </div>
                 </div>
-                
+
                 <div class="row">
                     <div class="form-group col-md-4">
                         <label for="email" class="form-label">Email Pessoal</label>
@@ -174,7 +204,7 @@ SecurityHeaders::setFull();
                         <span class="error_form" id="email_error_message"></span>
                     </div>
                 </div>
-                
+
                 <div class="row">
                     <div class="form-group">
                         <div class="col-md-3">
@@ -186,7 +216,7 @@ SecurityHeaders::setFull();
         </div>
     </main>
 
-    <?php require_once __DIR__ . '/../../Includes/footer.php'?>
+    <?php require_once __DIR__ . '/../../Includes/footer.php' ?>
     <script>
         // Selects com valores fornecidos da BD
         $(document).ready(function() {
@@ -308,31 +338,6 @@ SecurityHeaders::setFull();
                 error.insertAfter(element);
             }
         });
-
-        // $(document).ready(function () {
-        //     $('#formCartaDeEstagio').submit(function (e) {
-        //         e.preventDefault();
-        //         console.log('Dados enviados:', $(this).serialize());
-        //         $.ajax({
-        //             url: $(this).attr('action'), // e.g., ../../Controller/Estagio/FormularioDeCartaDeEstagio.php
-        //             method: 'POST',
-        //             data: $(this).serialize(),
-        //             dataType: 'json',
-        //             success: function (response) {
-        //                 if (response.success) {
-        //                     alert(response.message);
-        //                     window.location.href = response.redirect; // Redireciona para GerarPdfCarta.php
-        //                 } else {
-        //                     alert(response.message);
-        //                 }
-        //             },
-        //             error: function (xhr, status, error) {
-        //                 console.log('Erro AJAX:', xhr.status, status, error, xhr.responseText);
-        //                 alert('Erro ao processar a requisição: ' + (xhr.responseText || 'Verifique o console para mais detalhes.'));
-        //             }
-        //         });
-        //     });
-        // });
     </script>
 
     <script>

@@ -1,13 +1,21 @@
 <?php
-// Form para criar nova avaliação
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
+}
 require_once __DIR__ . '/../../Conexao/conector.php';
 require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
+require_once __DIR__ . '/../../Helpers/NotificationHelper.php';
 require_once __DIR__ . '/../../middleware/auth.php';
 
 SecurityHeaders::setFull();
 
 $conexao = new Conector();
 $conn = $conexao->getConexao();
+
+$userId = NotificationHelper::sanitizeUserId($_SESSION['usuario_id'] ?? 0);
+NotificationHelper::handleAction($conn, $userId, $_POST ?? []);
+$unreadCount = NotificationHelper::getUnreadCount($conn, $userId);
+$notifications = NotificationHelper::getNotifications($conn, $userId);
 
 // Carrega listas para selects
 $formandos = $conn->query("SELECT id_formando, nome, apelido FROM formando ORDER BY nome");
@@ -27,12 +35,21 @@ $tentativas = $conn->query("SELECT id_tentativa, descricao FROM tipo_tentativa O
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Notifications CSS -->
+  <link rel="stylesheet" href="../../Assets/CSS/notifications.css">
 
   <!-- CSS personalizado -->
   <link rel="stylesheet" href="../../Style/home.css">
 </head>
 
 <body class="bg-light">
+  <!-- Notification Widget -->
+  <nav class="navbar navbar-expand-lg bg-white border-bottom">
+    <div class="container-fluid">
+      <span class="navbar-text me-auto">Notificações</span>
+      <?php include __DIR__ . '/../../Includes/notification-widget.php'; ?>
+    </div>
+  </nav>
 
   <div class="container py-5">
     <div class="card shadow-lg border-0 rounded-4">

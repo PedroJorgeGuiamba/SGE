@@ -1,8 +1,18 @@
 <?php
 require_once __DIR__ . '/../../Conexao/conector.php';
-
+require_once __DIR__ . '/../../Helpers/NotificationHelper.php';
+require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
+SecurityHeaders::setFull();
 $conector = new Conector();
 $conn = $conector->getConexao();
+
+$userId = NotificationHelper::sanitizeUserId($_SESSION['usuario_id'] ?? 0);
+
+NotificationHelper::handleAction($conn, $userId, $_POST ?? []);
+
+$unreadCount = NotificationHelper::getUnreadCount($conn, $userId);
+$notifications = NotificationHelper::getNotifications($conn, $userId);
+
 
 // User roles pie chart
 $user_roles_query = mysqli_query($conn, "SELECT role, COUNT(*) as count FROM usuarios GROUP BY role");
@@ -38,118 +48,118 @@ if ($formandos_per_curso_query) {
 ?>
 <?php require_once __DIR__ . '/../../Includes/header-admin.php' ?>
 
-    <section class="dashboard-header text-center">
-        <div class="container">
-            <h1 class="display-4 fw-bold"><i class="fas fa-chart-line me-3"></i>Resumo dos Dados Geral</h1>
-            <p class="lead">Dados Gerais do Sistema</p>
+<section class="dashboard-header text-center">
+    <div class="container">
+        <h1 class="display-4 fw-bold"><i class="fas fa-chart-line me-3"></i>Resumo dos Dados Geral</h1>
+        <p class="lead">Dados Gerais do Sistema</p>
+    </div>
+</section>
+
+<main class="container-fluid">
+    <!-- Charts Section -->
+    <section class="row g-4">
+        <!-- Pie Chart: User Roles -->
+        <div class="col-lg-6">
+            <div class="chart-container">
+                <h4 class="chart-title"><i class="fas fa-chart-pie me-2"></i>Distribuição de Perfil por Utilizador</h4>
+                <canvas id="pieChart" height="300"></canvas>
+            </div>
+        </div>
+
+        <!-- Bar Chart: Monthly Sessions -->
+        <div class="col-lg-6">
+            <div class="chart-container">
+                <h4 class="chart-title"><i class="fas fa-chart-bar me-2"></i>Sessões por mês (<?= date('Y') ?>)</h4>
+                <canvas id="barChart" height="300"></canvas>
+            </div>
+        </div>
+
+        <!-- Bar Chart: Formandos per Curso -->
+        <div class="col-lg-6">
+            <div class="chart-container">
+                <h4 class="chart-title"><i class="fas fa-chart-bar me-2"></i>Formandos por Curso</h4>
+                <canvas id="formandosChart" height="300"></canvas>
+            </div>
         </div>
     </section>
-
-    <main class="container-fluid">
-        <!-- Charts Section -->
-        <section class="row g-4">
-            <!-- Pie Chart: User Roles -->
-            <div class="col-lg-6">
-                <div class="chart-container">
-                    <h4 class="chart-title"><i class="fas fa-chart-pie me-2"></i>Distribuição de Perfil por Utilizador</h4>
-                    <canvas id="pieChart" height="300"></canvas>
-                </div>
-            </div>
-
-            <!-- Bar Chart: Monthly Sessions -->
-            <div class="col-lg-6">
-                <div class="chart-container">
-                    <h4 class="chart-title"><i class="fas fa-chart-bar me-2"></i>Sessões por mês (<?= date('Y') ?>)</h4>
-                    <canvas id="barChart" height="300"></canvas>
-                </div>
-            </div>
-
-            <!-- Bar Chart: Formandos per Curso -->
-            <div class="col-lg-6">
-                <div class="chart-container">
-                    <h4 class="chart-title"><i class="fas fa-chart-bar me-2"></i>Formandos por Curso</h4>
-                    <canvas id="formandosChart" height="300"></canvas>
-                </div>
-            </div>
-        </section>
-    </main>
+</main>
 
 
-    <?php require_once __DIR__ . '/../../Includes/footer.php'?>
-    <script>
-        // Pie Chart: User Roles
-        const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
-        const borderColor = isDark ? '#333333' : '#ffffff';
-        const ctxPie = document.getElementById('pieChart').getContext('2d');
-        new Chart(ctxPie, {
-            type: 'pie',
-            data: {
-                labels: <?php echo json_encode($user_roles_labels); ?>,
-                datasets: [{
-                    data: <?php echo json_encode($user_roles_data); ?>,
-                    backgroundColor: ['#0dcaf0', '#198754', '#ffc107', '#dc3545'],
-                    borderWidth: 2,
-                    borderColor: borderColor,
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
+<?php require_once __DIR__ . '/../../Includes/footer.php' ?>
+<script>
+    // Pie Chart: User Roles
+    const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+    const borderColor = isDark ? '#333333' : '#ffffff';
+    const ctxPie = document.getElementById('pieChart').getContext('2d');
+    new Chart(ctxPie, {
+        type: 'pie',
+        data: {
+            labels: <?php echo json_encode($user_roles_labels); ?>,
+            datasets: [{
+                data: <?php echo json_encode($user_roles_data); ?>,
+                backgroundColor: ['#0dcaf0', '#198754', '#ffc107', '#dc3545'],
+                borderWidth: 2,
+                borderColor: borderColor,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
                 }
             }
-        });
+        }
+    });
 
-        // Bar Chart: Monthly Sessions
-        const ctxBar = document.getElementById('barChart').getContext('2d');
-        new Chart(ctxBar, {
-            type: 'bar',
-            data: {
-                labels: <?php echo json_encode($months); ?>,
-                datasets: [{
-                    label: 'Number of Sessions',
-                    data: <?php echo json_encode($monthly_sessions); ?>,
-                    backgroundColor: 'rgba(13, 202, 240, 0.6)',
-                    borderColor: 'rgba(13, 202, 240, 1)',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+    // Bar Chart: Monthly Sessions
+    const ctxBar = document.getElementById('barChart').getContext('2d');
+    new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+            labels: <?php echo json_encode($months); ?>,
+            datasets: [{
+                label: 'Number of Sessions',
+                data: <?php echo json_encode($monthly_sessions); ?>,
+                backgroundColor: 'rgba(13, 202, 240, 0.6)',
+                borderColor: 'rgba(13, 202, 240, 1)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
                 }
             }
-        });
+        }
+    });
 
-        // Bar Chart: Formandos per Curso
-        const ctxFormandos = document.getElementById('formandosChart').getContext('2d');
-        new Chart(ctxFormandos, {
-            type: 'bar',
-            data: {
-                labels: <?php echo json_encode($formandos_curso_labels); ?>,
-                datasets: [{
-                    label: 'Number of Formandos',
-                    data: <?php echo json_encode($formandos_curso_data); ?>,
-                    backgroundColor: 'rgba(25, 135, 84, 0.6)',
-                    borderColor: 'rgba(25, 135, 84, 1)',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+    // Bar Chart: Formandos per Curso
+    const ctxFormandos = document.getElementById('formandosChart').getContext('2d');
+    new Chart(ctxFormandos, {
+        type: 'bar',
+        data: {
+            labels: <?php echo json_encode($formandos_curso_labels); ?>,
+            datasets: [{
+                label: 'Number of Formandos',
+                data: <?php echo json_encode($formandos_curso_data); ?>,
+                backgroundColor: 'rgba(25, 135, 84, 0.6)',
+                borderColor: 'rgba(25, 135, 84, 1)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
                 }
             }
-        });
-    </script>
+        }
+    });
+</script>
 </body>
 
 </html>

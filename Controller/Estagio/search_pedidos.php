@@ -1,31 +1,69 @@
 <?php
 require_once __DIR__ . '/../../Conexao/conector.php';
+session_start();
 
 $conexao = new Conector();
-$conn = $conexao->getConexao();
+$conn    = $conexao->getConexao();
 
-$termo = $_GET['termo'] ?? '';
-$termo = trim($termo);
+$termo = trim($_GET['termo'] ?? '');
 
 $filtroBase = "p.data_de_levantamento IS NULL";
 
-// Se estiver vazio, retorna todos os pedidos
+// --- Filtro por qualificação do supervisor ---
+$filtroAdicional = "";
+$qualificacaoId     = null;
+
+if (isset($_SESSION['role']) && $_SESSION['role'] === 'supervisor' && isset($_SESSION['usuario_id'])) {
+    $userId = (int) $_SESSION['usuario_id'];
+
+    // Busca a qualificação associada ao supervisor
+    $stmtSup = $conn->prepare("
+        SELECT id_qualificacao 
+        FROM supervisor 
+        WHERE usuario_id = ? 
+        LIMIT 1
+    ");
+    $stmtSup->bind_param("i", $userId);
+    $stmtSup->execute();
+    $resSup = $stmtSup->get_result()->fetch_assoc();
+    $stmtSup->close();
+
+    if ($resSup && $resSup['id_qualificacao']) {
+        $qualificacaoId     = (int) $resSup['id_qualificacao'];
+        $filtroAdicional = "AND p.qualificacao = $qualificacaoId";
+    }
+}
+
+if (isset($_SESSION['role']) && $_SESSION['role'] === 'formando' && isset($_SESSION['usuario_id'])) {
+    $userId = (int) $_SESSION['usuario_id'];
+    $codigoFormando = (int) $_SESSION['codigo_formando'];
+
+    $filtroAdicional = "AND codigo_formando = $codigoFormando";
+    
+}
+
 if ($termo === '') {
-    $sql    = "SELECT p.*, q.descricao AS qualificacao_descricao, t.nome AS turma
-                FROM pedido_carta p
-                LEFT JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
-                LEFT JOIN turma t ON t.codigo_qualificacao = q.id_qualificacao
-                WHERE $filtroBase
-                ORDER BY p.id_pedido_carta DESC";
+    $sql = "
+        SELECT p.*, q.descricao AS qualificacao_descricao, t.nome AS turma
+        FROM pedido_carta p
+        LEFT JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
+        LEFT JOIN turma t ON t.codigo_qualificacao = q.id_qualificacao
+        WHERE $filtroBase $filtroAdicional
+        ORDER BY p.id_pedido_carta DESC
+    ";
     $result = $conn->query($sql);
+
 } else {
-    $sql    = "SELECT p.*, q.descricao AS qualificacao_descricao, t.nome AS turma
-                FROM pedido_carta p
-                LEFT JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
-                LEFT JOIN turma t ON  p.qualificacao = t.codigo_qualificacao
-                WHERE p.empresa LIKE ? OR p.nome LIKE ? OR p.apelido LIKE ? OR p.email LIKE ?
-                ORDER BY p.id_pedido_carta DESC";
-    $stmt = $conn->prepare($sql);
+    $sql = "
+        SELECT p.*, q.descricao AS qualificacao_descricao, t.nome AS turma
+        FROM pedido_carta p
+        LEFT JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
+        LEFT JOIN turma t ON p.qualificacao = t.codigo_qualificacao
+        WHERE $filtroBase $filtroAdicional
+          AND (p.empresa LIKE ? OR p.nome LIKE ? OR p.apelido LIKE ? OR p.email LIKE ?)
+        ORDER BY p.id_pedido_carta DESC
+    ";
+    $stmt       = $conn->prepare($sql);
     $searchTerm = '%' . $termo . '%';
     $stmt->bind_param("ssss", $searchTerm, $searchTerm, $searchTerm, $searchTerm);
     $stmt->execute();
@@ -39,6 +77,5 @@ while ($row = $result->fetch_assoc()) {
 
 header('Content-Type: application/json');
 echo json_encode($pedidos);
-
 $conn->close();
 ?>

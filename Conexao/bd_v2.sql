@@ -1,3 +1,19 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+-- -----------------------------------------------------
+-- Schema itc_v3
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema itc_v3
+-- -----------------------------------------------------
 CREATE SCHEMA IF NOT EXISTS `itc_v3` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ;
 USE `itc_v3` ;
 
@@ -37,7 +53,7 @@ CREATE TABLE IF NOT EXISTS `itc_v3`.`sessao` (
     FOREIGN KEY (`utilizador_id`)
     REFERENCES `itc_v3`.`usuarios` (`id`))
 ENGINE = InnoDB
-AUTO_INCREMENT = 99
+AUTO_INCREMENT = 157
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -142,7 +158,7 @@ CREATE TABLE IF NOT EXISTS `itc_v3`.`formando` (
     REFERENCES `itc_v3`.`usuarios` (`id`)
     ON DELETE CASCADE)
 ENGINE = InnoDB
-AUTO_INCREMENT = 7
+AUTO_INCREMENT = 8
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -221,7 +237,7 @@ CREATE TABLE IF NOT EXISTS `itc_v3`.`curso` (
   PRIMARY KEY (`id_curso`),
   UNIQUE INDEX `codigo` (`codigo` ASC) VISIBLE)
 ENGINE = InnoDB
-AUTO_INCREMENT = 5
+AUTO_INCREMENT = 10
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -276,7 +292,7 @@ CREATE TABLE IF NOT EXISTS `itc_v3`.`pedido_carta` (
     FOREIGN KEY (`codigo_turma`)
     REFERENCES `itc_v3`.`turma` (`codigo`))
 ENGINE = InnoDB
-AUTO_INCREMENT = 84
+AUTO_INCREMENT = 10
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -299,7 +315,7 @@ CREATE TABLE IF NOT EXISTS `itc_v3`.`resposta_carta` (
     FOREIGN KEY (`numero_carta`)
     REFERENCES `itc_v3`.`pedido_carta` (`id_pedido_carta`))
 ENGINE = InnoDB
-AUTO_INCREMENT = 40
+AUTO_INCREMENT = 10
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -328,7 +344,34 @@ CREATE TABLE IF NOT EXISTS `itc_v3`.`avaliacao_estagio` (
     FOREIGN KEY (`id_resposta`)
     REFERENCES `itc_v3`.`resposta_carta` (`id_resposta`))
 ENGINE = InnoDB
-AUTO_INCREMENT = 4
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `itc_v3`.`credencial_estagio`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `itc_v3`.`credencial_estagio` (
+  `id_credencial` INT NOT NULL AUTO_INCREMENT,
+  `id_pedido_carta` INT NOT NULL,
+  `nome` VARCHAR(50) NULL DEFAULT NULL,
+  `apelido` VARCHAR(100) NULL DEFAULT NULL,
+  `codigo_formando` INT NULL DEFAULT NULL,
+  `contactoFormando` INT NULL DEFAULT NULL,
+  `email` VARCHAR(100) CHARACTER SET 'utf8mb3' NULL DEFAULT NULL,
+  `empresa` VARCHAR(100) NULL DEFAULT NULL,
+  `data_do_pedido` DATE NULL DEFAULT NULL,
+  PRIMARY KEY (`id_credencial`),
+  INDEX `fk_credencial_formando` (`codigo_formando` ASC) VISIBLE,
+  INDEX `fk_pedido_carta_credencial` (`id_pedido_carta` ASC) VISIBLE,
+  CONSTRAINT `fk_credencial_formando`
+    FOREIGN KEY (`codigo_formando`)
+    REFERENCES `itc_v3`.`formando` (`codigo`),
+  CONSTRAINT `fk_pedido_carta_credencial`
+    FOREIGN KEY (`id_pedido_carta`)
+    REFERENCES `itc_v3`.`pedido_carta` (`id_pedido_carta`))
+ENGINE = InnoDB
+AUTO_INCREMENT = 2
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -432,7 +475,7 @@ CREATE TABLE IF NOT EXISTS `itc_v3`.`empresa` (
   `numero` INT NULL DEFAULT NULL,
   `andar` INT NULL DEFAULT NULL,
   `telefone` VARCHAR(20) NULL DEFAULT NULL,
-  `email` VARCHAR(100) NOT NULL,
+  `email` VARCHAR(100) NULL DEFAULT NULL,
   `sector` ENUM('Publico', 'Privado') NOT NULL DEFAULT 'Publico',
   `sector_atividade` VARCHAR(100) NULL DEFAULT NULL,
   `telefone_contato` VARCHAR(20) NULL DEFAULT NULL,
@@ -442,6 +485,7 @@ CREATE TABLE IF NOT EXISTS `itc_v3`.`empresa` (
   UNIQUE INDEX `nome` (`nome` ASC) VISIBLE,
   UNIQUE INDEX `nuit` (`nuit` ASC) VISIBLE)
 ENGINE = InnoDB
+AUTO_INCREMENT = 18
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -454,9 +498,9 @@ CREATE TABLE IF NOT EXISTS `itc_v3`.`estagio` (
   `codigo_formando` INT NOT NULL,
   `id_empresa` INT NULL DEFAULT '0',
   `id_supervisor` INT NULL DEFAULT NULL,
-  `data_inicio` DATE NOT NULL,
+  `data_inicio` DATE NULL DEFAULT NULL,
   `data_fim` DATE NULL DEFAULT NULL,
-  `status` ENUM('Pendente', 'Em curso', 'Concluído') NULL DEFAULT 'Pendente',
+  `status` ENUM('Concluido', 'Nao Concluido', 'Pendente') NULL DEFAULT NULL,
   `observacoes` TEXT NULL DEFAULT NULL,
   `id_resposta` INT NULL DEFAULT NULL,
   PRIMARY KEY (`id_estagio`),
@@ -581,34 +625,7 @@ CREATE TABLE IF NOT EXISTS `itc_v3`.`notificacao` (
     FOREIGN KEY (`id_utilizador`)
     REFERENCES `itc_v3`.`usuarios` (`id`))
 ENGINE = InnoDB
-AUTO_INCREMENT = 12
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
-
--- -----------------------------------------------------
--- Table `itc_v3`.`pedido_carta_backup`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `itc_v3`.`pedido_carta_backup` (
-  `numero` INT NOT NULL AUTO_INCREMENT,
-  `nome` VARCHAR(50) CHARACTER SET 'utf8mb3' NULL DEFAULT NULL,
-  `apelido` VARCHAR(100) CHARACTER SET 'utf8mb3' NULL DEFAULT NULL,
-  `codigo_formando` INT NULL DEFAULT NULL,
-  `codigo_turma` INT NULL DEFAULT NULL,
-  `data_do_pedido` DATE NULL DEFAULT NULL,
-  `hora_do_pedido` TIME NULL DEFAULT NULL,
-  `empresa` VARCHAR(100) NULL DEFAULT NULL,
-  `data_de_levantamento` DATE NULL DEFAULT NULL,
-  `contactoPrincipal` INT NULL DEFAULT NULL,
-  `contactoSecundario` INT NULL DEFAULT NULL,
-  `email` VARCHAR(100) CHARACTER SET 'utf8mb3' NULL DEFAULT NULL,
-  `qualificacao` INT NULL DEFAULT NULL,
-  PRIMARY KEY (`numero`),
-  INDEX `fk_pedido_formando` (`codigo_formando` ASC) VISIBLE,
-  INDEX `fk_pedido_turma` (`codigo_turma` ASC) VISIBLE,
-  INDEX `fk_pedido_carta_turma` (`qualificacao` ASC) VISIBLE)
-ENGINE = InnoDB
-AUTO_INCREMENT = 52
+AUTO_INCREMENT = 45
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -652,7 +669,7 @@ CREATE TABLE IF NOT EXISTS `itc_v3`.`supervisor` (
     REFERENCES `itc_v3`.`usuarios` (`id`)
     ON DELETE CASCADE)
 ENGINE = InnoDB
-AUTO_INCREMENT = 5
+AUTO_INCREMENT = 9
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
@@ -711,7 +728,38 @@ CREATE TABLE IF NOT EXISTS `itc_v3`.`user_otps` (
     REFERENCES `itc_v3`.`usuarios` (`id`)
     ON DELETE CASCADE)
 ENGINE = InnoDB
-AUTO_INCREMENT = 126
+AUTO_INCREMENT = 182
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `itc_v3`.`visita_estagio`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `itc_v3`.`visita_estagio` (
+  `id_visita` INT NOT NULL AUTO_INCREMENT,
+  `id_pedido_carta` INT NOT NULL,
+  `nome` VARCHAR(50) NULL DEFAULT NULL,
+  `apelido` VARCHAR(100) NULL DEFAULT NULL,
+  `codigo_formando` INT NULL DEFAULT NULL,
+  `contactoFormando` INT NULL DEFAULT NULL,
+  `empresa` VARCHAR(100) NULL DEFAULT NULL,
+  `endereco` VARCHAR(200) NULL DEFAULT NULL,
+  `nomeSupervisor` VARCHAR(100) NULL DEFAULT NULL,
+  `contactoSupervisor` INT NULL DEFAULT NULL,
+  `dataHoraDaVisita` DATETIME NULL DEFAULT NULL,
+  `data_do_pedido` DATE NULL DEFAULT NULL,
+  PRIMARY KEY (`id_visita`),
+  INDEX `fk_visita_formando` (`codigo_formando` ASC) VISIBLE,
+  INDEX `fk_pedido_carta` (`id_pedido_carta` ASC) VISIBLE,
+  CONSTRAINT `fk_pedido_carta`
+    FOREIGN KEY (`id_pedido_carta`)
+    REFERENCES `itc_v3`.`pedido_carta` (`id_pedido_carta`),
+  CONSTRAINT `fk_visita_formando`
+    FOREIGN KEY (`codigo_formando`)
+    REFERENCES `itc_v3`.`formando` (`codigo`))
+ENGINE = InnoDB
+AUTO_INCREMENT = 5
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 

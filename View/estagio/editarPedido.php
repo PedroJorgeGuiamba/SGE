@@ -83,7 +83,7 @@ $conn->close();
             </div>
 
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <a href="listaDePedidos.php" class="btn btn-secondary me-md-2">Cancelar</a>
+                <a href="<?php echo $_SESSION['role'] === 'admin' || $_SESSION['role'] === 'supervisor' ? 'listaDePedidos.php' : '../../View/Formando/portalDeEstudante.php'; ?>" class="btn btn-secondary me-md-2">Cancelar</a>
                 <button type="submit" class="btn btn-primary">Atualizar Pedido</button>
             </div>
         </form>

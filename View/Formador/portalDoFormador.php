@@ -1,10 +1,23 @@
 <?php
 session_start();
 include '../../Controller/Formador/Home.php';
-require_once __DIR__ .'/../../middleware/auth.php';
+require_once __DIR__ . '/../../middleware/auth.php';
 require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
+require_once __DIR__ . '/../../Helpers/NotificationHelper.php';
+require_once __DIR__ . '/../../Conexao/conector.php';
 
 SecurityHeaders::setFull();
+
+$conector = new Conector();
+$conn = $conector->getConexao();
+$userId = NotificationHelper::sanitizeUserId($_SESSION['usuario_id'] ?? 0);
+NotificationHelper::handleAction($conn, $userId, $_POST ?? []);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+$unreadCount = NotificationHelper::getUnreadCount($conn, $userId);
+$notifications = NotificationHelper::getNotifications($conn, $userId);
 ?>
 
 <!DOCTYPE html>
@@ -22,6 +35,7 @@ SecurityHeaders::setFull();
     <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
     <!-- CSS -->
     <link rel="stylesheet" href="../../Style/home.css">
+    <link rel="stylesheet" href="../../Assets/CSS/notifications.css">
 </head>
 
 <body>
@@ -57,6 +71,7 @@ SecurityHeaders::setFull();
                                 <a class="nav-link"
                                     href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://simplesharebuttons.com">Linkedin</a>
                             </li>
+                            <?php include __DIR__ . '/../../Includes/notification-widget.php'; ?>
                             <li class="nav-item">
                                 <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger">Logout</a>
                             </li>
@@ -240,7 +255,7 @@ SecurityHeaders::setFull();
         </section>
     </main>
 
-    <?php require_once __DIR__ . '/../../Includes/footer.php'?>
+    <?php require_once __DIR__ . '/../../Includes/footer.php' ?>
     <script src="/js/scripts.js"></script>
 </body>
 

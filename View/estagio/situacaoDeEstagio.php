@@ -1,13 +1,21 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 include '../../Controller/Admin/Home.php';
 include '../../Conexao/conector.php';
 require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
+require_once __DIR__ . '/../../Helpers/NotificationHelper.php';
 
 SecurityHeaders::setFull();
 
 $conector = new Conector();
 $conn = $conector->getConexao();
+
+$userId = NotificationHelper::sanitizeUserId($_SESSION['usuario_id'] ?? 0);
+NotificationHelper::handleAction($conn, $userId, $_POST ?? []);
+$unreadCount = NotificationHelper::getUnreadCount($conn, $userId);
+$notifications = NotificationHelper::getNotifications($conn, $userId);
 
 $months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 $pedidos_monthly_query = mysqli_query($conn, "SELECT MONTH(data_do_pedido) as month, COUNT(*) as count FROM pedido_carta WHERE YEAR(data_do_pedido) = YEAR(CURDATE()) GROUP BY MONTH(data_do_pedido)");
@@ -31,6 +39,44 @@ if ($pedidos_monthly_query_per_qualification) {
 }
 $qualifications = array_keys($pedidos_monthly_per_qualification);
 $pedidos_per_qual_json = json_encode($pedidos_monthly_per_qualification);
+
+$credenciais_empresa_query = mysqli_query($conn, "
+    SELECT 
+        c.empresa,
+        q.descricao AS qualificacao_desc,
+        COUNT(*) AS count
+    FROM credencial_estagio c
+    JOIN pedido_carta p ON c.id_pedido_carta = p.id_pedido_carta
+    JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
+    WHERE YEAR(c.data_do_pedido) = YEAR(CURDATE())
+      AND c.empresa IS NOT NULL
+      AND c.empresa != ''
+    GROUP BY c.empresa, q.descricao
+    ORDER BY count DESC
+");
+
+$credenciais_por_empresa = [];
+$empresas_labels = [];
+
+if ($credenciais_empresa_query) {
+    while ($row = mysqli_fetch_assoc($credenciais_empresa_query)) {
+        $empresa = $row['empresa'];
+        $qual = $row['qualificacao_desc'];
+
+        if (!in_array($empresa, $empresas_labels)) {
+            $empresas_labels[] = $empresa;
+        }
+
+        if (!isset($credenciais_por_empresa[$qual])) {
+            $credenciais_por_empresa[$qual] = [];
+        }
+
+        $credenciais_por_empresa[$qual][$empresa] = $row['count'];
+    }
+}
+
+$empresas_labels_json = json_encode($empresas_labels);
+$credenciais_por_empresa_json = json_encode($credenciais_por_empresa);
 
 // Status resposta pie chart
 $status_resposta_query = mysqli_query($conn, "SELECT status_resposta, COUNT(*) as count FROM resposta_carta GROUP BY status_resposta");
@@ -89,171 +135,262 @@ if ($avaliacao_result_query) {
 
 <?php require_once __DIR__ . '/../../Includes/header-estagio-situacao-admin.php' ?>
 
-    <section class="dashboard-header text-center">
-        <div class="container">
-            <h1 class="display-4 fw-bold"><i class="fas fa-chart-line me-3"></i>Resumo dos Dados de Estágios</h1>
-            <p class="lead">Visão Geral dos Dados de Estágio</p>
+<section class="dashboard-header text-center">
+    <div class="container">
+        <h1 class="display-4 fw-bold"><i class="fas fa-chart-line me-3"></i>Resumo dos Dados de Estágios</h1>
+        <p class="lead">Visão Geral dos Dados de Estágio</p>
+    </div>
+</section>
+
+<main class="container-fluid">
+    <!-- Charts Section -->
+    <section class="row g-4">
+        <!-- Bar Chart: Pedidos per Month -->
+        <div class="col-lg-6">
+            <div class="chart-container">
+                <h4 class="chart-title"><i class="fas fa-chart-bar me-2"></i>Cartas de Estágio geradas por mês (<?= date('Y') ?>)</h4>
+                <canvas id="pedidosBarChart" height="300"></canvas>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="chart-container">
+                <h4 class="chart-title"><i class="fas fa-chart-bar me-2"></i>Cartas de Estágio geradas por mês e por qualificação (<?= date('Y') ?>)</h4>
+                <canvas id="pedidosPieChart" height="300"></canvas>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="chart-container">
+                <h4 class="chart-title"><i class="fas fa-chart-bar me-2"></i>Empresas com Mais Credenciais Pedidas por Qualificação (<?= date('Y') ?>)</h4>
+                <canvas id="credenciaisEmpresaChart" height="300"></canvas>
+            </div>
+        </div>
+
+        <!-- Pie Chart: Status Resposta -->
+        <div class="col-lg-6">
+            <div class="chart-container">
+                <h4 class="chart-title"><i class="fas fa-chart-pie me-2"></i>Distribuição do Estado das Resposta Às Cartas</h4>
+                <canvas id="statusRespostaPie" height="300"></canvas>
+            </div>
+        </div>
+
+        <!-- Pie Chart: Status Estagio -->
+        <div class="col-lg-6">
+            <div class="chart-container">
+                <h4 class="chart-title"><i class="fas fa-chart-pie me-2"></i>Distribuição dos Estados dos Estágios</h4>
+                <canvas id="statusEstagioPie" height="300"></canvas>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="chart-container">
+                <h4 class="chart-title"><i class="fas fa-chart-pie me-2"></i>Distribuição dos Estados dos Estágios</h4>
+                <canvas id="statusEstagioQualificacaoPie" height="300"></canvas>
+            </div>
         </div>
     </section>
+</main>
 
-    <main class="container-fluid">
-        <!-- Charts Section -->
-        <section class="row g-4">
-            <!-- Bar Chart: Pedidos per Month -->
-            <div class="col-lg-6">
-                <div class="chart-container">
-                    <h4 class="chart-title"><i class="fas fa-chart-bar me-2"></i>Cartas de Estágio geradas por mês (<?= date('Y') ?>)</h4>
-                    <canvas id="pedidosBarChart" height="300"></canvas>
-                </div>
-            </div>
-
-            <div class="col-lg-6">
-                <div class="chart-container">
-                    <h4 class="chart-title"><i class="fas fa-chart-bar me-2"></i>Cartas de Estágio geradas por mês e por qualificação (<?= date('Y') ?>)</h4>
-                    <canvas id="pedidosPieChart" height="300"></canvas>
-                </div>
-            </div>
-
-            <!-- Pie Chart: Status Resposta -->
-            <div class="col-lg-6">
-                <div class="chart-container">
-                    <h4 class="chart-title"><i class="fas fa-chart-pie me-2"></i>Distribuição do Estado das Resposta Às Cartas</h4>
-                    <canvas id="statusRespostaPie" height="300"></canvas>
-                </div>
-            </div>
-
-            <!-- Pie Chart: Status Estagio -->
-            <div class="col-lg-6">
-                <div class="chart-container">
-                    <h4 class="chart-title"><i class="fas fa-chart-pie me-2"></i>Distribuição dos Estados dos Estágios</h4>
-                    <canvas id="statusEstagioPie" height="300"></canvas>
-                </div>
-            </div>
-
-            <div class="col-lg-6">
-                <div class="chart-container">
-                    <h4 class="chart-title"><i class="fas fa-chart-pie me-2"></i>Distribuição dos Estados dos Estágios</h4>
-                    <canvas id="statusEstagioQualificacaoPie" height="300"></canvas>
-                </div>
-            </div>
-        </section>
-    </main>
-    
-    <?php require_once __DIR__ . '/../../Includes/footer.php'?>
-    <script>
-        const ctxPedidos = document.getElementById('pedidosBarChart').getContext('2d');
-        new Chart(ctxPedidos, {
-            type: 'bar',
-            data: {
-                labels: <?php echo json_encode($months); ?>,
-                datasets: [{
-                    label: 'Number of Requests',
-                    data: <?php echo json_encode($pedidos_monthly); ?>,
-                    backgroundColor: 'rgba(13, 202, 240, 0.6)',
-                    borderColor: 'rgba(13, 202, 240, 1)',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: { y: { beginAtZero: true } }
-            }
-        });
-
-        const ctxPedidosQualificacao = document.getElementById('pedidosPieChart').getContext('2d');
-        const qualifications = <?php echo json_encode($qualifications); ?>;
-        const pedidos_data = <?php echo $pedidos_per_qual_json; ?>;
-        const colors = [
-            'rgba(255, 99, 132, 0.6)',
-            'rgba(54, 162, 235, 0.6)',
-            'rgba(255, 206, 86, 0.6)',
-            'rgba(75, 192, 192, 0.6)',
-            'rgba(153, 102, 255, 0.6)',
-            'rgba(255, 159, 64, 0.6)',
-            'rgba(201, 203, 207, 0.6)'
-        ];
-        const borderColors = colors.map(color => color.replace('0.6', '1'));
-        let datasets = qualifications.map((qual, index) => {
-            return {
-                label: qual,
-                data: pedidos_data[qual],
-                backgroundColor: colors[index % colors.length],
-                borderColor: borderColors[index % colors.length],
+<?php require_once __DIR__ . '/../../Includes/footer.php' ?>
+<script>
+    const ctxPedidos = document.getElementById('pedidosBarChart').getContext('2d');
+    new Chart(ctxPedidos, {
+        type: 'bar',
+        data: {
+            labels: <?php echo json_encode($months); ?>,
+            datasets: [{
+                label: 'Number of Requests',
+                data: <?php echo json_encode($pedidos_monthly); ?>,
+                backgroundColor: 'rgba(13, 202, 240, 0.6)',
+                borderColor: 'rgba(13, 202, 240, 1)',
                 borderWidth: 2
-            };
-        });
-        new Chart(ctxPedidosQualificacao, {
-            type: 'bar',
-            data: {
-                labels: <?php echo json_encode($months); ?>,
-                datasets: datasets
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    x: { stacked: true },
-                    y: { stacked: true, beginAtZero: true }
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    const ctxPedidosQualificacao = document.getElementById('pedidosPieChart').getContext('2d');
+    const qualifications = <?php echo json_encode($qualifications); ?>;
+    const pedidos_data = <?php echo $pedidos_per_qual_json; ?>;
+    const colors = [
+        'rgba(255, 99, 132, 0.6)',
+        'rgba(54, 162, 235, 0.6)',
+        'rgba(255, 206, 86, 0.6)',
+        'rgba(75, 192, 192, 0.6)',
+        'rgba(153, 102, 255, 0.6)',
+        'rgba(255, 159, 64, 0.6)',
+        'rgba(201, 203, 207, 0.6)'
+    ];
+    const borderColors = colors.map(color => color.replace('0.6', '1'));
+    let datasets = qualifications.map((qual, index) => {
+        return {
+            label: qual,
+            data: pedidos_data[qual],
+            backgroundColor: colors[index % colors.length],
+            borderColor: borderColors[index % colors.length],
+            borderWidth: 2
+        };
+    });
+    new Chart(ctxPedidosQualificacao, {
+        type: 'bar',
+        data: {
+            labels: <?php echo json_encode($months); ?>,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    stacked: true
                 },
-                plugins: { legend: { position: 'bottom' } }
-            }
-        });
-
-        const ctxResposta = document.getElementById('statusRespostaPie').getContext('2d');
-        new Chart(ctxResposta, {
-            type: 'pie',
-            data: {
-                labels: <?php echo json_encode($status_resposta_labels); ?>,
-                datasets: [{
-                    data: <?php echo json_encode($status_resposta_data); ?>,
-                    backgroundColor: ['#0dcaf0', '#198754', '#ffc107'],
-                    borderWidth: 2,
-                    borderColor: '#fff'
-                }]
+                y: {
+                    stacked: true,
+                    beginAtZero: true
+                }
             },
-            options: {
-                responsive: true,
-                plugins: { legend: { position: 'bottom' } }
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
             }
-        });
+        }
+    });
 
-        const ctxEstagio = document.getElementById('statusEstagioPie').getContext('2d');
-        new Chart(ctxEstagio, {
-            type: 'pie',
-            data: {
-                labels: <?php echo json_encode($status_estagio_labels); ?>,
-                datasets: [{
-                    data: <?php echo json_encode($status_estagio_data); ?>,
-                    backgroundColor: ['#198754', '#dc3545'],
-                    borderWidth: 2,
-                    borderColor: '#fff'
-                }]
+    const ctxResposta = document.getElementById('statusRespostaPie').getContext('2d');
+    new Chart(ctxResposta, {
+        type: 'pie',
+        data: {
+            labels: <?php echo json_encode($status_resposta_labels); ?>,
+            datasets: [{
+                data: <?php echo json_encode($status_resposta_data); ?>,
+                backgroundColor: ['#0dcaf0', '#198754', '#ffc107'],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    const ctxEstagio = document.getElementById('statusEstagioPie').getContext('2d');
+    new Chart(ctxEstagio, {
+        type: 'pie',
+        data: {
+            labels: <?php echo json_encode($status_estagio_labels); ?>,
+            datasets: [{
+                data: <?php echo json_encode($status_estagio_data); ?>,
+                backgroundColor: ['#198754', '#dc3545'],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    const ctxEstagioQualificacao = document.getElementById('statusEstagioQualificacaoPie').getContext('2d');
+    new Chart(ctxEstagioQualificacao, {
+        type: 'pie',
+        data: {
+            labels: <?php echo json_encode($status_estagio_qualificacao_labels); ?>,
+            datasets: [{
+                data: <?php echo json_encode($status_estagio_qualificacao_data); ?>,
+                backgroundColor: ['#198754', '#dc3545'],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Cores para cada qualificação
+    const credenciaisEmpresaLabels = <?= $empresas_labels_json ?>;
+    const credenciaisEmpresaData = <?= $credenciais_por_empresa_json ?>;
+
+    const qualColors = [
+        '#4e79a7', '#f28e2b', '#e15759', '#76b7b2',
+        '#59a14f', '#edc948', '#b07aa1', '#ff9da7',
+        '#9c755f', '#bab0ac'
+    ];
+
+    const credenciaisEmpresaDatasets = Object.entries(credenciaisEmpresaData).map(([qual, empresaMap], i) => ({
+        label: qual,
+        data: credenciaisEmpresaLabels.map(emp => empresaMap[emp] ?? 0),
+        backgroundColor: qualColors[i % qualColors.length],
+        borderRadius: 4,
+    }));
+
+    const ctxCredEmpresa = document.getElementById('credenciaisEmpresaChart').getContext('2d');
+    new Chart(ctxCredEmpresa, {
+        type: 'bar',
+        data: {
+            labels: credenciaisEmpresaLabels,
+            datasets: credenciaisEmpresaDatasets,
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top'
+                },
+                title: {
+                    display: true
+                },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y} credencial(ais)`
+                    }
+                }
             },
-            options: {
-                responsive: true,
-                plugins: { legend: { position: 'bottom' } }
+            scales: {
+                x: {
+                    stacked: false,
+                    ticks: {
+                        maxRotation: 35,
+                        minRotation: 20,
+                        font: {
+                            size: 11
+                        }
+                    }
+                },
+                y: {
+                    stacked: false,
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
             }
-        });
-
-        const ctxEstagioQualificacao = document.getElementById('statusEstagioQualificacaoPie').getContext('2d');
-        new Chart(ctxEstagioQualificacao, {
-            type: 'pie',
-            data: {
-                labels: <?php echo json_encode($status_estagio_qualificacao_labels); ?>,
-                datasets: [{
-                    data: <?php echo json_encode($status_estagio_qualificacao_data); ?>,
-                    backgroundColor: ['#198754', '#dc3545'],
-                    borderWidth: 2,
-                    borderColor: '#fff'
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { position: 'bottom' } }
-            }
-        });
-
-        
-    </script>
+        }
+    });
+</script>
 </body>
 
 </html>

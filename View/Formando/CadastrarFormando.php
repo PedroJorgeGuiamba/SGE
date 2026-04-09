@@ -1,11 +1,19 @@
 <?php
 include '../../Controller/Formando/CadastrarFormando.php';
+include_once __DIR__ . '/../../Helpers/CSRFProtection.php';
 ?>
 <?php require_once __DIR__ . '/../../Includes/header-admin.php' ?>
 
     <main>
         <div class="formulario">
             <form action="../../Controller/Formando/CadastrarFormando.php" method="post">
+                <?= CSRFProtection::getTokenField() ?>
+                <?php if (isset($_GET['erros'])): ?>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($_GET['erros']); ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <?php endif; ?>
                 <div class="row">
                     <div class="form-group col-md-4">
                         <label for="codigoformando" class="form-label">Código do Formando</label>

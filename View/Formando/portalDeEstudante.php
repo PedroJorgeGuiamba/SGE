@@ -3,47 +3,33 @@ session_start();
 include '../../Controller/Formando/Home.php';
 require_once __DIR__ . '/../../middleware/auth.php';
 require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
+require_once __DIR__ . '/../../Helpers/NotificationHelper.php';
 
 SecurityHeaders::setFull();
 
 $conexao = new Conector();
 $conn = $conexao->getConexao();
-$userId = $_SESSION['usuario_id'] ?? 0; // Assume logged in
+$userId = NotificationHelper::sanitizeUserId($_SESSION['usuario_id'] ?? 0);
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action'])) {
-        if ($_POST['action'] === 'mark_read' && isset($_POST['id_notificacao'])) {
-            $notifId = intval($_POST['id_notificacao']);
-            $sql = "UPDATE notificacao SET lida = 1 WHERE id_notificacao = $notifId AND id_utilizador = $userId";
-            $conn->query($sql);
-        } elseif ($_POST['action'] === 'mark_all_read') {
-            $sql = "UPDATE notificacao SET lida = 1 WHERE id_utilizador = $userId AND deleted = 0";
-            $conn->query($sql);
-        } elseif ($_POST['action'] === 'clear_all') {
-            $sql = "UPDATE notificacao SET deleted = 1 WHERE id_utilizador = $userId";
-            $conn->query($sql);
-        }
+// Verificar se o formando já confirmou seu código
+if (strtolower($_SESSION['role'] ?? '') === 'formando') {
+    if (!isset($_SESSION['codigo_formando'])) {
+        // Formando não confirmou código, redirecionar para confirmação
+        header("Location: /estagio/View/Auth/ConfirmacaoFormando.php");
+        exit();
     }
-    // Reload the page after action
+}
+
+NotificationHelper::handleAction($conn, $userId, $_POST ?? []);
+
+// Se efetuou ação via POST, redireciona e evita re-envio de formulário
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
 }
 
-// Fetch unread count
-$sql = "SELECT COUNT(*) as count FROM notificacao WHERE id_utilizador = $userId AND lida = 0 ";
-$result = $conn->query($sql);
-$unreadCount = $result ? $result->fetch_assoc()['count'] : 0;
-
-// Fetch all notifications for dropdown
-$sql = "SELECT * FROM notificacao WHERE id_utilizador = $userId ORDER BY lida ASC, data DESC";
-$result = $conn->query($sql);
-$notifications = [];
-if ($result) {
-    while ($row = $result->fetch_assoc()) {
-        $notifications[] = $row;
-    }
-}
-
+$unreadCount = NotificationHelper::getUnreadCount($conn, $userId);
+$notifications = NotificationHelper::getNotifications($conn, $userId);
 ?>
 
 <!DOCTYPE html>
@@ -59,10 +45,11 @@ if ($result) {
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
     <link href='https://cdn.boxicons.com/fonts/brands/boxicons-brands.min.css' rel='stylesheet'>
     <!-- CSS -->
+    <link rel="stylesheet" href="../../Assets/CSS/notifications.css">
     <style>
         /* ====== VARIÁVEIS E CONFIGURAÇÕES GLOBAIS ====== */
         :root {
@@ -249,40 +236,6 @@ if ($result) {
             line-height: 1.6;
         }
 
-        .badge {
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.5em 0.75em;
-        }
-
-        .notification-icon {
-            position: relative;
-            margin-left: 15px;
-        }
-        .notification-count {
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            background-color: #dc3545;
-            color: white;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 12px;
-        }
-        .dropdown-menu.notifications {
-            width: 300px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .notification-item {
-            border-bottom: 1px solid #eee;
-            padding: 10px;
-        }
-        .notification-item.unread {
-            background-color: #f8f9fa;
-        }
-
-
         /* ====== RESPONSIVIDADE ====== */
         @media (min-width: 768px) {
             main {
@@ -399,9 +352,14 @@ if ($result) {
             outline-offset: 2px;
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
     <link href='https://cdn.boxicons.com/fonts/brands/boxicons-brands.min.css' rel='stylesheet'>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../../Style/home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
@@ -441,45 +399,7 @@ if ($result) {
                                     <i class="fa-brands fa-linkedin-in" style="color: #3a4c91;"></i>
                                 </a>
                             </li>
-                            <!-- Notification Bell -->
-                            <li class="nav-item dropdown">
-                                <a href="#" class="notification-icon me-3 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-bell fs-4" style="color: #3a4c91;"></i>
-                                    <?php if ($unreadCount > 0): ?>
-                                        <span class="notification-count"><?php echo $unreadCount; ?></span>
-                                    <?php endif; ?>
-                                </a>
-                                <ul class="dropdown-menu notifications dropdown-menu-end">
-                                    <?php if (empty($notifications)): ?>
-                                        <li class="notification-item text-center">Nenhuma notificação.</li>
-                                    <?php else: ?>
-                                        <?php foreach ($notifications as $notif): ?>
-                                            <li class="notification-item <?php echo $notif['lida'] == 0 ? 'unread' : ''; ?>">
-                                                <p><?php echo htmlspecialchars($notif['mensagem']); ?></p>
-                                                <small class="text-muted"><?php echo htmlspecialchars($notif['data']); ?></small>
-                                                <?php if ($notif['lida'] == 0): ?>
-                                                    <form method="POST" style="display:inline;">
-                                                        <input type="hidden" name="action" value="mark_read">
-                                                        <input type="hidden" name="id_notificacao" value="<?php echo $notif['id_notificacao']; ?>">
-                                                        <button type="submit" class="btn btn-sm btn-link">Marcar como lida</button>
-                                                    </form>
-                                                <?php endif; ?>
-                                            </li>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
-                                    <li class="dropdown-divider"></li>
-                                    <li class="text-center">
-                                        <form method="POST" style="display:inline;">
-                                            <input type="hidden" name="action" value="mark_all_read">
-                                            <button type="submit" class="btn btn-sm btn-primary">Marcar todas como lidas</button>
-                                        </form>
-                                        <form method="POST" style="display:inline;">
-                                            <input type="hidden" name="action" value="clear_all">
-                                            <button type="submit" class="btn btn-sm btn-danger">Limpar todas</button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </li>
+                            <?php include __DIR__ . '/../../Includes/notification-widget.php'; ?>
                             <li class="nav-item">
                                 <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger">Logout</a>
                             </li>
@@ -497,105 +417,173 @@ if ($result) {
                 <li class="nav-item">
                     <a class="nav-link" href="../estagio/formularioDeCartaDeEstagio.php">Fazer Pedido de Estágio</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../estagio/formularioDeCredencialDeEstagio.php">Solicitar Credencial de Estágio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../estagio/formularioDeVisita.php">Solicitar Visita de Estágio</a>
+                </li>
             </ul>
         </nav>
     </header>
 
-    <main>
-        <section style="padding-top: 100px;" class="noticias">
-            <div class="row row-cols-1 row-cols-md-2 g-4">
-                <div class="col">
-                    <div class="card">
-                        <img src="https://www.itc.ac.mz/wp-content/uploads/2020/07/itc-p.png" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">Card title</h5>
-                            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional
-                                content. This content is a little bit longer.</p>
-                        </div>
-                    </div>
-                </div>
+    <main class="container mt-4">
+        <h2 class="mb-4" style="padding-top: 30px;">Histórico de Pedidos</h2>
 
-                <div class="col">
-                    <div class="card">
-                        <img src="https://www.itc.ac.mz/wp-content/uploads/2024/10/WhatsApp-Image-2024-10-29-at-14.36.59-7-768x1024.jpeg" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">Card title</h5>
-                            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional
-                                content. This content is a little bit longer.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card">
-                        <img src="https://www.itc.ac.mz/wp-content/uploads/2023/10/WhatsApp-Image-2023-10-26-at-15.03.08-2.jpeg" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">Card title</h5>
-                            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional
-                                content.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card">
-                        <img src="https://www.itc.ac.mz/wp-content/uploads/2023/10/WhatsApp-Image-2023-10-26-at-15.03.08-2.jpeg" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">Card title</h5>
-                            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional
-                                content. This content is a little bit longer.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card">
-                        <img src="https://www.itc.ac.mz/wp-content/uploads/2023/10/WhatsApp-Image-2023-10-26-at-15.03.08-2.jpeg" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">Card title</h5>
-                            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional
-                                content. This content is a little bit longer.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card">
-                        <img src="https://www.itc.ac.mz/wp-content/uploads/2023/10/WhatsApp-Image-2023-10-26-at-15.03.08-2.jpeg" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">Card title</h5>
-                            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional
-                                content. This content is a little bit longer.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card">
-                        <img src="https://www.itc.ac.mz/wp-content/uploads/2023/10/WhatsApp-Image-2023-10-26-at-15.03.08-2.jpeg" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">Card title</h5>
-                            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional
-                                content.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card">
-                        <img src="https://www.itc.ac.mz/wp-content/uploads/2023/10/WhatsApp-Image-2023-10-26-at-15.03.08-2.jpeg" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">Card title</h5>
-                            <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional
-                                content. This content is a little bit longer.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <div class="table-responsive">
+            <table id="pedidosTable" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="selectAll"></th>
+                        <th>Numero</th>
+                        <th>Nome</th>
+                        <th>Apelido</th>
+                        <th>Código Formando</th>
+                        <th>Qualificação</th>
+                        <th>Turma</th>
+                        <th>Data do Pedido</th>
+                        <th>Hora do Pedido</th>
+                        <th>Empresa</th>
+                        <th>Contacto Principal</th>
+                        <th>Contacto Secundário</th>
+                        <th>Email</th>
+                        <th>Acções</th>
+                    </tr>
+                </thead>
+                <tbody id="pedidosTbody">
+                </tbody>
+            </table>
+            <nav>
+                <ul class="pagination justify-content-center mt-3" id="pagination"></ul>
+            </nav>
+        </div>
     </main>
 
-    <?php require_once __DIR__ . '/../../Includes/footer.php'?>
+    <?php require_once __DIR__ . '/../../Includes/footer.php' ?>
+
+    <script>
+        $(document).ready(function() {
+            let currentPage = 1;
+            const rowsPerPage = 4;
+            let pedidosData = [];
+
+            function renderTable() {
+                $('#pedidosTbody').empty();
+                const start = (currentPage - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+                const pageData = pedidosData.slice(start, end);
+
+                pageData.forEach(pedido => {
+                    $('#pedidosTbody').append(`
+                        <tr>
+                            <td><input type="checkbox" class="select-checkbox" value="${pedido.id_pedido_carta}"></td>
+                            <td>${pedido.numero}</td>
+                            <td>${pedido.nome}</td>
+                            <td>${pedido.apelido}</td>
+                            <td>${pedido.codigo_formando}</td>
+                            <td>${pedido.qualificacao_descricao ?? pedido.qualificacao}</td>
+                            <td>${pedido.turma}</td>
+                            <td>${pedido.data_do_pedido.split('-').reverse().join('/')}</td>
+                            <td>${pedido.hora_do_pedido}</td>
+                            <td>${pedido.empresa}</td>
+                            <td>${pedido.contactoPrincipal}</td>
+                            <td>${pedido.contactoSecundario}</td>
+                            <td>${pedido.email}</td>
+                            <td>
+                                <button class="btn btn-sm btn-warning editar-btn" data-id="${pedido.id_pedido_carta}" title="Editar" >
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger remover-btn" data-id="${pedido.id_pedido_carta}" title="Remover">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `);
+                });
+
+                renderPagination();
+            }
+
+            function renderPagination() {
+                const totalPages = Math.ceil(pedidosData.length / rowsPerPage);
+                $('#pagination').empty();
+
+                for (let i = 1; i <= totalPages; i++) {
+                    $('#pagination').append(`
+                        <li class="page-item ${i === currentPage ? 'active' : ''}">
+                            <a class="page-link" href="#">${i}</a>
+                        </li>
+                    `);
+                }
+
+                $('.page-link').click(function(e) {
+                    e.preventDefault();
+                    currentPage = parseInt($(this).text());
+                    renderTable();
+                });
+            }
+
+            function buscarPedidos(pesquisa = '') {
+                $.get('../../Controller/Estagio/search_pedidos.php', {
+                    termo: pesquisa
+                }, function(data) {
+                    pedidosData = data;
+                    currentPage = 1;
+                    renderTable();
+                });
+            }
+
+            buscarPedidos('');
+
+            $(document).on('click', '.editar-btn', function() {
+                var id = $(this).data('id');
+                window.location.href = '../estagio/editarPedido.php?numero=' + id;
+            });
+
+            $(document).on('click', '.remover-btn', function() {
+                var id = $(this).data('id');
+
+                // Confirmação antes de remover
+                if (confirm('Tem certeza que deseja remover o pedido #' + id + '?')) {
+                    $.ajax({
+                        url: '../../Controller/Estagio/remover_pedido.php',
+                        type: 'POST',
+                        data: {
+                            id_pedido_carta: id
+                        },
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.success) {
+                                alert(response.message);
+                                buscarPedidos($('#searchInput').val().trim());
+                            } else {
+                                alert(response.error || 'Erro ao remover o pedido');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.log('Status:', xhr.status);
+                            console.log('Resposta:', xhr.responseText); // ← mostra o que o PHP devolveu
+                            alert('Erro: ' + xhr.responseText);
+                        }
+                        // error: function() {
+                        //     alert('Erro ao comunicar com o servidor');
+                        // }
+                    });
+                }
+            });
+
+            $('#selectAll').on('change', function() {
+                $('.select-checkbox').prop('checked', this.checked);
+            });
+
+            // Atualiza o "Select All" quando desmarcar um checkbox
+            $(document).on('change', '.select-checkbox', function() {
+                const allChecked = $('.select-checkbox').length === $('.select-checkbox:checked').length;
+                $('#selectAll').prop('checked', allChecked);
+            });
+
+        });
+    </script>
 </body>
 
 </html>

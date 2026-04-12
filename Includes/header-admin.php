@@ -40,34 +40,9 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="../../Style/home.css">
+    <link rel="stylesheet" href="../../Assets/CSS/global.css">
     <link rel="stylesheet" href="../../Assets/CSS/chart.css">
     <link rel="stylesheet" href="../../Assets/CSS/notifications.css">
-    <style>
-        :root {
-            --primary-color: #0d6efd;
-            --secondary-color: #6c757d;
-            --success-color: #198754;
-            --info-color: #0dcaf0;
-            --warning-color: #ffc107;
-            --danger-color: #dc3545;
-            /* --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
-            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            --border-radius: 15px;
-        }
-
-        footer {
-            /* background: var(--bg-gradient); */
-            background-color: #3A4C91;
-            color: white;
-            /* padding: 1rem 0; */
-            margin-top: 3rem;
-        }
-
-        header nav ul li.nav-item ul.dropdown-menu li a.dropdown-item {
-            color: black;
-        }
-    </style>
 </head>
 
 <body>
@@ -85,69 +60,89 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                             <!-- Instagram -->
                             <li class="nav-item">
-                                <a class="nav-link" aria-current="page" href="https://www.instagram.com/itc.ac">Instagram</a>
+                                <a class="nav-link fs-5" aria-current="page" href="https://www.instagram.com/itc.ac" aria-label="Instagram">
+                                    <i class="fa-brands fa-instagram" style="color: #3a4c91;"></i>
+                                </a>
                             </li>
                             <!-- Facebook -->
                             <li class="nav-item">
-                                <a class="nav-link" aria-current="page" href="https://pt-br.facebook.com/itc.transcom">Facebook</a>
+                                <a class="nav-link fs-5" aria-current="page" href="https://pt-br.facebook.com/itc.transcom" aria-label="Facebook">
+                                    <i class="fa-brands fa-facebook" style="color: #3a4c91;"></i>
+                                </a>
                             </li>
                             <!-- Google -->
                             <li class="nav-item">
-                                <a class="nav-link" href="https://plus.google.com/share?url=https://simplesharebuttons.com">Google</a>
+                                <a class="nav-link fs-5" href="https://plus.google.com/share?url=https://simplesharebuttons.com" aria-label="Google">
+                                    <i class="fa-brands fa-google" style="color: #3a4c91;"></i>
+                                </a>
                             </li>
                             <!-- LinkedIn -->
                             <li class="nav-item">
-                                <a class="nav-link" href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://simplesharebuttons.com">Linkedin</a>
+                                <a class="nav-link fs-5" href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://simplesharebuttons.com" aria-label="LinkedIn">
+                                    <i class="fa-brands fa-linkedin-in" style="color: #3a4c91;"></i>
+                                </a>
                             </li>
                             <li class="nav-item">
-                                <button id="themeToggle" class="btn btn-outline-secondary position-fixed bottom-0 end-0 m-3" style="z-index: 1050;">
-                                    <i class="fas fa-moon"></i> <!-- ícone muda com JS -->
+                                <button id="themeToggle" class="btn btn-outline-secondary position-fixed bottom-0 end-0 m-3 shadow-sm" style="z-index: 1050; border-radius: 50%; width: 45px; height: 45px;">
+                                    <i class="fas fa-moon"></i>
                                 </button>
                             </li>
                             <?php include __DIR__ . '/notification-widget.php'; ?>
-                            <li class="nav-item">
-                                <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger">Logout</a>
+                            <li class="nav-item ms-lg-3">
+                                <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger shadow-sm"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
                             </li>
                         </ul>
                     </div>
                 </div>
         </nav>
 
-        <!-- Nav Secundária -->
-        <nav>
-            <ul class="nav justify-content-center">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="../../View/Admin/portalDoAdmin.php">Home</a>
+        <nav class="bg-white shadow-sm border-bottom">
+            <ul class="nav justify-content-center py-2">
+                <li class="nav-item mx-2">
+                    <a class="nav-link active fw-semibold text-dark" aria-current="page" href="../../View/Admin/portalDoAdmin.php">
+                        <i class="fas fa-home me-1 text-primary"></i> Home
+                    </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Módulos</a>
+                <li class="nav-item mx-2">
+                    <a class="nav-link fw-semibold text-dark" href="#">
+                        <i class="fas fa-cubes me-1 text-primary"></i> Módulos
+                    </a>
                 </li>
 
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="dropdownModulos" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Cadastrar
+                <li class="nav-item dropdown mx-2">
+                    <a class="nav-link dropdown-toggle fw-semibold text-dark" href="#" id="dropdownModulos" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-plus-circle me-1 text-primary"></i> Cadastrar
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownModulos">
-                        <li><a class="dropdown-item" href="../../View/Cursos/CadastrarCurso.php">Cursos</a></li>
-                        <li><a class="dropdown-item" href="../../View/Qualificacao/CadastrarQualificacao.php">Qualificacoes</a></li>
-                        <li><a class="dropdown-item" href="../../View/Turmas/CadastrarTurma.php">Turmas</a></li>
-                        <li><a class="dropdown-item" href="../../View/Formando/CadastrarFormando.php">Formandos</a></li>
-                        <li><a class="dropdown-item" href="../../View/Formador/CadastrarFormador.php">Formadores</a></li>
-                        <li><a class="dropdown-item" href="../../View/Supervisor/CadastrarSupervisor.php">Supervisores</a></li>
+                    <ul class="dropdown-menu shadow-sm border-0" aria-labelledby="dropdownModulos">
+                        <li><a class="dropdown-item" href="../../View/Cursos/CadastrarCurso.php"><i class="fas fa-graduation-cap fa-fw me-2 text-secondary"></i> Cursos</a></li>
+                        <li><a class="dropdown-item" href="../../View/Qualificacao/CadastrarQualificacao.php"><i class="fas fa-certificate fa-fw me-2 text-secondary"></i> Qualificações</a></li>
+                        <li><a class="dropdown-item" href="../../View/Turmas/CadastrarTurma.php"><i class="fas fa-users-class fa-fw me-2 text-secondary"></i> Turmas</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="../../View/Formando/CadastrarFormando.php"><i class="fas fa-user-graduate fa-fw me-2 text-secondary"></i> Formandos</a></li>
+                        <li><a class="dropdown-item" href="../../View/Formador/CadastrarFormador.php"><i class="fas fa-chalkboard-teacher fa-fw me-2 text-secondary"></i> Formadores</a></li>
+                        <li><a class="dropdown-item" href="../../View/Supervisor/CadastrarSupervisor.php"><i class="fas fa-user-tie fa-fw me-2 text-secondary"></i> Supervisores</a></li>
                     </ul>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Horário</a>
+                <li class="nav-item mx-2">
+                    <a class="nav-link fw-semibold text-dark" href="#">
+                        <i class="far fa-calendar-alt me-1 text-primary"></i> Horário
+                    </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Situação de Pagamento</a>
+                <li class="nav-item mx-2">
+                    <a class="nav-link fw-semibold text-dark" href="#">
+                        <i class="fas fa-money-bill-wave me-1 text-primary"></i> Situação de Pagamento
+                    </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="../estagio/situacaoDeEstagio.php">Situação de Estagio</a>
+                <li class="nav-item mx-2">
+                    <a class="nav-link fw-semibold text-dark" href="../estagio/situacaoDeEstagio.php">
+                        <i class="fas fa-briefcase me-1 text-primary"></i> Situação de Estágio
+                    </a>
                 </li>
-                <li>
-                    <a class="nav-link" href="../Notas/visualizarNotas.php">Notas</a>
+                <li class="nav-item mx-2">
+                    <a class="nav-link fw-semibold text-dark" href="../Notas/visualizarNotas.php">
+                        <i class="fas fa-clipboard-list me-1 text-primary"></i> Notas
+                    </a>
                 </li>
             </ul>
         </nav>

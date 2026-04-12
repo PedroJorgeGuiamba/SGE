@@ -39,7 +39,7 @@ $tentativas = $conn->query("SELECT id_tentativa, descricao FROM tipo_tentativa O
   <link rel="stylesheet" href="../../Assets/CSS/notifications.css">
 
   <!-- CSS personalizado -->
-  <link rel="stylesheet" href="../../Style/home.css">
+  <link rel="stylesheet" href="../../Assets/CSS/global.css">
 </head>
 
 <body class="bg-light">

@@ -44,7 +44,7 @@ $res = $mysqli->query($query);
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- CSS personalizado -->
-  <link rel="stylesheet" href="../../Style/home.css">
+  <link rel="stylesheet" href="../../Assets/CSS/global.css">
   <!-- Notifications CSS -->
   <link rel="stylesheet" href="../../Assets/CSS/notifications.css">
 </head>

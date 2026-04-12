@@ -47,7 +47,7 @@ $tentativas = $mysqli->query("SELECT id_tentativa, descricao FROM tipo_tentativa
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- CSS personalizado -->
-  <link rel="stylesheet" href="../../Style/home.css">
+  <link rel="stylesheet" href="../../Assets/CSS/global.css">
 </head>
 
 <body class="bg-light">

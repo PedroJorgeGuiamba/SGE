@@ -1,0 +1,272 @@
+/* ====== PORTAL DE FORMADORES - ESTILOS ESPECÍFICOS ====== */
+
+/* Secção Hero de Formadores */
+.formadores-hero {
+    background: linear-gradient(135deg, rgba(58, 76, 145, 0.05) 0%, rgba(60, 155, 255, 0.05) 100%);
+    border-bottom: 1px solid rgba(58, 76, 145, 0.1);
+}
+
+/* Estatísticas dos Formadores */
+.formadores-stats {
+    margin: 3rem 0;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.stat-box {
+    padding: 2rem;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    transition: var(--transition);
+}
+
+.stat-box:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-medium);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+.stat-label {
+    color: #6c757d;
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Listagem de Formadores */
+.formadores-list {
+    padding: 3rem 0;
+    background: white;
+}
+
+/* Card de Formador */
+.formador-card {
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    transition: var(--transition);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.formador-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-heavy);
+}
+
+/* Wrapper da imagem com overlay */
+.card-img-wrapper {
+    position: relative;
+    overflow: hidden;
+    height: 250px;
+}
+
+.card-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.formador-card:hover .card-img-wrapper img {
+    transform: scale(1.05);
+}
+
+/* Overlay ao passar o mouse */
+.card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(58, 76, 145, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.formador-card:hover .card-overlay {
+    opacity: 1;
+}
+
+.card-overlay a {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* Corpo do card */
+.formador-card .card-body {
+    padding: 1.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Título e Especialidade */
+.formador-card .card-title {
+    color: var(--primary-color);
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    font-size: 1.15rem;
+}
+
+.formador-card .card-text {
+    color: #6c757d;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+/* Badge de Especialização */
+.formador-card .badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.5em 0.75em;
+    display: inline-block;
+    margin-bottom: 0.75rem;
+}
+
+/* Estatísticas do Formador */
+.formador-stats {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.formador-stats small {
+    font-size: 0.85rem;
+}
+
+.formador-stats small i {
+    width: 16px;
+    text-align: center;
+}
+
+/* ====== MODO ESCURO ====== */
+[data-bs-theme="dark"] .formadores-hero {
+    background: linear-gradient(135deg, rgba(58, 76, 145, 0.15) 0%, rgba(60, 155, 255, 0.15) 100%);
+}
+
+[data-bs-theme="dark"] .formadores-stats {
+    background: linear-gradient(135deg, #212529 0%, #1a1d20 100%);
+}
+
+[data-bs-theme="dark"] .stat-box {
+    background: #2c3034;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="dark"] .stat-box:hover {
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+}
+
+[data-bs-theme="dark"] .formadores-list {
+    background: #1a1d20;
+}
+
+[data-bs-theme="dark"] .formador-card {
+    background: #212529;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="dark"] .formador-card:hover {
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+}
+
+[data-bs-theme="dark"] .formador-card .card-title {
+    color: var(--secondary-color);
+}
+
+[data-bs-theme="dark"] .formador-card .card-text {
+    color: #adb5bd;
+}
+
+[data-bs-theme="dark"] .formador-stats small {
+    color: #adb5bd;
+}
+
+/* ====== RESPONSIVIDADE ====== */
+@media (max-width: 768px) {
+    .stat-number {
+        font-size: 2rem;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+    }
+
+    .stat-box {
+        padding: 1.5rem;
+    }
+
+    .card-img-wrapper {
+        height: 200px;
+    }
+
+    .formador-card .card-title {
+        font-size: 1rem;
+    }
+
+    .formador-card .card-text {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .formadores-stats .row {
+        flex-direction: column;
+    }
+
+    .stat-box {
+        margin-bottom: 1rem;
+    }
+
+    .card-img-wrapper {
+        height: 180px;
+    }
+
+    .formador-card .card-body {
+        padding: 1rem;
+    }
+
+    .formador-card .card-title {
+        font-size: 0.95rem;
+    }
+
+    .formador-stats small {
+        font-size: 0.8rem;
+    }
+}
+
+/* ====== ANIMAÇÕES ====== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in forwards;
+}
+
+.fade-in:nth-child(1) { animation-delay: 0s; }
+.fade-in:nth-child(2) { animation-delay: 0.1s; }
+.fade-in:nth-child(3) { animation-delay: 0.2s; }
+.fade-in:nth-child(4) { animation-delay: 0.3s; }
+.fade-in:nth-child(5) { animation-delay: 0.4s; }
+.fade-in:nth-child(6) { animation-delay: 0.5s; }

@@ -51,13 +51,21 @@ $lockoutTime = $controller->getLockoutRemainingTime();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confirmação de Formando - SGE</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/estagio/Assets/CSS/home.css">
+    <link rel="stylesheet" href="../../Assets/CSS/global.css">
     <style>
+        /* ====== PALETA DO PROJECTO SGE ====== */
+        :root {
+            --primary:   #3a4c91;
+            --secondary: #3c9bff;
+            --accent:    #0d6efd;
+        }
+
         .confirmation-container {
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -66,13 +74,13 @@ $lockoutTime = $controller->getLockoutRemainingTime();
 
         .confirmation-card {
             background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 50px rgba(58, 76, 145, 0.25);
             padding: 40px;
             max-width: 500px;
             width: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .confirmation-header {
@@ -80,21 +88,32 @@ $lockoutTime = $controller->getLockoutRemainingTime();
             margin-bottom: 30px;
         }
 
-        .confirmation-header i {
-            font-size: 4rem;
-            color: #667eea;
+        .confirmation-header .icon-wrapper {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(58, 76, 145, 0.3);
+        }
+
+        .confirmation-header .icon-wrapper i {
+            font-size: 2.2rem;
+            color: #ffffff;
         }
 
         .confirmation-header h2 {
-            color: #333;
-            font-weight: 600;
-            margin-bottom: 10px;
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 8px;
         }
 
         .confirmation-header p {
-            color: #666;
-            font-size: 1.1rem;
+            color: #64748b;
+            font-size: 1rem;
         }
 
         .form-group {
@@ -108,37 +127,41 @@ $lockoutTime = $controller->getLockoutRemainingTime();
         }
 
         .form-control {
-            border: 2px solid #e1e5e9;
+            border: 2px solid #e9ecef;
             border-radius: 10px;
             padding: 12px 16px;
             font-size: 1rem;
+            background: #f8f9fa;
             transition: all 0.3s ease;
         }
 
         .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            border-color: var(--primary);
+            background: #ffffff;
+            box-shadow: 0 0 0 0.2rem rgba(58, 76, 145, 0.18);
         }
 
         .btn-confirm {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             border: none;
             border-radius: 10px;
-            padding: 12px 30px;
-            font-size: 1.1rem;
+            padding: 13px 30px;
+            font-size: 1.05rem;
             font-weight: 600;
             color: white;
             width: 100%;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(58, 76, 145, 0.3);
         }
 
         .btn-confirm:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 10px 25px rgba(58, 76, 145, 0.4);
+            color: white;
         }
 
         .btn-confirm:disabled {
-            background: #ccc;
+            background: #adb5bd;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
@@ -151,15 +174,15 @@ $lockoutTime = $controller->getLockoutRemainingTime();
         }
 
         .attempts-info {
-            background: rgba(255, 193, 7, 0.1);
-            border: 1px solid rgba(255, 193, 7, 0.3);
+            background: rgba(255, 193, 7, 0.08);
+            border: 1px solid rgba(255, 193, 7, 0.35);
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 20px;
         }
 
         .attempts-info i {
-            color: #ffc107;
+            color: #e6a817;
         }
 
         .countdown {
@@ -168,15 +191,16 @@ $lockoutTime = $controller->getLockoutRemainingTime();
         }
 
         .help-text {
-            background: rgba(0, 123, 255, 0.1);
-            border: 1px solid rgba(0, 123, 255, 0.3);
+            background: rgba(58, 76, 145, 0.06);
+            border: 1px solid rgba(58, 76, 145, 0.18);
             border-radius: 10px;
             padding: 15px;
             margin-top: 20px;
         }
 
         .help-text h6 {
-            color: #0056b3;
+            color: var(--primary);
+            font-weight: 600;
             margin-bottom: 10px;
         }
 
@@ -187,7 +211,19 @@ $lockoutTime = $controller->getLockoutRemainingTime();
 
         .help-text li {
             margin-bottom: 5px;
-            color: #666;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .btn-outline-secondary {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: white;
         }
 
         @media (max-width: 576px) {
@@ -196,8 +232,13 @@ $lockoutTime = $controller->getLockoutRemainingTime();
                 margin: 10px;
             }
 
-            .confirmation-header i {
-                font-size: 3rem;
+            .confirmation-header .icon-wrapper {
+                width: 65px;
+                height: 65px;
+            }
+
+            .confirmation-header .icon-wrapper i {
+                font-size: 1.8rem;
             }
         }
     </style>
@@ -207,9 +248,11 @@ $lockoutTime = $controller->getLockoutRemainingTime();
     <div class="confirmation-container">
         <div class="confirmation-card">
             <div class="confirmation-header">
-                <i class="fas fa-user-graduate"></i>
+                <div class="icon-wrapper">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
                 <h2>Confirmação de Formando</h2>
-                <p>Para acessar o sistema, confirme seu código de formando</p>
+                <p>Para aceder ao sistema, confirme o seu código de formando</p>
             </div>
 
             <?php if (!empty($error)): ?>

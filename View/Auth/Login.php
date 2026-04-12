@@ -17,58 +17,61 @@ include_once __DIR__ . '/../../Controller/Auth/AuthController.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Fazer link do CSS Global -->
+    <link rel="stylesheet" href="../../Assets/CSS/global.css">
+    <!-- FontAwesome para icones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg bg-body-tertiary">
-            <div class="container-fluid">
-                <img src="https://www.itc.ac.mz/wp-content/uploads/2020/07/cropped-LOGO_ITC-09.png" alt="ITC Logo">
-                <div class="nav-modal">
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarText">
-                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                            <li><a class="nav-link" href="Auth/Register.php">Registrar</a></li>
-                        </ul>
-                    </div>
-                </div>
+    <main class="auth-wrapper">
+        <div class="auth-card">
+            <!-- Logo do ITC -->
+            <div class="logo-container">
+                <a href="../../Index.php">
+                    <img src="https://www.itc.ac.mz/wp-content/uploads/2020/07/cropped-LOGO_ITC-09.png" alt="ITC Logo">
+                </a>
             </div>
-        </nav>
-    </header>
+            
+            <h3 class="auth-title">Bem-vindo</h3>
+            <p class="auth-subtitle">Faça o seu login para acessar o SGE</p>
+            
+            <?php if (isset($_GET['error']) || isset($error)): ?>
+                <div class="alert alert-danger shadow-sm">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <?= htmlspecialchars($_GET['error'] ?? $error) ?>
+                </div>
+            <?php endif; ?>
 
-    <div class="container custom-container">
-        <h2>LOGIN</h2>
-        <hr />
-        <?php if (isset($_GET['error']) || isset($error)): ?>
-            <div class="alert alert-danger"><?= htmlspecialchars($_GET['error'] ?? $error) ?></div>
-        <?php endif; ?>
+            <form method="post">
+                <?= CSRFProtection::getTokenField() ?>
+                
+                <div class="form-group mb-3">
+                    <label for="email" class="form-label text-muted small fw-bold">Endereço de Email</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-envelope text-muted"></i></span>
+                        <input type="email" name="email" class="form-control border-start-0 ps-0" id="email" placeholder="exemplo@dominio.com" required>
+                    </div>
+                </div>
+                
+                <div class="form-group mb-4">
+                    <label for="password" class="form-label text-muted small fw-bold">Palavra-passe</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-lock text-muted"></i></span>
+                        <input type="password" name="password" class="form-control border-start-0 ps-0" id="password" placeholder="**********" required>
+                    </div>
+                </div>
 
-        <form method="post">
-            <?= CSRFProtection::getTokenField() ?>
-            <div class="card mb-3">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="form-group col-md-4">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" name="email" class="form-control" id="email" placeholder="exemplo@dominio.com" required>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group col-md-4">
-                            <label for="password" class="form-label">Senha</label>
-                            <input type="password" name="password" class="form-control" id="password" placeholder="**********" required>
-                        </div>
-                    </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary w-100 shadow-sm text-white">Entrar no Sistema</button>
                 </div>
-            </div>
-            <div class="form-group">
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-success form-control">Login</button>
+                
+                <div class="auth-links">
+                    <p class="text-muted mb-0">Ainda não tem conta? <a href="Register.php">Criar Registo</a></p>
+                    <p class="mt-2"><a href="../../Index.php" class="text-secondary"><i class="fas fa-arrow-left me-1"></i> Voltar à Home</a></p>
                 </div>
-            </div>
-        </form>
-    </div>
+            </form>
+        </div>
+    </main>
 
     <script src="../../Assets/JS/info-message-close.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

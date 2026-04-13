@@ -123,7 +123,7 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
                     </ul>
                 </li>
 
-                <?php if ($_SESSION['role'] === 'admin'): ?>
+                <?php if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'supervisor'): ?>
                 <li class="nav-item mx-1 dropdown">
                     <a class="nav-link fw-semibold text-dark dropdown-toggle" href="#" id="listasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-list-ul fa-fw me-1 text-info"></i> Listas
@@ -135,8 +135,8 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
                     </ul>
                 </li>
                 <li class="nav-item mx-1">
-                    <a class="nav-link fw-semibold text-dark" href="respostaCarta.php">
-                        <i class="fas fa-reply-all fa-fw me-1 text-warning"></i> Resposta das Cartas
+                    <a class="nav-link fw-semibold text-dark" href="relatorio.php">
+                        <i class="fas fa-file-pdf fa-fw me-1 text-danger"></i> Gerar Relatórios
                     </a>
                 </li>
                 <?php endif; ?>
@@ -144,7 +144,7 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
         </nav>
     </header>
 
-    <main class="container mb-5" style="margin-top: 140px;">
+    <main class="container mb-5" style="margin-top: 40px;">
         <div class="row justify-content-center">
             <div class="col-lg-10">
                 <div class="card shadow-sm border-0 rounded-4">

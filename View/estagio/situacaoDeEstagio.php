@@ -135,7 +135,7 @@ if ($avaliacao_result_query) {
 
 <?php require_once __DIR__ . '/../../Includes/header-estagio-situacao-admin.php' ?>
 
-<section class="dashboard-header text-center bg-white border-bottom shadow-sm py-5 mb-4" style="margin-top: 140px;">
+<section class="dashboard-header text-center bg-white border-bottom shadow-sm py-5 mb-4" style="margin-top: 40px;">
     <div class="container">
         <h1 class="display-5 fw-bold text-primary"><i class="fas fa-chart-pie me-3"></i>Situação de Estágios</h1>
         <p class="lead text-muted">Acompanhe as métricas globais e o status das candidaturas a estágio</p>

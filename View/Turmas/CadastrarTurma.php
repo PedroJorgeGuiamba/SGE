@@ -4,7 +4,7 @@ include '../../Controller/Turmas/CadastrarTurma.php';
 
 <?php require_once __DIR__ . '/../../Includes/header-admin.php' ?>
 
-    <main class="container mb-5" style="margin-top: 140px;">
+    <main class="container mb-5" style="margin-top: 40px;">
         <div class="row justify-content-center">
             <div class="col-lg-10">
                 <div class="card shadow-sm border-0 rounded-4">

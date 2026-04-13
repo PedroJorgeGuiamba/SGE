@@ -9,48 +9,71 @@ $termo = trim($_GET['termo'] ?? '');
 
 // --- Filtro por qualificação do supervisor ---
 $filtroQualificacao = "";
-$qualificacaoId     = null;
+$filtroAdicional = "";
 
 if (isset($_SESSION['role']) && $_SESSION['role'] === 'supervisor' && isset($_SESSION['usuario_id'])) {
     $userId = (int) $_SESSION['usuario_id'];
 
-    // Busca a qualificação associada ao supervisor
     $stmtSup = $conn->prepare("
         SELECT id_qualificacao 
         FROM supervisor 
-        WHERE usuario_id = ? 
-        LIMIT 1
+        WHERE usuario_id = ?
     ");
     $stmtSup->bind_param("i", $userId);
     $stmtSup->execute();
-    $resSup = $stmtSup->get_result()->fetch_assoc();
+    $resSup = $stmtSup->get_result();
+
+    $qualificacaoIds = [];
+    while ($row = $resSup->fetch_assoc()) {
+        if ($row['id_qualificacao']) {
+            $qualificacaoIds[] = (int) $row['id_qualificacao'];
+        }
+    }
     $stmtSup->close();
 
-    if ($resSup && $resSup['id_qualificacao']) {
-        $qualificacaoId     = (int) $resSup['id_qualificacao'];
-        $filtroQualificacao = "p.qualificacao = $qualificacaoId";
+    if (!empty($qualificacaoIds)) {
+        $placeholders        = implode(',', $qualificacaoIds);
+        $filtroQualificacao  = "p.qualificacao IN ($placeholders)";
     }
+}
+
+if (isset($_SESSION['role']) && $_SESSION['role'] === 'formando' && isset($_SESSION['usuario_id'])) {
+    $userId = (int) $_SESSION['usuario_id'];
+    $codigoFormando = (int) $_SESSION['codigo_formando'];
+
+    $filtroAdicional = "p.codigo_formando = $codigoFormando";
+    
 }
 
 // --- Queries ---
 if ($termo === '') {
-    if($_SESSION['role'] && $_SESSION['role'] !== 'supervisor'){
+    if(($_SESSION['role']) && $_SESSION['role'] === 'formando'){
         $sql = "
-        SELECT p.*, q.descricao AS qualificacao_descricao, t.nome AS turma
-        FROM pedido_carta p
-        LEFT JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
-        LEFT JOIN turma t ON t.codigo_qualificacao = q.id_qualificacao
-        ORDER BY p.id_pedido_carta DESC
-    ";
-    }else{
-    $sql = "
-        SELECT p.*, q.descricao AS qualificacao_descricao, t.nome AS turma
-        FROM pedido_carta p
-        LEFT JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
-        LEFT JOIN turma t ON t.codigo_qualificacao = q.id_qualificacao
-        WHERE $filtroQualificacao
-        ORDER BY p.id_pedido_carta DESC
-    ";
+            SELECT p.*, q.descricao AS qualificacao_descricao, t.nome AS turma
+            FROM pedido_carta p
+            LEFT JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
+            LEFT JOIN turma t ON t.codigo_qualificacao = q.id_qualificacao
+            WHERE $filtroAdicional
+            ORDER BY p.id_pedido_carta DESC
+        ";
+    }elseif($_SESSION['role'] && $_SESSION['role'] === 'admin'){
+        $sql = "
+            SELECT p.*, q.descricao AS qualificacao_descricao, t.nome AS turma
+            FROM pedido_carta p
+            LEFT JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
+            LEFT JOIN turma t ON t.codigo_qualificacao = q.id_qualificacao
+            ORDER BY p.id_pedido_carta DESC
+        ";
+    }
+    else{
+        $sql = "
+            SELECT p.*, q.descricao AS qualificacao_descricao, t.nome AS turma
+            FROM pedido_carta p
+            LEFT JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
+            LEFT JOIN turma t ON t.codigo_qualificacao = q.id_qualificacao
+            WHERE $filtroQualificacao
+            ORDER BY p.id_pedido_carta DESC
+        ";
     }
     $result = $conn->query($sql);
 

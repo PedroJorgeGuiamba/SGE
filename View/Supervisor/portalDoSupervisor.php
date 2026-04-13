@@ -192,19 +192,29 @@ $years_list_json = json_encode(array_values($years_list));
                         <i class="fas fa-home me-1 text-primary"></i> Home
                     </a>
                 </li>
-                <li class="nav-item mx-2">
-                    <a class="nav-link fw-semibold text-dark" href="../estagio/formularioDeCartaDeEstagio.php">
-                        <i class="fas fa-paper-plane me-1 text-primary"></i> Fazer Pedido de Estágio
+                <li class="nav-item mx-1 dropdown">
+                    <a class="nav-link fw-semibold text-dark dropdown-toggle" href="#" id="pedidosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-plus-circle fa-fw me-1 text-success"></i> Fazer Pedidos
                     </a>
+                    <ul class="dropdown-menu shadow border-0 mt-2" aria-labelledby="pedidosDropdown">
+                        <li><a class="dropdown-item" href="../estagio/formularioDeCartaDeEstagio.php"><i class="fas fa-envelope-open-text fa-fw me-2 text-secondary"></i> Pedido de Estágio</a></li>
+                        <li><a class="dropdown-item" href="../estagio/formularioDeCredencialDeEstagio.php"><i class="fas fa-id-badge fa-fw me-2 text-secondary"></i> Credencial de Estágio</a></li>
+                        <li><a class="dropdown-item" href="../estagio/formularioDeVisita.php"><i class="fas fa-map-marked-alt fa-fw me-2 text-secondary"></i> Visita de Estágio</a></li>
+                    </ul>
                 </li>
-                <li class="nav-item mx-2">
-                    <a class="nav-link fw-semibold text-dark" href="../estagio/listaDePedidos.php">
-                        <i class="fas fa-list me-1 text-primary"></i> Pedidos de Estágio
+                <li class="nav-item mx-1 dropdown">
+                    <a class="nav-link fw-semibold text-dark dropdown-toggle" href="#" id="listasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-list-ul fa-fw me-1 text-info"></i> Listas
                     </a>
+                    <ul class="dropdown-menu shadow border-0 mt-2" aria-labelledby="listasDropdown">
+                        <li><a class="dropdown-item" href="../estagio/listaDePedidos.php"><i class="fas fa-file-alt fa-fw me-2 text-secondary"></i> Pedidos de Estágio</a></li>
+                        <li><a class="dropdown-item" href="../estagio/listaDePedidosCredencial.php"><i class="fas fa-id-card-clip fa-fw me-2 text-secondary"></i> Pedidos de Credencial</a></li>
+                        <li><a class="dropdown-item" href="../estagio/listaDePedidosVisita.php"><i class="fas fa-route fa-fw me-2 text-secondary"></i> Pedidos de Visita</a></li>
+                    </ul>
                 </li>
-                <li class="nav-item mx-2">
-                    <a class="nav-link fw-semibold text-dark" href="../estagio/respostaCarta.php">
-                        <i class="fas fa-reply-all me-1 text-primary"></i> Respostas
+                <li class="nav-item mx-1">
+                    <a class="nav-link fw-semibold text-dark" href="../estagio/relatorio.php">
+                        <i class="fas fa-file-pdf fa-fw me-1 text-danger"></i> Gerar Relatórios
                     </a>
                 </li>
             </ul>

@@ -39,15 +39,15 @@ class CSRFProtection {
         
         // ✅ Verificações rigorosas
         if (!isset($_SESSION['csrf_token']) || empty($_SESSION['csrf_token'])) {
-            throw new Exception('Token CSRF não encontrado na sessão. Session ID: ' . session_id());
+            throw new RuntimeException('Token CSRF não encontrado na sessão. Session ID: ' . session_id());
         }
         
         if (empty($token)) {
-            throw new Exception('Token CSRF não fornecido no formulário');
+            throw new RuntimeException('Token CSRF não fornecido no formulário');
         }
         
         if (!hash_equals($_SESSION['csrf_token'], $token)) {
-            throw new Exception(
+            throw new RuntimeException(
                 'Token CSRF não corresponde. ' .
                 'Sessão: ' . session_id() . ' | ' .
                 'Esperado: ' . $_SESSION['csrf_token'] . ' | ' .

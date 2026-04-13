@@ -11,26 +11,31 @@ $filtroBase = "p.data_de_levantamento IS NULL";
 
 // --- Filtro por qualificação do supervisor ---
 $filtroAdicional = "";
-$qualificacaoId     = null;
+// $qualificacaoId     = null;
 
 if (isset($_SESSION['role']) && $_SESSION['role'] === 'supervisor' && isset($_SESSION['usuario_id'])) {
     $userId = (int) $_SESSION['usuario_id'];
 
-    // Busca a qualificação associada ao supervisor
     $stmtSup = $conn->prepare("
         SELECT id_qualificacao 
         FROM supervisor 
-        WHERE usuario_id = ? 
-        LIMIT 1
+        WHERE usuario_id = ?
     ");
     $stmtSup->bind_param("i", $userId);
     $stmtSup->execute();
-    $resSup = $stmtSup->get_result()->fetch_assoc();
+    $resSup = $stmtSup->get_result();
+
+    $qualificacaoIds = [];
+    while ($row = $resSup->fetch_assoc()) {
+        if ($row['id_qualificacao']) {
+            $qualificacaoIds[] = (int) $row['id_qualificacao'];
+        }
+    }
     $stmtSup->close();
 
-    if ($resSup && $resSup['id_qualificacao']) {
-        $qualificacaoId     = (int) $resSup['id_qualificacao'];
-        $filtroAdicional = "AND p.qualificacao = $qualificacaoId";
+    if (!empty($qualificacaoIds)) {
+        $placeholders        = implode(',', $qualificacaoIds);
+        $filtroQualificacao  = "AND p.qualificacao IN ($placeholders)";
     }
 }
 

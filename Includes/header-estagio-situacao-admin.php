@@ -130,11 +130,6 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
                     </ul>
                 </li>
                 <li class="nav-item mx-1">
-                    <a class="nav-link fw-semibold text-dark" href="respostaCarta.php">
-                        <i class="fas fa-reply-all fa-fw me-1 text-warning"></i> Resposta das Cartas
-                    </a>
-                </li>
-                <li class="nav-item mx-1">
                     <a class="nav-link fw-semibold text-dark" href="relatorio.php">
                         <i class="fas fa-file-pdf fa-fw me-1 text-danger"></i> Gerar Relatórios
                     </a>

@@ -40,24 +40,25 @@ try {
     $stmt->close();
 
     // Notifica o formando
-    // $stmtFormando = $conn->prepare("
-    //     SELECT f.usuario_id 
-    //     FROM pedido_carta p
-    //     JOIN formando f ON f.codigo = p.codigo_formando
-    //     WHERE p.id_visita = ?
-    // ");
-    // $stmtFormando->bind_param('i', $idPedidoVisita);
-    // $stmtFormando->execute();
-    // $formando = $stmtFormando->get_result()->fetch_assoc();
-    // $stmtFormando->close();
+    $stmtFormando = $conn->prepare("
+        SELECT f.usuario_id, p.id_pedido_carta
+        FROM formando f
+        JOIN pedido_carta p ON p.codigo_formando = f.codigo
+        JOIN visita_estagio v ON v.id_pedido_carta = p.id_pedido_carta
+        WHERE v.id_visita = ?
+    ");
+    $stmtFormando->bind_param('i', $idPedidoVisita);
+    $stmtFormando->execute();
+    $formando = $stmtFormando->get_result()->fetch_assoc();
+    $stmtFormando->close();
 
-    // if ($formando && $formando['usuario_id']) {
-    //     $mensagem = "O seu pedido de visita de estágio foi aprovado.";
-    //     $stmtNotif = $conn->prepare("INSERT INTO notificacao (id_utilizador, mensagem) VALUES (?, ?)");
-    //     $stmtNotif->bind_param('is', $formando['usuario_id'], $mensagem);
-    //     $stmtNotif->execute();
-    //     $stmtNotif->close();
-    // }
+    if ($formando && $formando['usuario_id']) {
+        $mensagem = "O seu pedido de visita de estágio foi aprovado.";
+        $stmtNotif = $conn->prepare("INSERT INTO notificacao (id_utilizador, mensagem) VALUES (?, ?)");
+        $stmtNotif->bind_param('is', $formando['usuario_id'], $mensagem);
+        $stmtNotif->execute();
+        $stmtNotif->close();
+    }
 
     if (isset($_SESSION['sessao_id'])) {
         registrarAtividade($_SESSION['sessao_id'], "Visita de estágio aprovada (pedido #$idPedidoVisita)", "ACTUALIZACAO");

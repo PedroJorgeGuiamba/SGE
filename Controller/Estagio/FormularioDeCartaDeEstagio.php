@@ -22,7 +22,11 @@ class FormularioDeCartaDeEstagio
             
         try {
             $token = $_POST['csrf_token'] ?? '';
-            CSRFProtection::validateToken($token);
+            try{
+                CSRFProtection::validateToken($token);
+            }catch(ErrorException $e){
+                header("LOCATION: /estagio/View/estagio/formularioDeCartaDeEstagio.php?erros=" . $e);
+            }
             
             date_default_timezone_set('Africa/Maputo');
 
@@ -52,8 +56,8 @@ class FormularioDeCartaDeEstagio
             $codigoTurma         = isset($dados['turma'])          ? (int) $dados['turma']          : null;
             $codigoQualificacao  = isset($dados['qualificacao'])   ? (int) $dados['qualificacao']   : null;
             $empresa             = strtoupper(trim($dados['empresa'] ?? ''));
-            $contactoPrincipal   = isset($dados['contactoPrincipal']);
-            $contactoSecundario  = isset($dados['contactoSecundario']);
+            $contactoPrincipal   = trim($dados['contactoPrincipal']);
+            $contactoSecundario  = trim($dados['contactoSecundario']);
             $email               = trim($dados['email']);
 
             $dadosFormando = $pedido->buscarNomeEApelido((int) $codigoFormando);

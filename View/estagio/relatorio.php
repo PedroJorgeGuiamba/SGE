@@ -2,8 +2,9 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include '../../Controller/Admin/Home.php';
+include '../../Controller/Geral/SupervisorAdmin.php';
 include '../../Conexao/conector.php';
+require_once __DIR__ . '/../../middleware/auth.php';
 require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
 require_once __DIR__ . '/../../Helpers/NotificationHelper.php';
 
@@ -185,11 +186,8 @@ $total_credenciais = array_sum($credenciais_dia_data);
                     <?php endif; ?>
                     
                     <div class="col-md d-flex justify-content-end gap-2">
-                        <a href="relatorio_impressao.php?periodo=<?php echo $filtro_periodo; ?>&ano=<?php echo $ano_filtro; ?>&mes=<?php echo $mes_filtro; ?>" class="btn btn-outline-secondary fw-semibold shadow-sm" target="_blank">
-                            <i class="fas fa-print me-2"></i>Imprimir
-                        </a>
                         <a href="../../Controller/Estagio/GerarPdfRelatorio.php?periodo=<?= $filtro_periodo ?>&ano=<?= $ano_filtro ?><?= $filtro_periodo === 'mensal' ? '&mes=' . $mes_filtro : '' ?>" 
-                           class="btn btn-primary fw-semibold shadow-sm" target="_blank">
+                        class="btn btn-primary fw-semibold shadow-sm" target="_blank">
                             <i class="fas fa-file-pdf me-2"></i> Exportar Relatório PDF
                         </a>
                     </div>

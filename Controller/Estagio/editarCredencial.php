@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../Conexao/conector.php';
-require_once __DIR__ . '/../../Model/PedidoDeCarta.php';
+require_once __DIR__ . '/../../Model/PedidoDeCredencial.php';
 
 class EditarPedido
 {
@@ -13,20 +13,18 @@ class EditarPedido
         try {
             $conexao = new Conector();
             $conn = $conexao->getConexao();
-            $pedido = new PedidoDeCarta();
+            $pedido = new PedidoDeCredencial();
 
-            $numero = $_POST['numero'];
+            $id_credencial = $_POST['id_credencial'];
             $nome = $_POST['nome'];
             $apelido = $_POST['apelido'];
             $codigo_formando = $_POST['codigo_formando'];
-            $qualificacao = $_POST['qualificacao'];
-            $codigo_turma = $_POST['codigo_turma'];
+            $contactoFormando = $_POST['contactoFormando'];
             $empresa = $_POST['empresa'];
-            $contactoPrincipal = $_POST['contactoPrincipal'];
-            $contactoSecundario = $_POST['contactoSecundario'];
             $email = $_POST['email'];
             
-            if ($pedido->actualizar($nome, $apelido, $codigo_formando, $qualificacao, $codigo_turma, $empresa, $contactoPrincipal, $contactoSecundario, $email, $numero)) {
+            
+            if ($pedido->actualizar($nome, $apelido, $codigo_formando, $contactoFormando, $empresa, $email, $id_credencial)) {
                 echo json_encode(['success' => true, 'message' => 'Pedido atualizado com sucesso!']);
             } else {
                 echo json_encode(['success' => false, 'message' => 'Erro ao atualizar pedido: ' . $conn->error]);

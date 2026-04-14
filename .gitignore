@@ -14,10 +14,8 @@ Temp/*
 
 security_tests/*
 
-SECURITY_TESTS_ADAPTATIONS.md
+config/*
 
-SECURITY_TESTS_ANALYSIS.md
+!config/.gitkeep
 
-SECURITY_TESTS_COVERAGE_ANALYSIS.md
-
-SECURITY_TESTS_SUMMARY.md
+config/.env

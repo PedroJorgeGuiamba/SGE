@@ -89,7 +89,7 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
                             </li>
                             <?php include __DIR__ . '/notification-widget.php'; ?>
                             <li class="nav-item ms-lg-3">
-                                <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger shadow-sm"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+                                <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger shadow-sm px-4 fw-semibold rounded-pill"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
                             </li>
                         </ul>
                     </div>

@@ -143,12 +143,15 @@ if (!empty($_POST['ids']) && is_array($_POST['ids'])) {
     $erros      = [];
     $adicionados = 0;
 
+    $idsGeradosComSucesso = [];
+
     foreach ($ids as $id) {
         $bytes = gerarPdfBytes($id, $pdfDir, $wkhtmltopdfPath);
         if ($bytes !== null) {
             // addFromString: escreve o conteúdo diretamente no ZIP, sem depender do ficheiro em disco
             $zip->addFromString("Pacote_Estagio_Completo_$id.pdf", $bytes);
             $adicionados++;
+            $idsGeradosComSucesso[] = $id;
             logMsg("ID $id adicionado ao ZIP via addFromString.");
         } else {
             $erros[] = $id;
@@ -169,7 +172,7 @@ if (!empty($_POST['ids']) && is_array($_POST['ids'])) {
         exit;
     }
 
-    foreach ($idsGerados as $id) {
+    foreach ($idsGeradosComSucesso as $id) {
         gravarDataLevantamento($id);
     }
 

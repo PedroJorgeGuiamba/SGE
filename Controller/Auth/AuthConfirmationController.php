@@ -31,113 +31,102 @@ class AuthConfirmationController
     public function verificar()
     {
         if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-            $this->error = "Método inválido.";
-            return $this->error;
+            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Método inválido."));
+            exit();
         }
 
         try {
             CSRFProtection::validateToken($_POST['csrf_token'] ?? '');
         } catch (Exception $e) {
-            $this->error = "Token de segurança inválido. Recarregue a página e tente novamente.";
             error_log("CSRF Validation Failed: " . $e->getMessage());
-            return $this->error;
+            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Token de segurança inválido. Recarregue a página e tente novamente."));
+            exit();
         }
 
         $codigo = trim($_POST['codigo'] ?? '');
-        if (!preg_match('/^\d{6}$/', $codigo) || !ctype_digit($codigo)) {
-            $this->error = "Código inválido. Deve ter exatamente 6 dígitos.";
-            return $this->error;
-        }
-
-        // ✅ CORREÇÃO:
         if (!preg_match('/^\d{6}$/', $codigo) || !ctype_digit($codigo) || strlen($codigo) !== 6) {
-            $this->error = "Código inválido.";
-            return $this->error;
+            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Código inválido. Deve ter exatamente 6 dígitos."));
+            exit();
         }
 
         $user_id_criptografado = $_SESSION['pending_user_id'] ?? null;
         if (!$user_id_criptografado) {
-            $this->error = "Sessão expirou. Faça login novamente.";
-            return $this->error;
+            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Sessão expirou. Faça login novamente."));
+            exit();
         }
         $user_id = $this->criptografia->descriptografar($user_id_criptografado);
         if (!$user_id) {
-            $this->error = "Erro ao descriptografar ID do usuário. Faça login novamente.";
-            return $this->error;
+            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Erro ao descriptografar ID do usuário. Faça login novamente."));
+            exit();
         }
 
         $user_id = intval($user_id);
         if ($user_id <= 0) {
-            $this->error = "ID de usuário inválido.";
-            return $this->error;
+            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("ID de usuário inválido."));
+            exit();
         }
 
         $sql = "SELECT * FROM user_otps WHERE user_id = ? ORDER BY created_at DESC LIMIT 1";
         $stmt = $this->conn->prepare($sql);
 
         if (!$stmt) {
-            $this->error = "Erro interno do sistema.";
-            error_log("Erro prepare OTP: " . $this->conn->error);
-            return $this->error;
+            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Erro interno" ));
+            exit();
         }
 
         $stmt->bind_param("i", $user_id);
 
         if (!$stmt->execute()) {
-            $this->error = "Erro ao verificar código.";
-            error_log("Erro execute OTP: " . $stmt->error);
-            $stmt->close();
-            return $this->error;
+            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Erro ao verificar código."));
+            exit();
         }
 
         $otp = $stmt->get_result()->fetch_assoc();
         $stmt->close();
 
         if (!$otp) {
-            $this->error = "Nenhum código encontrado.";
-            return $this->error;
+            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Nenhum código encontrado."));
+            exit();
         }
         if ($otp['is_used']) {
-            $this->error = "Código já usado.";
-            return $this->error;
+            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Código já usado."));
+            exit();
         }
         if (strtotime($otp['expires_at']) < time()) {
-            $this->error = "Código expirado.";
-            return $this->error;
+            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Código expirado."));
+            exit();
         }
 
         if (!hash_equals($otp['otp_code'], $codigo)) {
-            $this->error = "Código inválido.";
-            return $this->error;
+            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Código inválido"));
+            exit();
         }
 
         $user = $this->getUserById($user_id);
         if (!$user) {
-            $this->error = "Usuário não encontrado.";
-            return $this->error;
+            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Usuário não encontrado."));
+            exit();
         }
 
         $email_descriptografado = $this->criptografia->descriptografar($user['email']);
         if (!$email_descriptografado) {
-            $this->error = "Erro ao descriptografar e-mail do usuário.";
-            return $this->error;
+            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Erro ao descriptografar e-mail do usuário."));
+            exit();
         }
 
         $sqlUpdate = "UPDATE user_otps SET is_used = 1 WHERE id = ?";
         $stmtUpdate = $this->conn->prepare($sqlUpdate);
 
         if (!$stmtUpdate) {
-            $this->error = "Erro interno do sistema.";
-            error_log("Erro prepare update OTP: " . $this->conn->error);
-            return $this->error;
+            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Erro ao Actualizar Estado do OTP."));
+            exit();
         }
 
         $stmtUpdate->bind_param("i", $otp['id']);
         if (!$stmtUpdate->execute()) {
-            $this->error = "Erro ao processar código.";
-            error_log("Erro execute update OTP: " . $stmtUpdate->error);
             $stmtUpdate->close();
-            return $this->error;
+            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Erro ao processar código."));
+            exit();
         }
         $stmtUpdate->close();
 

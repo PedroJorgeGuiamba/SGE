@@ -13,97 +13,300 @@ SecurityHeaders::setFull();
 $conector = new Conector();
 $conn = $conector->getConexao();
 
-$userId = NotificationHelper::sanitizeUserId($_SESSION['usuario_id'] ?? 0);
+$userId   = NotificationHelper::sanitizeUserId($_SESSION['usuario_id'] ?? 0);
+$userRole = $_SESSION['role'] ?? '';
+
 NotificationHelper::handleAction($conn, $userId, $_POST ?? []);
-$unreadCount = NotificationHelper::getUnreadCount($conn, $userId);
+$unreadCount   = NotificationHelper::getUnreadCount($conn, $userId);
 $notifications = NotificationHelper::getNotifications($conn, $userId);
 
-// Obter filtro de período (padrão: ano atual)
+// ============================================================
+// CONTROLO DE QUALIFICAÇÕES POR ROLE
+// ============================================================
+// Se for supervisor, carrega apenas as qualificações que lhe estão
+// associadas na tabela `supervisor_qualificacao`.
+// Se for admin, carrega todas as qualificações disponíveis.
+//
+// Estrutura esperada para a tabela de vínculo:
+//   CREATE TABLE supervisor_qualificacao (
+//     id          INT AUTO_INCREMENT PRIMARY KEY,
+//     usuario_id  INT NOT NULL,   -- FK -> usuarios(id)
+//     id_qualificacao INT NOT NULL, -- FK -> qualificacao(id_qualificacao)
+//     UNIQUE (usuario_id, id_qualificacao),
+//     FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+//     FOREIGN KEY (id_qualificacao) REFERENCES qualificacao(id_qualificacao)
+//   );
+// ============================================================
+
+$qualificacoes_ids      = [];   // IDs permitidos para o utilizador actual
+$qualificacoes_sql_in   = '';   // Fragmento SQL "IN (1,2,3)" ou vazio
+$is_supervisor          = ($userRole === 'supervisor');
+
+if ($is_supervisor) {
+    // Busca os ids das qualificações ligadas a este supervisor
+    $stmt_qual = mysqli_prepare(
+        $conn,
+        "SELECT id_qualificacao FROM supervisor WHERE usuario_id = ?"
+    );
+    if ($stmt_qual) {
+        mysqli_stmt_bind_param($stmt_qual, 'i', $userId);
+        mysqli_stmt_execute($stmt_qual);
+        $result_qual = mysqli_stmt_get_result($stmt_qual);
+        while ($row = mysqli_fetch_assoc($result_qual)) {
+            $qualificacoes_ids[] = (int)$row['id_qualificacao'];
+        }
+        mysqli_stmt_close($stmt_qual);
+    }
+
+    if (!empty($qualificacoes_ids)) {
+        // Monta o fragmento IN de forma segura (valores já convertidos para int)
+        $placeholders         = implode(',', $qualificacoes_ids);
+        $qualificacoes_sql_in = " AND q.id_qualificacao IN ($placeholders) ";
+    } else {
+        // Supervisor sem qualificações associadas: não retorna nada
+        $qualificacoes_sql_in = " AND 1=0 ";
+    }
+}
+// Para admin ($is_supervisor === false): $qualificacoes_sql_in fica '' → sem filtro adicional
+
+// ============================================================
+// HELPER: monta o WHERE completo de período + qualificação
+// Recebe o alias da tabela de data e o alias da tabela que tem
+// a coluna qualificacao (FK para qualificacao.id_qualificacao).
+// ============================================================
+function buildWhere(string $alias_data, string $alias_qual, int $ano, int $mes, string $filtro, string $qual_in): string
+{
+    $where = " WHERE YEAR($alias_data.data_do_pedido) = $ano";
+    if ($filtro === 'mensal') {
+        $where .= " AND MONTH($alias_data.data_do_pedido) = $mes";
+    }
+    // Substitui o placeholder de alias do campo qualificacao
+    // (a coluna na pedido_carta chama-se `qualificacao` e é FK para qualificacao.id_qualificacao)
+    $qual_in_alias = str_replace('q.id_qualificacao', "$alias_qual.id_qualificacao", $qual_in);
+    $where .= $qual_in_alias;
+    return $where;
+}
+
+// ============================================================
+// FILTROS DE PERÍODO
+// ============================================================
 $filtro_periodo = $_GET['periodo'] ?? 'anual';
-$ano_filtro = (int)($_GET['ano'] ?? date('Y'));
-$mes_filtro = (int)($_GET['mes'] ?? date('m'));
+$ano_filtro     = (int)($_GET['ano'] ?? date('Y'));
+$mes_filtro     = (int)($_GET['mes'] ?? date('m'));
 
-$months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+$months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 
-// ========== GRÁFICOS MENSAIS ==========
+// ============================================================
+// QUERIES PRINCIPAIS
+// ============================================================
 if ($filtro_periodo === 'mensal') {
-    // Cartas por dia do mês
-    $cartas_dia_query = mysqli_query($conn, "SELECT DAY(data_do_pedido) as dia, COUNT(*) as count FROM pedido_carta WHERE YEAR(data_do_pedido) = $ano_filtro AND MONTH(data_do_pedido) = $mes_filtro GROUP BY DAY(data_do_pedido) ORDER BY dia");
+
+    // --- Cartas por dia ---
+    // pedido_carta tem coluna `qualificacao` que é FK para qualificacao(id_qualificacao)
+    // Precisamos do JOIN apenas quando há filtro de qualificação para supervisor
+    if ($is_supervisor && !empty($qualificacoes_ids)) {
+        $placeholders = implode(',', $qualificacoes_ids);
+        $sql_cartas_dia = "
+            SELECT DAY(p.data_do_pedido) AS dia, COUNT(*) AS count
+            FROM pedido_carta p
+            JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
+            WHERE YEAR(p.data_do_pedido) = $ano_filtro
+              AND MONTH(p.data_do_pedido) = $mes_filtro
+              AND q.id_qualificacao IN ($placeholders)
+            GROUP BY DAY(p.data_do_pedido)
+            ORDER BY dia";
+
+        $sql_credenciais_dia = "
+            SELECT DAY(c.data_do_pedido) AS dia, COUNT(*) AS count
+            FROM credencial_estagio c
+            JOIN pedido_carta p ON c.id_pedido_carta = p.id_pedido_carta
+            JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
+            WHERE YEAR(c.data_do_pedido) = $ano_filtro
+              AND MONTH(c.data_do_pedido) = $mes_filtro
+              AND q.id_qualificacao IN ($placeholders)
+            GROUP BY DAY(c.data_do_pedido)
+            ORDER BY dia";
+    } else {
+        $sql_cartas_dia = "
+            SELECT DAY(data_do_pedido) AS dia, COUNT(*) AS count
+            FROM pedido_carta
+            WHERE YEAR(data_do_pedido) = $ano_filtro
+              AND MONTH(data_do_pedido) = $mes_filtro
+            GROUP BY DAY(data_do_pedido)
+            ORDER BY dia";
+
+        $sql_credenciais_dia = "
+            SELECT DAY(data_do_pedido) AS dia, COUNT(*) AS count
+            FROM credencial_estagio
+            WHERE YEAR(data_do_pedido) = $ano_filtro
+              AND MONTH(data_do_pedido) = $mes_filtro
+            GROUP BY DAY(data_do_pedido)
+            ORDER BY dia";
+    }
+
     $cartas_dia_labels = [];
-    $cartas_dia_data = [];
-    if ($cartas_dia_query) {
-        while ($row = mysqli_fetch_assoc($cartas_dia_query)) {
+    $cartas_dia_data   = [];
+    $q = mysqli_query($conn, $sql_cartas_dia);
+    if ($q) {
+        while ($row = mysqli_fetch_assoc($q)) {
             $cartas_dia_labels[] = $row['dia'];
-            $cartas_dia_data[] = $row['count'];
+            $cartas_dia_data[]   = $row['count'];
         }
     }
 
-    // Credenciais por dia do mês
-    $credenciais_dia_query = mysqli_query($conn, "SELECT DAY(data_do_pedido) as dia, COUNT(*) as count FROM credencial_estagio WHERE YEAR(data_do_pedido) = $ano_filtro AND MONTH(data_do_pedido) = $mes_filtro GROUP BY DAY(data_do_pedido) ORDER BY dia");
     $credenciais_dia_labels = [];
-    $credenciais_dia_data = [];
-    if ($credenciais_dia_query) {
-        while ($row = mysqli_fetch_assoc($credenciais_dia_query)) {
+    $credenciais_dia_data   = [];
+    $q = mysqli_query($conn, $sql_credenciais_dia);
+    if ($q) {
+        while ($row = mysqli_fetch_assoc($q)) {
             $credenciais_dia_labels[] = $row['dia'];
-            $credenciais_dia_data[] = $row['count'];
+            $credenciais_dia_data[]   = $row['count'];
         }
     }
 
-    $grafico_titulo_cartas = "Cartas de Estágio por Dia - " . $months[$mes_filtro - 1] . " de " . $ano_filtro;
+    $labels                   = $cartas_dia_labels;
+    $grafico_titulo_cartas    = "Cartas de Estágio por Dia - " . $months[$mes_filtro - 1] . " de " . $ano_filtro;
     $grafico_titulo_credenciais = "Credenciais por Dia - " . $months[$mes_filtro - 1] . " de " . $ano_filtro;
-    $labels = $cartas_dia_labels;
+
 } else {
-    // ========== GRÁFICOS ANUAIS ==========
-    // Cartas por mês do ano
-    $cartas_mes_query = mysqli_query($conn, "SELECT MONTH(data_do_pedido) as mes, COUNT(*) as count FROM pedido_carta WHERE YEAR(data_do_pedido) = $ano_filtro GROUP BY MONTH(data_do_pedido)");
+    // --- Anuais ---
+    if ($is_supervisor && !empty($qualificacoes_ids)) {
+        $placeholders = implode(',', $qualificacoes_ids);
+
+        $sql_cartas_mes = "
+            SELECT MONTH(p.data_do_pedido) AS mes, COUNT(*) AS count
+            FROM pedido_carta p
+            JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
+            WHERE YEAR(p.data_do_pedido) = $ano_filtro
+              AND q.id_qualificacao IN ($placeholders)
+            GROUP BY MONTH(p.data_do_pedido)";
+
+        $sql_credenciais_mes = "
+            SELECT MONTH(c.data_do_pedido) AS mes, COUNT(*) AS count
+            FROM credencial_estagio c
+            JOIN pedido_carta p ON c.id_pedido_carta = p.id_pedido_carta
+            JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
+            WHERE YEAR(c.data_do_pedido) = $ano_filtro
+              AND q.id_qualificacao IN ($placeholders)
+            GROUP BY MONTH(c.data_do_pedido)";
+    } else {
+        $sql_cartas_mes = "
+            SELECT MONTH(data_do_pedido) AS mes, COUNT(*) AS count
+            FROM pedido_carta
+            WHERE YEAR(data_do_pedido) = $ano_filtro
+            GROUP BY MONTH(data_do_pedido)";
+
+        $sql_credenciais_mes = "
+            SELECT MONTH(data_do_pedido) AS mes, COUNT(*) AS count
+            FROM credencial_estagio
+            WHERE YEAR(data_do_pedido) = $ano_filtro
+            GROUP BY MONTH(data_do_pedido)";
+    }
+
     $cartas_mes_data = array_fill(0, 12, 0);
-    if ($cartas_mes_query) {
-        while ($row = mysqli_fetch_assoc($cartas_mes_query)) {
+    $q = mysqli_query($conn, $sql_cartas_mes);
+    if ($q) {
+        while ($row = mysqli_fetch_assoc($q)) {
             $cartas_mes_data[$row['mes'] - 1] = $row['count'];
         }
     }
 
-    // Credenciais por mês do ano
-    $credenciais_mes_query = mysqli_query($conn, "SELECT MONTH(data_do_pedido) as mes, COUNT(*) as count FROM credencial_estagio WHERE YEAR(data_do_pedido) = $ano_filtro GROUP BY MONTH(data_do_pedido)");
     $credenciais_mes_data = array_fill(0, 12, 0);
-    if ($credenciais_mes_query) {
-        while ($row = mysqli_fetch_assoc($credenciais_mes_query)) {
+    $q = mysqli_query($conn, $sql_credenciais_mes);
+    if ($q) {
+        while ($row = mysqli_fetch_assoc($q)) {
             $credenciais_mes_data[$row['mes'] - 1] = $row['count'];
         }
     }
 
-    $cartas_dia_data = $cartas_mes_data;
-    $credenciais_dia_data = $credenciais_mes_data;
-    $labels = $months;
-    $grafico_titulo_cartas = "Cartas de Estágio por Mês - Ano " . $ano_filtro;
+    $cartas_dia_data            = $cartas_mes_data;
+    $credenciais_dia_data       = $credenciais_mes_data;
+    $labels                     = $months;
+    $grafico_titulo_cartas      = "Cartas de Estágio por Mês - Ano " . $ano_filtro;
     $grafico_titulo_credenciais = "Credenciais por Mês - Ano " . $ano_filtro;
 }
 
-// Distribuição por qualificação (Cartas)
-$cartas_qual_query = mysqli_query($conn, "SELECT q.descricao, COUNT(*) as count FROM pedido_carta p JOIN qualificacao q ON p.qualificacao = q.id_qualificacao WHERE YEAR(p.data_do_pedido) = $ano_filtro" . ($filtro_periodo === 'mensal' ? " AND MONTH(p.data_do_pedido) = $mes_filtro" : "") . " GROUP BY q.descricao");
+// ============================================================
+// DISTRIBUIÇÃO POR QUALIFICAÇÃO
+// ============================================================
+$periodo_where_cartas      = " AND YEAR(p.data_do_pedido) = $ano_filtro"
+    . ($filtro_periodo === 'mensal' ? " AND MONTH(p.data_do_pedido) = $mes_filtro" : "");
+
+$periodo_where_credenciais = " AND YEAR(c.data_do_pedido) = $ano_filtro"
+    . ($filtro_periodo === 'mensal' ? " AND MONTH(c.data_do_pedido) = $mes_filtro" : "");
+
+// Filtro de qualificação para os pie charts
+$qual_in_fragment = '';
+if ($is_supervisor && !empty($qualificacoes_ids)) {
+    $placeholders       = implode(',', $qualificacoes_ids);
+    $qual_in_fragment   = " AND q.id_qualificacao IN ($placeholders) ";
+} elseif ($is_supervisor && empty($qualificacoes_ids)) {
+    $qual_in_fragment   = " AND 1=0 ";
+}
+
+// Pie: Cartas por Qualificação
+$sql_cartas_qual = "
+    SELECT q.descricao, COUNT(*) AS count
+    FROM pedido_carta p
+    JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
+    WHERE 1=1
+    $periodo_where_cartas
+    $qual_in_fragment
+    GROUP BY q.id_qualificacao, q.descricao";
+
 $cartas_qual_labels = [];
-$cartas_qual_data = [];
-if ($cartas_qual_query) {
-    while ($row = mysqli_fetch_assoc($cartas_qual_query)) {
+$cartas_qual_data   = [];
+$q = mysqli_query($conn, $sql_cartas_qual);
+if ($q) {
+    while ($row = mysqli_fetch_assoc($q)) {
         $cartas_qual_labels[] = $row['descricao'];
-        $cartas_qual_data[] = $row['count'];
+        $cartas_qual_data[]   = $row['count'];
     }
 }
 
-// Distribuição por qualificação (Credenciais)
-$credenciais_qual_query = mysqli_query($conn, "SELECT q.descricao, COUNT(*) as count FROM credencial_estagio c JOIN pedido_carta p ON c.id_pedido_carta = p.id_pedido_carta JOIN qualificacao q ON p.qualificacao = q.id_qualificacao WHERE YEAR(c.data_do_pedido) = $ano_filtro" . ($filtro_periodo === 'mensal' ? " AND MONTH(c.data_do_pedido) = $mes_filtro" : "") . " GROUP BY q.descricao");
+// Pie: Credenciais por Qualificação
+$sql_credenciais_qual = "
+    SELECT q.descricao, COUNT(*) AS count
+    FROM credencial_estagio c
+    JOIN pedido_carta p ON c.id_pedido_carta = p.id_pedido_carta
+    JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
+    WHERE 1=1
+    $periodo_where_credenciais
+    $qual_in_fragment
+    GROUP BY q.id_qualificacao, q.descricao";
+
 $credenciais_qual_labels = [];
-$credenciais_qual_data = [];
-if ($credenciais_qual_query) {
-    while ($row = mysqli_fetch_assoc($credenciais_qual_query)) {
+$credenciais_qual_data   = [];
+$q = mysqli_query($conn, $sql_credenciais_qual);
+if ($q) {
+    while ($row = mysqli_fetch_assoc($q)) {
         $credenciais_qual_labels[] = $row['descricao'];
-        $credenciais_qual_data[] = $row['count'];
+        $credenciais_qual_data[]   = $row['count'];
     }
 }
 
 // Totais
-$total_cartas = array_sum($cartas_dia_data);
+$total_cartas      = array_sum($cartas_dia_data);
 $total_credenciais = array_sum($credenciais_dia_data);
+
+// Label de escopo para mostrar na UI (só para supervisor)
+$escopo_label = '';
+if ($is_supervisor) {
+    if (!empty($qualificacoes_ids)) {
+        // Busca os nomes das qualificações para exibir
+        $pids = implode(',', $qualificacoes_ids);
+        $q_nomes = mysqli_query($conn, "SELECT descricao FROM qualificacao WHERE id_qualificacao IN ($pids)");
+        $nomes = [];
+        if ($q_nomes) {
+            while ($r = mysqli_fetch_assoc($q_nomes)) {
+                $nomes[] = $r['descricao'];
+            }
+        }
+        $escopo_label = implode(' · ', $nomes);
+    } else {
+        $escopo_label = 'Nenhuma qualificação atribuída';
+    }
+}
 ?>
 
 <?php require_once __DIR__ . '/../../Includes/header-estagio-admin.php'?>
@@ -140,15 +343,52 @@ $total_credenciais = array_sum($credenciais_dia_data);
         .bg-gradient-success {
             background: linear-gradient(135deg, #198754 0%, #146c43 100%);
         }
+        .scope-badge {
+            background: rgba(13, 110, 253, 0.08);
+            border: 1px solid rgba(13, 110, 253, 0.2);
+            color: #0d6efd;
+            border-radius: 50px;
+            padding: 4px 14px;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+        .scope-badge.no-qual {
+            background: rgba(220, 53, 69, 0.08);
+            border-color: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
     </style>
 
     <main class="container-fluid px-4 mb-5" style="margin-top: 40px;">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h3 class="fw-bold text-primary mb-0"><i class="fas fa-chart-pie me-2"></i>Dashboard Analítico</h3>
-                <p class="text-muted small mb-0">Estatísticas detalhadas sobre emissão de Cartas e Credenciais de Estágio</p>
+                <h3 class="fw-bold text-primary mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>Dashboard Analítico
+                </h3>
+                <p class="text-muted small mb-0">
+                    Estatísticas detalhadas sobre emissão de Cartas e Credenciais de Estágio
+                </p>
+                <?php if ($is_supervisor && $escopo_label): ?>
+                    <div class="mt-2">
+                        <i class="fas fa-filter text-muted me-1" style="font-size:.8rem;"></i>
+                        <span class="scope-badge <?= empty($qualificacoes_ids) ? 'no-qual' : '' ?>">
+                            <i class="fas fa-graduation-cap me-1"></i><?= htmlspecialchars($escopo_label) ?>
+                        </span>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
+
+        <?php if ($is_supervisor && empty($qualificacoes_ids)): ?>
+            <!-- Aviso: supervisor sem qualificações associadas -->
+            <div class="alert alert-warning rounded-4 border-0 shadow-sm d-flex align-items-center gap-3 mb-4">
+                <i class="fas fa-exclamation-triangle fa-2x text-warning"></i>
+                <div>
+                    <strong>Sem qualificações atribuídas.</strong>
+                    Não existem qualificações associadas à sua conta. Contacte o administrador do sistema.
+                </div>
+            </div>
+        <?php endif; ?>
 
         <!-- Filtros Card -->
         <div class="card shadow-sm border-0 rounded-4 mb-4">
@@ -157,8 +397,8 @@ $total_credenciais = array_sum($credenciais_dia_data);
                     <div class="col-md-3">
                         <label for="periodo" class="form-label text-muted fw-bold small">Período de Análise</label>
                         <select name="periodo" id="periodo" class="form-select bg-light border-0" onchange="this.form.submit()">
-                            <option value="anual" <?php echo $filtro_periodo === 'anual' ? 'selected' : ''; ?>>Dados Anuais</option>
-                            <option value="mensal" <?php echo $filtro_periodo === 'mensal' ? 'selected' : ''; ?>>Dados Mensais</option>
+                            <option value="anual"  <?= $filtro_periodo === 'anual'  ? 'selected' : '' ?>>Dados Anuais</option>
+                            <option value="mensal" <?= $filtro_periodo === 'mensal' ? 'selected' : '' ?>>Dados Mensais</option>
                         </select>
                     </div>
                     <div class="col-md-2">
@@ -173,21 +413,21 @@ $total_credenciais = array_sum($credenciais_dia_data);
                         </select>
                     </div>
                     <?php if ($filtro_periodo === 'mensal'): ?>
-                        <div class="col-md-2">
-                            <label for="mes" class="form-label text-muted fw-bold small">Mês</label>
-                            <select name="mes" id="mes" class="form-select bg-light border-0" onchange="this.form.submit()">
-                                <?php
-                                for ($i = 1; $i <= 12; $i++) {
-                                    echo "<option value=\"$i\" " . ($mes_filtro === $i ? 'selected' : '') . ">" . $months[$i - 1] . "</option>";
-                                }
-                                ?>
-                            </select>
-                        </div>
+                    <div class="col-md-2">
+                        <label for="mes" class="form-label text-muted fw-bold small">Mês</label>
+                        <select name="mes" id="mes" class="form-select bg-light border-0" onchange="this.form.submit()">
+                            <?php
+                            for ($i = 1; $i <= 12; $i++) {
+                                echo "<option value=\"$i\" " . ($mes_filtro === $i ? 'selected' : '') . ">" . $months[$i - 1] . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
                     <?php endif; ?>
-                    
+
                     <div class="col-md d-flex justify-content-end gap-2">
-                        <a href="../../Controller/Estagio/GerarPdfRelatorio.php?periodo=<?= $filtro_periodo ?>&ano=<?= $ano_filtro ?><?= $filtro_periodo === 'mensal' ? '&mes=' . $mes_filtro : '' ?>" 
-                        class="btn btn-primary fw-semibold shadow-sm" target="_blank">
+                        <a href="../../Controller/Estagio/GerarPdfRelatorio.php?periodo=<?= $filtro_periodo ?>&ano=<?= $ano_filtro ?><?= $filtro_periodo === 'mensal' ? '&mes=' . $mes_filtro : '' ?>"
+                           class="btn btn-primary fw-semibold shadow-sm" target="_blank">
                             <i class="fas fa-file-pdf me-2"></i> Exportar Relatório PDF
                         </a>
                     </div>
@@ -202,7 +442,7 @@ $total_credenciais = array_sum($credenciais_dia_data);
                     <div class="card-body d-flex align-items-center justify-content-between p-4">
                         <div>
                             <h6 class="text-white-50 fw-semibold text-uppercase letter-spacing-1 mb-1">Total de Cartas Expedidas</h6>
-                            <h2 class="display-4 fw-bold mb-0"><?php echo $total_cartas; ?></h2>
+                            <h2 class="display-4 fw-bold mb-0"><?= $total_cartas ?></h2>
                         </div>
                         <i class="fas fa-envelope-open-text fa-4x opacity-25"></i>
                     </div>
@@ -213,7 +453,7 @@ $total_credenciais = array_sum($credenciais_dia_data);
                     <div class="card-body d-flex align-items-center justify-content-between p-4">
                         <div>
                             <h6 class="text-white-50 fw-semibold text-uppercase letter-spacing-1 mb-1">Total de Credenciais Emitidas</h6>
-                            <h2 class="display-4 fw-bold mb-0"><?php echo $total_credenciais; ?></h2>
+                            <h2 class="display-4 fw-bold mb-0"><?= $total_credenciais ?></h2>
                         </div>
                         <i class="fas fa-id-badge fa-4x opacity-25"></i>
                     </div>
@@ -223,31 +463,24 @@ $total_credenciais = array_sum($credenciais_dia_data);
 
         <!-- Charts Section -->
         <div class="row g-4">
-            <!-- Bar Chart: Cartas -->
             <div class="col-lg-6">
                 <div class="chart-container">
-                    <h5 class="chart-title"><i class="fas fa-chart-column text-primary me-2"></i><?php echo $grafico_titulo_cartas; ?></h5>
+                    <h5 class="chart-title"><i class="fas fa-chart-column text-primary me-2"></i><?= htmlspecialchars($grafico_titulo_cartas) ?></h5>
                     <canvas id="cartasChart" height="250"></canvas>
                 </div>
             </div>
-
-            <!-- Bar Chart: Credenciais -->
             <div class="col-lg-6">
                 <div class="chart-container">
-                    <h5 class="chart-title"><i class="fas fa-chart-column text-success me-2"></i><?php echo $grafico_titulo_credenciais; ?></h5>
+                    <h5 class="chart-title"><i class="fas fa-chart-column text-success me-2"></i><?= htmlspecialchars($grafico_titulo_credenciais) ?></h5>
                     <canvas id="credenciaisChart" height="250"></canvas>
                 </div>
             </div>
-
-            <!-- Pie Chart: Cartas por Qualificação -->
             <div class="col-lg-6">
                 <div class="chart-container">
                     <h5 class="chart-title"><i class="fas fa-chart-pie text-warning me-2"></i>Cartas por Qualificação</h5>
                     <canvas id="cartasQualChart" height="250"></canvas>
                 </div>
             </div>
-
-            <!-- Pie Chart: Credenciais por Qualificação -->
             <div class="col-lg-6">
                 <div class="chart-container">
                     <h5 class="chart-title"><i class="fas fa-chart-pie text-info me-2"></i>Credenciais por Qualificação</h5>
@@ -260,7 +493,6 @@ $total_credenciais = array_sum($credenciais_dia_data);
     <?php require_once __DIR__ . '/../../Includes/footer.php' ?>
 
     <script>
-        // Cores
         const colors = [
             'rgba(54, 162, 235, 0.7)',
             'rgba(255, 99, 132, 0.7)',
@@ -271,100 +503,63 @@ $total_credenciais = array_sum($credenciais_dia_data);
         ];
         const borderColors = colors.map(c => c.replace('0.7', '1'));
 
-        // Gráfico de Cartas
-        const ctxCartas = document.getElementById('cartasChart').getContext('2d');
-        new Chart(ctxCartas, {
+        new Chart(document.getElementById('cartasChart').getContext('2d'), {
             type: 'bar',
             data: {
-                labels: <?php echo json_encode($labels); ?>,
+                labels: <?= json_encode($labels) ?>,
                 datasets: [{
                     label: 'Cartas de Estágio',
-                    data: <?php echo json_encode($cartas_dia_data); ?>,
+                    data: <?= json_encode($cartas_dia_data) ?>,
                     backgroundColor: 'rgba(54, 162, 235, 0.6)',
                     borderColor: 'rgba(54, 162, 235, 1)',
                     borderWidth: 2
                 }]
             },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
         });
 
-        // Gráfico de Credenciais
-        const ctxCredenciais = document.getElementById('credenciaisChart').getContext('2d');
-        new Chart(ctxCredenciais, {
+        new Chart(document.getElementById('credenciaisChart').getContext('2d'), {
             type: 'bar',
             data: {
-                labels: <?php echo json_encode($labels); ?>,
+                labels: <?= json_encode($labels) ?>,
                 datasets: [{
                     label: 'Credenciais',
-                    data: <?php echo json_encode($credenciais_dia_data); ?>,
+                    data: <?= json_encode($credenciais_dia_data) ?>,
                     backgroundColor: 'rgba(75, 192, 192, 0.6)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 2
                 }]
             },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
         });
 
-        // Pie Chart: Cartas por Qualificação
-        const ctxCartasQual = document.getElementById('cartasQualChart').getContext('2d');
-        new Chart(ctxCartasQual, {
+        new Chart(document.getElementById('cartasQualChart').getContext('2d'), {
             type: 'pie',
             data: {
-                labels: <?php echo json_encode($cartas_qual_labels); ?>,
+                labels: <?= json_encode($cartas_qual_labels) ?>,
                 datasets: [{
-                    data: <?php echo json_encode($cartas_qual_data); ?>,
+                    data: <?= json_encode($cartas_qual_data) ?>,
                     backgroundColor: colors,
                     borderColor: borderColors,
                     borderWidth: 2
                 }]
             },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
         });
 
-        // Pie Chart: Credenciais por Qualificação
-        const ctxCredenciaisQual = document.getElementById('credenciaisQualChart').getContext('2d');
-        new Chart(ctxCredenciaisQual, {
+        new Chart(document.getElementById('credenciaisQualChart').getContext('2d'), {
             type: 'pie',
             data: {
-                labels: <?php echo json_encode($credenciais_qual_labels); ?>,
+                labels: <?= json_encode($credenciais_qual_labels) ?>,
                 datasets: [{
-                    data: <?php echo json_encode($credenciais_qual_data); ?>,
+                    data: <?= json_encode($credenciais_qual_data) ?>,
                     backgroundColor: colors,
                     borderColor: borderColors,
                     borderWidth: 2
                 }]
             },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
         });
     </script>
 </body>
-
 </html>

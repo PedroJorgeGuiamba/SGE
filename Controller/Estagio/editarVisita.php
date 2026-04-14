@@ -1,11 +1,11 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../Conexao/conector.php';
-require_once __DIR__ . '/../../Model/PedidoDeCarta.php';
+require_once __DIR__ . '/../../Model/PedidoDeVisita.php';
 
-class EditarPedido
+class EditarVisita
 {
-    public function editarPedido()
+    public function editarVisita()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             echo json_encode(['success' => false, 'message' => 'Método de requisição inválido']);
@@ -13,20 +13,20 @@ class EditarPedido
         try {
             $conexao = new Conector();
             $conn = $conexao->getConexao();
-            $pedido = new PedidoDeCarta();
-
-            $numero = $_POST['numero'];
+            $pedido = new PedidoDeVisita();
+            
+            $id_visita = $_POST['id_visita'];
             $nome = $_POST['nome'];
             $apelido = $_POST['apelido'];
             $codigo_formando = $_POST['codigo_formando'];
-            $qualificacao = $_POST['qualificacao'];
-            $codigo_turma = $_POST['codigo_turma'];
+            $contactoFormando = $_POST['contactoFormando'];
             $empresa = $_POST['empresa'];
-            $contactoPrincipal = $_POST['contactoPrincipal'];
-            $contactoSecundario = $_POST['contactoSecundario'];
-            $email = $_POST['email'];
+            $endereco = $_POST['endereco'];
+            $nomeSupervisor = $_POST['nomeSupervisor'];
+            $contactoSupervisor = $_POST['contactoSupervisor'];
+            $dataHoraDaVisita = $_POST['dataHoraDaVisita'];
             
-            if ($pedido->actualizar($nome, $apelido, $codigo_formando, $qualificacao, $codigo_turma, $empresa, $contactoPrincipal, $contactoSecundario, $email, $numero)) {
+            if ($pedido->actualizar($nome, $apelido, $codigo_formando, $contactoFormando, $empresa, $endereco, $nomeSupervisor, $contactoSupervisor, $dataHoraDaVisita, $id_visita)) {
                 echo json_encode(['success' => true, 'message' => 'Pedido atualizado com sucesso!']);
             } else {
                 echo json_encode(['success' => false, 'message' => 'Erro ao atualizar pedido: ' . $conn->error]);
@@ -34,11 +34,11 @@ class EditarPedido
             
             $conn->close();
         } catch (Exception $e) {
-            error_log('Erro em editarPedido.php: ' . $e->getMessage());
+            error_log('Erro em editarVisita.php: ' . $e->getMessage());
             echo json_encode(['success' => false, 'message' => 'Exceção capturada: ' . $e->getMessage()]);
         }
     }
 }
 
-$controller = new EditarPedido();
-$controller->editarPedido();
+$controller = new EditarVisita();
+$controller->editarVisita();

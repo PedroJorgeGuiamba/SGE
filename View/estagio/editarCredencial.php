@@ -10,15 +10,9 @@ require_once __DIR__ . '/../../Conexao/conector.php';
 $conexao = new Conector();
 $conn = $conexao->getConexao();
 
-$sql = "SELECT p.*,
-            q.descricao AS qualificacao_descricao,
-            q.id_qualificacao AS nivel,
-            t.nome AS nomeT,
-            t.codigo AS codigoT
-        FROM pedido_carta p
-        JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
-        JOIN turma t ON p.codigo_turma = t.codigo
-        WHERE numero = ?
+$sql = "SELECT c.*
+        FROM credencial_estagio c
+        WHERE id_credencial = ?
 
 ";
 $stmt = $conn->prepare($sql);
@@ -37,11 +31,10 @@ $stmt->close();
 <?php require_once __DIR__ . '/../../Includes/header-estagio-admin.php' ?>
 
     <main class="container mt-4">
-        <h2 class="mb-4">Editar Pedido de Estágio</h2>
+        <h2 class="mb-4">Editar Pedido de Credencial de Estágio</h2>
 
-        <form id="formEditarPedido" action="../../Controller/Estagio/editarPedido.php" method="POST">
-            <input type="hidden" name="numero" value="<?php echo htmlspecialchars($pedido['numero']); ?>">
-
+        <form id="formEditarPedido" action="../../Controller/Estagio/editarCredencial.php" method="POST">
+            <input type="hidden" name="id_credencial" value="<?php echo htmlspecialchars($pedido['id_credencial']); ?>">
             
             <div class="row mb-3">
                 <div class="col-md-6">
@@ -61,48 +54,27 @@ $stmt->close();
                     <span class="error_form text-danger small" id="codigoFormando_error_message"></span>
                 </div>
                 <div class="col-md-6">
-                    <label for="qualificacao" class="form-label">Qualificação</label>
-                    <input type="text" class="form-control" value="<?php echo htmlspecialchars($pedido['qualificacao_descricao']); ?>" readonly>
-                    
-                    <input type="hidden" name="qualificacao" id="qualificacao" value="<?php echo htmlspecialchars($pedido['nivel']); ?>">
+                    <label for="contactoFormando" class="form-label">Contacto do Formando</label>
+                    <input type="text" class="form-control" id="contactoFormando" name="contactoFormando" value="<?php echo htmlspecialchars($pedido['contactoFormando']); ?>" required>
+                    <span class="error_form text-danger small" id="cPrincipal_error_message"></span>
                 </div>
             </div>
 
             <div class="row mb-3">
-                <div class="col-md-6">
-                    <label for="codigo_turma" class="form-label">Turma</label>
-                    <input type="text" class="form-control" value="<?php echo htmlspecialchars($pedido['nomeT']); ?>" readonly>
-                    
-                    <input type="hidden" name="codigo_turma" id="codigo_turma" value="<?php echo htmlspecialchars($pedido['codigoT']); ?>">
-                </div>
                 <div class="col-md-6">
                     <label for="empresa" class="form-label">Empresa</label>
                     <input type="text" class="form-control" id="empresa" name="empresa" value="<?php echo htmlspecialchars($pedido['empresa']); ?>" required>
                     <span class="error_form text-danger small" id="empresa_error_message"></span>
                 </div>
-            </div>
-
-            <div class="row mb-3">
                 <div class="col-md-6">
-                    <label for="contactoPrincipal" class="form-label">Contacto Principal</label>
-                    <input type="text" class="form-control" id="contactoPrincipal" name="contactoPrincipal" value="<?php echo htmlspecialchars($pedido['contactoPrincipal']); ?>" required>
-                    <span class="error_form text-danger small" id="cPrincipal_error_message"></span>
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($pedido['email']); ?>" required>
+                    <span class="error_form text-danger small" id="email_error_message"></span>
                 </div>
-                <div class="col-md-6">
-                    <label for="contactoSecundario" class="form-label">Contacto Secundário</label>
-                    <input type="text" class="form-control" id="contactoSecundario" name="contactoSecundario" value="<?php echo htmlspecialchars($pedido['contactoSecundario']); ?>">
-                    <span class="error_form text-danger small" id="cSecundario_error_message"></span>
-                </div>
-            </div>
-            
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($pedido['email']); ?>" required>
-                <span class="error_form text-danger small" id="email_error_message"></span>
             </div>
             
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <a href="<?php echo $_SESSION['role'] === 'admin' || $_SESSION['role'] === 'supervisor' ? 'listaDePedidos.php' : '../../View/Formando/portalDeEstudante.php'; ?>" class="btn btn-secondary me-md-2">Cancelar</a>
+                <a href="<?php echo $_SESSION['role'] === 'admin' || $_SESSION['role'] === 'supervisor' ? 'listaDePedidosCredencial.php' : '../../View/Formando/portalDeEstudante.php'; ?>" class="btn btn-secondary me-md-2">Cancelar</a>
                 <button type="submit" class="btn btn-primary">Atualizar Pedido</button>
             </div>
         </form>

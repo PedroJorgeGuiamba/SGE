@@ -87,15 +87,17 @@
                             <td>${pedido.contactoSecundario}</td>
                             <td>${pedido.email}</td>
                             <td>
-                                <button class="btn btn-sm btn-primary gerar-pdf-completo-btn" data-id="${pedido.id_pedido_carta}" title="Gerar PDF">
-                                    <i class="fas fa-file-pdf"></i>
-                                </button>
-                                <button class="btn btn-sm btn-warning editar-btn" data-id="${pedido.id_pedido_carta}" title="Editar" >
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-sm btn-danger remover-btn" data-id="${pedido.id_pedido_carta}" title="Remover">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
+                                <div class="d-flex gap-1">
+                                    <button class="btn btn-sm btn-primary gerar-pdf-completo-btn" data-id="${pedido.id_pedido_carta}" title="Gerar PDF">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-warning editar-btn" data-id="${pedido.id_pedido_carta}" title="Editar" >
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger remover-btn" data-id="${pedido.id_pedido_carta}" title="Remover">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     `);

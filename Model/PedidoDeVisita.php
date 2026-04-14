@@ -4,7 +4,7 @@ require_once __DIR__ . '/../Conexao/conector.php';
 class PedidoDeVisita
 {
     private $conn;
-
+    private $id_visita;
     private $id_pedido_carta;
     private $codigoFormando;
     private $contactoFormando;
@@ -27,6 +27,11 @@ class PedidoDeVisita
     }
 
     // Getters e setters
+    public function setIdVisita($id)
+    {
+        $this->id_visita = $id;
+    }
+
     public function setIdPedido($id)
     {
         $this->id_pedido_carta = $id;
@@ -107,6 +112,39 @@ class PedidoDeVisita
             $this->dataHoraVisita,
             $this->dataPedido,
         );
+
+        return $stmt->execute();
+    }
+    public function actualizar(string $nome, string $apelido, int $codigo_formando, string $contactoFormando, string $empresa, string $endereco, string $nomeSupervisor, string $contactoSupervisor, string $dataHoraDaVisita, int $id_visita): bool
+    {
+        $stmt= $this->conn->prepare("UPDATE visita_estagio SET
+                    nome = ?,
+                    apelido = ?,
+                    codigo_formando = ?,
+                    contactoFormando = ?,
+                    empresa = ?,
+                    endereco = ?,
+                    nomeSupervisor = ?,
+                    contactoSupervisor = ?,
+                    dataHoraDaVisita = ?
+                    WHERE id_visita = ?");
+
+        if (!$stmt) {
+            return false;
+        }
+
+        $stmt->bind_param("ssissssssi",
+                $nome,
+                $apelido,
+                $codigo_formando,
+                $contactoFormando,
+                $empresa,
+                $endereco,
+                $nomeSupervisor,
+                $contactoSupervisor,
+                $dataHoraDaVisita,
+                $id_visita
+            );
 
         return $stmt->execute();
     }

@@ -347,7 +347,7 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
                             <?php include __DIR__ . '/../../Includes/notification-widget.php'; ?>
                             <!-- Logout -->
                             <li class="nav-item ms-lg-2">
-                                <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger shadow-sm">
+                                <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger shadow-sm px-4 fw-semibold rounded-pill">
                                     <i class="fas fa-sign-out-alt me-1"></i> Logout
                                 </a>
                             </li>
@@ -446,7 +446,7 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
                                 <th>Contacto 1</th>
                                 <th>Contacto 2</th>
                                 <th>Email</th>
-                                <th>Acções</th>
+                                <!-- <th>Acções</th> -->
                             </tr>
                         </thead>
                         <tbody id="pedidosTbody">
@@ -508,16 +508,7 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
                                 <td>${pedido.contactoPrincipal}</td>
                                 <td>${pedido.contactoSecundario}</td>
                                 <td>${pedido.email}</td>
-                                <td>
-                                    <div class="d-flex gap-1">
-                                        <button class="btn-action edit editar-btn" data-id="${pedido.id_pedido_carta}" title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn-action remove remover-btn" data-id="${pedido.id_pedido_carta}" title="Remover">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </div>
-                                </td>
+                                
                             </tr>
                         `);
                     });
@@ -604,3 +595,15 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
 </body>
 
 </html>
+
+<!-- <td>
+<div class="d-flex gap-1">
+    <button class="btn-action edit editar-btn" data-id="${pedido.id_pedido_carta}" title="Editar">
+        <i class="fas fa-edit"></i>
+    </button>
+    <button class="btn-action remove remover-btn" data-id="${pedido.id_pedido_carta}" title="Remover">
+        <i class="fas fa-trash-alt"></i>
+    </button>
+</div>
+</td> -->
+

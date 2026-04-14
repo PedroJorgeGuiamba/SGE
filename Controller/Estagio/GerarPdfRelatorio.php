@@ -181,13 +181,20 @@ file_put_contents($json_file, json_encode([
     'output' => $output_pdf,
 ]));
 
-// No Windows/XAMPP use python (não python3)
-$python_bin = 'python';   // ou 'C:\\Python312\\python.exe' se necessário
 
-$cmd = escapeshellcmd($python_bin) . ' ' 
-     . escapeshellarg($python_script) 
-     . ' < ' . escapeshellarg($json_file) 
-     . ' 2>&1';
+// $python_bin = 'python';   // ou 'C:\\Python312\\python.exe' se necessário
+$env = parse_ini_file(__DIR__ . '/../../Config/.env');
+
+foreach ($env as $key => $value) {
+    putenv("$key=$value");
+}
+
+$python_bin = getenv("python_bin");
+
+$cmd = escapeshellarg($python_bin) . ' ' 
+    . escapeshellarg($python_script) 
+    . ' < ' . escapeshellarg($json_file) 
+    . ' 2>&1';
 
 $output_cmd = shell_exec($cmd);
 

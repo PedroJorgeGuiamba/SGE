@@ -117,6 +117,40 @@ class PedidoDeCarta
         return $stmt->execute();
     }
 
+    public function actualizar(string $nome, string $apelido, int $codigo_formando, int $qualificacao, int $codigo_turma, string $empresa, string $contactoPrincipal, string $contactoSecundario, string $email, int $id_pedido_carta): bool
+    {
+        $stmt = $this->conn->prepare("UPDATE pedido_carta SET
+            nome = ?,
+            apelido = ?,
+            codigo_formando = ?,
+            qualificacao = ?,
+            codigo_turma = ?,
+            empresa = ?,
+            contactoPrincipal = ?,
+            contactoSecundario = ?,
+            email = ?
+            WHERE id_pedido_carta = ?");
+
+        if (!$stmt) {
+            return false;
+        }
+
+        $stmt->bind_param("sssssssssi",
+                $nome,
+                $apelido,
+                $codigo_formando,
+                $qualificacao,
+                $codigo_turma,
+                $empresa,
+                $contactoPrincipal,
+                $contactoSecundario,
+                $email,
+                $id_pedido_carta
+            );
+
+        return $stmt->execute();
+    }
+
     public function LastInsertId($conn){
         return $conn->insert_id;
     }

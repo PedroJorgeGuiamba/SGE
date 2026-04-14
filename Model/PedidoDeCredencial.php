@@ -89,6 +89,34 @@ class PedidoDeCredencial
         return $stmt->execute();
     }
 
+    public function actualizar(string $nome, string $apelido,int $codigo_formando, string $contactoFormando, string $empresa, string $email, int $id_credencial): bool
+    {
+        $stmt= $this->conn->prepare("UPDATE credencial_estagio SET
+                    nome = ?,
+                    apelido = ?,
+                    codigo_formando = ?,
+                    contactoFormando = ?,
+                    empresa = ?,
+                    email = ?
+                    WHERE id_credencial = ?");
+
+        if (!$stmt) {
+            return false;
+        }
+
+        $stmt->bind_param("ssisssi",
+                $nome,
+                $apelido,
+                $codigo_formando,
+                $contactoFormando,
+                $empresa,
+                $email,
+                $id_credencial
+        );
+
+        return $stmt->execute();
+    }
+
     public function LastInsertId($conn){
         return $conn->insert_id;
     }

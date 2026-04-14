@@ -361,7 +361,7 @@ header nav ul li.nav-item ul.dropdown-menu li a.dropdown-item {
 .hero-carousel {
     height: 80vh;
     min-height: 500px;
-    margin-top: -80px; /* Para ficar por baixo do header se ele for transparente, ou só anular o padding-top do main */
+    margin-top: -30px; /* Para ficar por baixo do header se ele for transparente, ou só anular o padding-top do main */
 }
 
 .hero-carousel .carousel-inner,

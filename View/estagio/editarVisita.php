@@ -10,15 +10,9 @@ require_once __DIR__ . '/../../Conexao/conector.php';
 $conexao = new Conector();
 $conn = $conexao->getConexao();
 
-$sql = "SELECT p.*,
-            q.descricao AS qualificacao_descricao,
-            q.id_qualificacao AS nivel,
-            t.nome AS nomeT,
-            t.codigo AS codigoT
-        FROM pedido_carta p
-        JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
-        JOIN turma t ON p.codigo_turma = t.codigo
-        WHERE numero = ?
+$sql = "SELECT v.*
+        FROM visita_estagio v
+        WHERE id_visita = ?
 
 ";
 $stmt = $conn->prepare($sql);
@@ -37,12 +31,11 @@ $stmt->close();
 <?php require_once __DIR__ . '/../../Includes/header-estagio-admin.php' ?>
 
     <main class="container mt-4">
-        <h2 class="mb-4">Editar Pedido de Estágio</h2>
+        <h2 class="mb-4">Editar Pedido de Visita de Estágio</h2>
 
-        <form id="formEditarPedido" action="../../Controller/Estagio/editarPedido.php" method="POST">
-            <input type="hidden" name="numero" value="<?php echo htmlspecialchars($pedido['numero']); ?>">
+        <form id="formEditarPedido" action="../../Controller/Estagio/editarVisita.php" method="POST">
+            <input type="hidden" name="id_visita" value="<?php echo htmlspecialchars($pedido['id_visita']); ?>">
 
-            
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label for="nome" class="form-label">Nome</label>
@@ -61,48 +54,46 @@ $stmt->close();
                     <span class="error_form text-danger small" id="codigoFormando_error_message"></span>
                 </div>
                 <div class="col-md-6">
-                    <label for="qualificacao" class="form-label">Qualificação</label>
-                    <input type="text" class="form-control" value="<?php echo htmlspecialchars($pedido['qualificacao_descricao']); ?>" readonly>
-                    
-                    <input type="hidden" name="qualificacao" id="qualificacao" value="<?php echo htmlspecialchars($pedido['nivel']); ?>">
+                    <label for="contactoFormando" class="form-label">Contacto do Formando</label>
+                    <input type="text" class="form-control" id="contactoFormando" name="contactoFormando" value="<?php echo htmlspecialchars($pedido['contactoFormando']); ?>" required>
+                    <span class="error_form text-danger small" id="cPrincipal_error_message"></span>
                 </div>
             </div>
 
             <div class="row mb-3">
-                <div class="col-md-6">
-                    <label for="codigo_turma" class="form-label">Turma</label>
-                    <input type="text" class="form-control" value="<?php echo htmlspecialchars($pedido['nomeT']); ?>" readonly>
-                    
-                    <input type="hidden" name="codigo_turma" id="codigo_turma" value="<?php echo htmlspecialchars($pedido['codigoT']); ?>">
-                </div>
                 <div class="col-md-6">
                     <label for="empresa" class="form-label">Empresa</label>
                     <input type="text" class="form-control" id="empresa" name="empresa" value="<?php echo htmlspecialchars($pedido['empresa']); ?>" required>
                     <span class="error_form text-danger small" id="empresa_error_message"></span>
                 </div>
+                <div class="col-md-6">
+                    <label for="endereco" class="form-label">Endereço da Empresa</label>
+                    <input type="text" class="form-control" id="endereco" name="endereco" value="<?php echo htmlspecialchars($pedido['endereco']); ?>" required>
+                    <span class="error_form text-danger small" id="endereco_error_message"></span>
+                </div>
             </div>
 
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <label for="contactoPrincipal" class="form-label">Contacto Principal</label>
-                    <input type="text" class="form-control" id="contactoPrincipal" name="contactoPrincipal" value="<?php echo htmlspecialchars($pedido['contactoPrincipal']); ?>" required>
-                    <span class="error_form text-danger small" id="cPrincipal_error_message"></span>
+                    <label for="nomeSupervisor" class="form-label">Nome do Supervisor</label>
+                    <input type="text" class="form-control" id="nomeSupervisor" name="nomeSupervisor" value="<?php echo htmlspecialchars($pedido['nomeSupervisor']); ?>" required>
+                    <span class="error_form text-danger small" id="nomeSupervisor_error_message"></span>
                 </div>
                 <div class="col-md-6">
-                    <label for="contactoSecundario" class="form-label">Contacto Secundário</label>
-                    <input type="text" class="form-control" id="contactoSecundario" name="contactoSecundario" value="<?php echo htmlspecialchars($pedido['contactoSecundario']); ?>">
-                    <span class="error_form text-danger small" id="cSecundario_error_message"></span>
+                    <label for="contactoSupervisor" class="form-label">Contacto do Supervisor</label>
+                    <input type="text" class="form-control" id="contactoSupervisor" name="contactoSupervisor" value="<?php echo htmlspecialchars($pedido['contactoSupervisor']); ?>">
+                    <span class="error_form text-danger small" id="cSupervisor_error_message"></span>
                 </div>
             </div>
-            
+
             <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($pedido['email']); ?>" required>
-                <span class="error_form text-danger small" id="email_error_message"></span>
+                <label for="dataHoraDaVisita" class="form-label">Data Da Visita</label>
+                <input type="datetime-local" class="form-control" id="dataHoraDaVisita" name="dataHoraDaVisita" value="<?php echo htmlspecialchars($pedido['dataHoraDaVisita']); ?>" required>
+                <span class="error_form text-danger small" id="dataDaVisita_error_message"></span>
             </div>
             
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <a href="<?php echo $_SESSION['role'] === 'admin' || $_SESSION['role'] === 'supervisor' ? 'listaDePedidos.php' : '../../View/Formando/portalDeEstudante.php'; ?>" class="btn btn-secondary me-md-2">Cancelar</a>
+                <a href="<?php echo $_SESSION['role'] === 'admin' || $_SESSION['role'] === 'supervisor' ? 'listaDePedidosVisita.php' : '../../View/Formando/portalDeEstudante.php'; ?>" class="btn btn-secondary me-md-2">Cancelar</a>
                 <button type="submit" class="btn btn-primary">Atualizar Pedido</button>
             </div>
         </form>
@@ -114,7 +105,7 @@ $stmt->close();
         $(document).ready(function () {
             $('#formEditarPedido').submit(function (e) {
                 e.preventDefault();
-                console.log('Dados enviados:', $(this).serialize()); // Log dos dados enviados
+                console.log('Dados enviados:', $(this).serialize());
                 $.ajax({
                     url: $(this).attr('action'),
                     method: 'POST',
@@ -123,7 +114,7 @@ $stmt->close();
                     success: function (response) {
                         if (response.success) {
                             alert(response.message);
-                            window.location.href = 'listaDePedidos.php';
+                            window.location.href = 'listaDePedidosVisita.php';
                         } else {
                             alert(response.message);
                         }
@@ -164,7 +155,15 @@ $stmt->close();
                     required: true,
                     telefone_mz: true
                 },
-                contactoSecundario: {
+                endereco: {
+                    required: true,
+                    minlength: 2
+                },
+                nomeSupervisor: {
+                    required: true,
+                    minlength: 2
+                },
+                contactoSupervisor: {
                     required: true,
                     telefone_mz: true
                 },
@@ -194,13 +193,17 @@ $stmt->close();
                     required: "Campo obrigatório.",
                     telefone_mz: "Número inválido. Ex: +258 84xxxxxxx"
                 },
-                contactoSecundario: {
+                contactoSupervisor: {
                     required: "Campo obrigatório.",
                     telefone_mz: "Número inválido. Ex: +258 84xxxxxxx"
                 },
-                email: {
-                    required: "Informe o e-mail.",
-                    email: "Endereço de e-mail inválido."
+                nomeSupervisor: {
+                    required: "Informe o nome do supervisor",
+                    minlength: "O nome deve ter pelo menos 2 caracteres."
+                },
+                endereco: {
+                    required: "Informe o endereço da empresa.",
+                    minlength: "O Endereço da deve ter mais de 2 letras."
                 }
             },
             errorClass: "is-invalid",

@@ -92,104 +92,155 @@ unset($_SESSION['flash_error']);
 <html lang="pt-pt" data-bs-theme="<?php echo $_SESSION['theme'] ?? 'light'; ?>">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Revisão do Pedido</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- <link rel="stylesheet" href="../../Assets/CSS/global.css"> -->
+
+    <!-- BootStrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- CSS -->
+    <link rel="stylesheet" href="../../Assets/CSS/global.css">
     <link rel="stylesheet" href="../../Assets/CSS/notifications.css">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Fallback local para jQuery -->
+    <script>
+        window.jQuery || document.write('<script src="../../Scripts/jquery-3.6.0.min.js"><\/script>');
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
+    <link href='https://cdn.boxicons.com/fonts/brands/boxicons-brands.min.css' rel='stylesheet'>
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, Verdana, Tahoma, Helvetica;
+        /* ====== PREVIEW CARD OVERRIDE ====== */
+        .preview-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
         }
 
-        html, body {
-        display: flex;
-        flex-direction: column;
-        margin: 0;
-        padding: 0;
-    }
-
-    header {
-        position: fixed;
-        top: 0;
-        width: 100%;
-        z-index: 1000;
-        background-color: var(--primary-color);
-        box-shadow: var(--shadow-medium);
-    }
-
-    .preview-card {
-    flex: 1;
-    padding-top: 80px; /* Espaço para o header fixo */
-    padding-bottom: 20px;
-}
-
-
-        body { background: var(--bs-tertiary-bg); }
-
         .preview-card {
-            max-width: 860px;
-            margin: 2.5rem auto;
-            background: var(--bs-body-bg);
-            border: 1px solid var(--bs-border-color);
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
             overflow: hidden;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .preview-card:hover {
+            transform: none;
         }
 
         .preview-header {
-            background: var(--bs-primary-bg-subtle);
-            border-bottom: 1px solid var(--bs-border-color);
-            padding: 1.25rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 1.5rem 2rem;
+            color: var(--text-light);
         }
-        .preview-header h5 { margin: 0; font-size: 15px; font-weight: 500; color: var(--bs-primary); }
-        .preview-header small { font-size: 12px; color: var(--bs-secondary-color); }
 
-        .preview-body { padding: 1.5rem; }
+        .preview-header h4 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: var(--text-light);
+        }
+
+        .preview-header small {
+            font-size: 0.8rem;
+            opacity: 0.85;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .preview-body {
+            padding: 2rem;
+        }
 
         .section-label {
             display: flex;
             align-items: center;
-            gap: 7px;
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--bs-secondary-color);
-            letter-spacing: .05em;
+            gap: 8px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            letter-spacing: 0.06em;
             text-transform: uppercase;
-            padding-bottom: 8px;
-            border-bottom: 1px solid var(--bs-border-color);
-            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(58, 76, 145, 0.12);
+            margin-bottom: 14px;
+        }
+
+        .section-label i {
+            font-size: 13px;
+            color: var(--secondary-color);
         }
 
         .field-card {
-            background: var(--bs-secondary-bg);
-            border-radius: 8px;
-            padding: 10px 14px;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+            padding: 14px 18px;
+            border: 1px solid #e9ecef;
+            transition: var(--transition);
         }
+
+        .field-card:hover {
+            border-color: var(--secondary-color);
+            box-shadow: 0 2px 8px rgba(60, 155, 255, 0.08);
+        }
+
         .field-card .field-label {
-            font-size: 11px;
-            color: var(--bs-tertiary-color);
-            margin: 0 0 2px;
+            font-size: 0.7rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            margin: 0 0 4px;
         }
+
         .field-card .field-value {
-            font-size: 15px;
-            font-weight: 500;
-            color: var(--bs-body-color);
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #212529;
             margin: 0;
             word-break: break-word;
         }
 
         .preview-footer {
-            padding: 1rem 1.5rem;
-            border-top: 1px solid var(--bs-border-color);
+            padding: 1.25rem 2rem;
+            border-top: 1px solid #e9ecef;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: #fafbfc;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .preview-footer .btn {
+            border-radius: 10px;
+            padding: 10px 28px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .preview-footer .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 767.98px) {
+            .preview-body {
+                padding: 1.25rem;
+            }
+            .preview-header {
+                padding: 1.25rem;
+            }
+            .preview-footer {
+                flex-direction: column;
+                gap: 10px;
+                padding: 1.25rem;
+            }
+            .preview-footer .btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
+
 <body>
     <header>
         <!-- Nav principal -->
@@ -286,137 +337,150 @@ unset($_SESSION['flash_error']);
             </ul>
         </nav>
     </header>
-    <div class="preview-card">
-        <?php if ($flashError): ?>
-            <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
-                <i class="fas fa-exclamation-circle me-1"></i>
-                <?php echo htmlspecialchars($flashError); ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        <?php endif; ?>
 
-        <div class="preview-header">
-            <h5><i class="fas fa-file-alt me-2"></i>Revisão do pedido de carta de estágio</h5>
-            <small>Verifique todos os dados antes de confirmar o envio</small>
+    <main class="container mb-5" style="margin-top: 40px;">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="preview-wrapper">
+                    <div class="preview-card">
+
+                        <?php if ($flashError): ?>
+                            <div class="alert alert-danger alert-dismissible fade show shadow-sm m-3 mb-0" role="alert">
+                                <i class="fas fa-exclamation-circle me-1"></i>
+                                <?php echo htmlspecialchars($flashError); ?>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        <?php endif; ?>
+
+                        <div class="preview-header">
+                            <h4><i class="fas fa-file-alt me-2"></i>Revisão do pedido de carta de estágio</h4>
+                            <small>Verifique todos os dados antes de confirmar o envio</small>
+                        </div>
+
+                        <div class="preview-body">
+
+                            <?php if (!$dadosFormando): ?>
+                                <div class="alert alert-danger d-flex align-items-center gap-2 mb-0">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Formando com código <strong class="ms-1 me-1"><?php echo htmlspecialchars($codigoFormando); ?></strong>
+                                    não encontrado. Verifique o código e tente novamente.
+                                </div>
+
+                            <?php else: ?>
+
+                            <!-- Secção: Formando -->
+                            <div class="mb-4">
+                                <div class="section-label">
+                                    <i class="fas fa-user"></i> Dados do formando
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="field-card">
+                                            <p class="field-label">Código</p>
+                                            <p class="field-value"><?php echo htmlspecialchars($dados['codigoFormando']); ?></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="field-card">
+                                            <p class="field-label">Nome</p>
+                                            <p class="field-value"><?php echo htmlspecialchars($dadosFormando['nome']); ?></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="field-card">
+                                            <p class="field-label">Apelido</p>
+                                            <p class="field-value"><?php echo htmlspecialchars($dadosFormando['apelido']); ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Secção: Académico -->
+                            <div class="mb-4">
+                                <div class="section-label">
+                                    <i class="fas fa-graduation-cap"></i> Dados académicos
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="field-card">
+                                            <p class="field-label">Qualificação</p>
+                                            <p class="field-value"><?php echo htmlspecialchars($nomeQualificacao); ?></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="field-card">
+                                            <p class="field-label">Turma</p>
+                                            <p class="field-value"><?php echo htmlspecialchars($nomeTurma); ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Secção: Pedido -->
+                            <div class="mb-4">
+                                <div class="section-label">
+                                    <i class="fas fa-briefcase"></i> Dados do pedido
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="field-card">
+                                            <p class="field-label">Empresa</p>
+                                            <p class="field-value"><?php echo htmlspecialchars($dados['empresa']); ?></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="field-card">
+                                            <p class="field-label">Contacto principal</p>
+                                            <p class="field-value"><?php echo htmlspecialchars($dados['contactoPrincipal']); ?></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="field-card">
+                                            <p class="field-label">Contacto secundário</p>
+                                            <p class="field-value"><?php echo htmlspecialchars($dados['contactoSecundario']); ?></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="field-card">
+                                            <p class="field-label">Email pessoal</p>
+                                            <p class="field-value"><?php echo htmlspecialchars($dados['email']); ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Aviso -->
+                            <div class="alert alert-warning d-flex align-items-center gap-2 py-2 mb-0">
+                                <i class="fas fa-info-circle" style="font-size:13px"></i>
+                                <small>Após confirmação, o pedido ficará <strong>pendente</strong> de aprovação por um administrador.</small>
+                            </div>
+
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="preview-footer">
+                            <a href="formularioDeCartaDeEstagio.php" class="btn btn-secondary shadow-sm px-5 py-2 fw-bold text-white">
+                                <i class="fas fa-arrow-left me-1"></i> Voltar e corrigir
+                            </a>
+
+                            <?php if ($dadosFormando): ?>
+                            <form action="../../Controller/Estagio/FormularioDeCartaDeEstagio.php" method="POST">
+                                <?php echo CSRFProtection::getTokenField(); ?>
+                                <input type="hidden" name="fromPreview" value="1">
+                                <button type="submit" class="btn btn-success shadow-sm px-5 py-2 fw-bold text-white">
+                                    <i class="fas fa-check me-1"></i> Confirmar e enviar
+                                </button>
+                            </form>
+                            <?php endif; ?>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
         </div>
+    </main>
 
-        <div class="preview-body">
-
-            <?php if (!$dadosFormando): ?>
-                <div class="alert alert-danger d-flex align-items-center gap-2 mb-0">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    Formando com código <strong class="ms-1 me-1"><?php echo htmlspecialchars($codigoFormando); ?></strong>
-                    não encontrado. Verifique o código e tente novamente.
-                </div>
-
-            <?php else: ?>
-
-            <!-- Secção: Formando -->
-            <div class="mb-4">
-                <div class="section-label">
-                    <i class="fas fa-user" style="font-size:12px"></i> Dados do formando
-                </div>
-                <div class="row g-2">
-                    <div class="col-md-4">
-                        <div class="field-card">
-                            <p class="field-label">Código</p>
-                            <p class="field-value"><?php echo htmlspecialchars($dados['codigoFormando']); ?></p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="field-card">
-                            <p class="field-label">Nome</p>
-                            <p class="field-value"><?php echo htmlspecialchars($dadosFormando['nome']); ?></p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="field-card">
-                            <p class="field-label">Apelido</p>
-                            <p class="field-value"><?php echo htmlspecialchars($dadosFormando['apelido']); ?></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Secção: Académico -->
-            <div class="mb-4">
-                <div class="section-label">
-                    <i class="fas fa-graduation-cap" style="font-size:12px"></i> Dados académicos
-                </div>
-                <div class="row g-2">
-                    <div class="col-md-6">
-                        <div class="field-card">
-                            <p class="field-label">Qualificação</p>
-                            <p class="field-value"><?php echo htmlspecialchars($nomeQualificacao); ?></p>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="field-card">
-                            <p class="field-label">Turma</p>
-                            <p class="field-value"><?php echo htmlspecialchars($nomeTurma); ?></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Secção: Pedido -->
-            <div class="mb-4">
-                <div class="section-label">
-                    <i class="fas fa-briefcase" style="font-size:12px"></i> Dados do pedido
-                </div>
-                <div class="row g-2">
-                    <div class="col-12">
-                        <div class="field-card">
-                            <p class="field-label">Empresa</p>
-                            <p class="field-value"><?php echo htmlspecialchars($dados['empresa']); ?></p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="field-card">
-                            <p class="field-label">Contacto principal</p>
-                            <p class="field-value"><?php echo htmlspecialchars($dados['contactoPrincipal']); ?></p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="field-card">
-                            <p class="field-label">Contacto secundário</p>
-                            <p class="field-value"><?php echo htmlspecialchars($dados['contactoSecundario']); ?></p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="field-card">
-                            <p class="field-label">Email pessoal</p>
-                            <p class="field-value"><?php echo htmlspecialchars($dados['email']); ?></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Aviso -->
-            <div class="alert alert-warning d-flex align-items-center gap-2 py-2 mb-0">
-                <i class="fas fa-info-circle" style="font-size:13px"></i>
-                <small>Após confirmação, o pedido ficará <strong>pendente</strong> de aprovação por um administrador.</small>
-            </div>
-
-            <?php endif; ?>
-        </div>
-
-        <div class="preview-footer">
-            <a href="formularioDeCartaDeEstagio.php" class="btn btn-secondary shadow-sm px-5 py-2 fw-bold text-white">
-                <i class="fas fa-arrow-left me-1"></i> Voltar e corrigir
-            </a>
-
-            <?php if ($dadosFormando): ?>
-            <form action="../../Controller/Estagio/FormularioDeCartaDeEstagio.php" method="POST">
-                <?php echo CSRFProtection::getTokenField(); ?>
-                <input type="hidden" name="fromPreview" value="1">
-                <button type="submit" class="btn btn-success shadow-sm px-5 py-2 fw-bold text-white">
-                    <i class="fas fa-check me-1"></i> Confirmar e enviar
-                </button>
-            </form>
-            <?php endif; ?>
-        </div>
-
-    </div>
+    <?php require_once __DIR__ . '/../../Includes/footer.php' ?>
 </body>
+
 </html>

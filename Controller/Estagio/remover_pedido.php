@@ -1,44 +1,38 @@
 <?php
-ob_start();
-header('Content-Type: application/json');
 require_once __DIR__ . '/../../Conexao/conector.php';
-require_once __DIR__ . '/../../middleware/auth.php';
+require_once __DIR__ . '/../../Helpers/Actividade.php';
 
-ob_clean();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-$conexao = new Conector();
-$conn = $conexao->getConexao();
+header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['error' => 'Método não permitido']);
+    echo htmlentities(json_encode(['success' => false, 'error' => 'Método inválido'], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT));
     exit;
 }
 
-$numero = isset($_POST['id_pedido_carta']) ? (int)$_POST['id_pedido_carta'] : null;
-
-if (!$numero) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Número do pedido não fornecido']);
+if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'supervisor'])) {
+    echo htmlentities(json_encode(['success' => false, 'error' => 'Sem permissão'], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT));
     exit;
 }
-$check = $conn->prepare("SELECT id_pedido_carta FROM pedido_carta WHERE id_pedido_carta = ?");
-$check->bind_param("i", $numero);
-$check->execute();
-$check->store_result();
 
-if ($check->num_rows === 0) {
-    http_response_code(404);
-    echo json_encode(['error' => 'Pedido não encontrado']);
-    $check->close();
-    exit;
-}
-$check->close();
+function removerPedido($conn, $numero)
+{
 
-$conn->begin_transaction();
+    $check = $conn->prepare("SELECT id_pedido_carta FROM pedido_carta WHERE id_pedido_carta = ?");
+    $check->bind_param("i", $numero);
+    $check->execute();
+    $check->store_result();
 
-try {
-    // 1. Buscar IDs das respostas ligadas a este pedido
+    if ($check->num_rows === 0) {
+        http_response_code(404);
+        echo htmlentities(json_encode(['error' => 'Pedido não encontrado'], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT));
+        $check->close();
+        return false;
+    }
+
     $res = $conn->prepare("SELECT id_resposta FROM resposta_carta WHERE numero_carta = ?");
     $res->bind_param("i", $numero);
     $res->execute();
@@ -93,23 +87,101 @@ try {
     $del = $conn->prepare("DELETE FROM pedido_carta WHERE id_pedido_carta = ?");
     $del->bind_param("i", $numero);
     $del->execute();
+    $affected = $del->affected_rows;
     $del->close();
 
-    $conn->commit();
+    if ($affected > 0 && isset($_SESSION['sessao_id'])) {
+        registrarAtividade($_SESSION['sessao_id'], "Pedido de estágio removido (ID: $numero)", "REMOCAO");
+    }
 
-    echo json_encode([
-        'success' => true,
-        'message' => 'Pedido #' . $numero . ' e todos os registos associados foram removidos com sucesso'
-    ]);
+    return $affected > 0;
+}
 
+$conexao = new Conector();
+$conn = $conexao->getConexao();
+
+$inputData = $_POST;
+$contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+
+if (strpos($contentType, 'application/json') !== false) {
+    $rawInput = file_get_contents('php://input');
+    $jsonData = json_decode($rawInput, true);
+    if ($jsonData !== null) {
+        $inputData = $jsonData;
+        error_log("Dados JSON decodificados: " . json_encode($inputData));
+    }
+}
+
+$ids = [];
+
+if (isset($inputData['ids']) && is_array($inputData['ids']) && !empty($inputData['ids'])) {
+    $ids = $inputData['ids'];
+} elseif (isset($inputData['ids']) && is_string($inputData['ids']) && !empty($inputData['ids'])) {
+    $ids = [$inputData['ids']];
+} elseif (isset($inputData['id_pedido_carta']) && (int)$inputData['id_pedido_carta'] > 0) {
+    $ids = [$inputData['id_pedido_carta']];
+}
+
+$ids = array_map('intval', $ids);
+$ids = array_filter($ids, function ($id) {
+    return $id > 0;
+});
+
+if (empty($ids)) {
+    echo htmlentities(json_encode(['success' => false, 'error' => 'Nenhum ID de Pedido de estágio foi fornecido. Dados recebidos: ' . json_encode($inputData)], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT));
+    $conn->close();
+    exit;
+}
+
+$conn->begin_transaction();
+
+try {
+    $removidos = [];
+    $falhas = [];
+
+    foreach ($ids as $id) {
+        if (removerPedido($conn, $id)) {
+            $removidos[] = $id;
+        } else {
+            $falhas[] = $id;
+        }
+    }
+
+    if (!empty($removidos)) {
+        $conn->commit();
+        $message = count($removidos) . " Pedido de estágio(s) removida(s) com sucesso.";
+        if (!empty($falhas)) {
+            $message .= " Falha nos IDs: " . implode(', ', $falhas);
+        }
+
+        echo htmlentities(json_encode([
+            'success' => true,
+            'message' => $message,
+            'debug' => [
+                'removidos' => $removidos,
+                'falhas' => $falhas,
+                'total_enviados' => count($ids)
+            ]
+        ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT));
+    } else {
+        $conn->rollback();
+        echo htmlentities(json_encode([
+            'success' => false,
+            'error' => 'Nenhum Pedido de estágio foi removida. IDs: ' . implode(', ', $ids),
+            'debug' => [
+                'removidos' => $removidos,
+                'falhas' => $falhas,
+                'total_enviados' => count($ids)
+            ]
+        ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT));
+    }
 } catch (Exception $e) {
     $conn->rollback();
-    http_response_code(500);
-    echo json_encode([
-        'error'   => 'Erro ao remover o pedido',
-        'detalhe' => $e->getMessage()
-    ]);
+    echo htmlentities(json_encode([
+        'success' => false,
+        'error' => 'Erro interno: ' . $e->getMessage()
+    ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT));
 }
 
 $conn->close();
-?>
+exit;

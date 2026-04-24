@@ -10,7 +10,6 @@ require_once __DIR__ . '/../Conexao/conector.php';
 
 SecurityHeaders::setFull();
 
-// Inicializar conexão se não existir
 if (!isset($conn) || $conn === null) {
     $conector = new Conector();
     $conn = $conector->getConexao();
@@ -22,9 +21,13 @@ NotificationHelper::handleAction($conn, $userId, $_POST ?? []);
 
 $unreadCount = NotificationHelper::getUnreadCount($conn, $userId);
 $notifications = NotificationHelper::getNotifications($conn, $userId);
+
+$themeValue = isset($_SESSION['theme']) ? trim($_SESSION['theme']) : 'light';
+$themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : 'light';
 ?>
 <!DOCTYPE html>
-<html lang="pt-pt" data-bs-theme="<?php echo $_SESSION['theme'] ?? 'light'; ?>">
+<html lang="pt-pt" data-bs-theme="<?php echo htmlspecialchars($themeValue, ENT_QUOTES, 'UTF-8'); ?>">
+</head>
 
 <head>
     <meta charset="UTF-8">
@@ -36,19 +39,36 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- CSS -->
-    <link rel="stylesheet" href="../../Assets/CSS/global.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="../../Assets/CSS/notifications.css">
+    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/estagio/Assets/CSS/chart.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/global.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/notifications.css">
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
+    <!-- <style>
         button {
             padding-bottom: 110px;
         }
-    </style>
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            color: #6c757d;
+        }
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+    </style> -->
 </head>
 
 <body>
@@ -95,7 +115,7 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
                             </li>
                             <?php include __DIR__ . '/notification-widget.php'; ?>
                             <li class="nav-item ms-3">
-                                <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger shadow-sm px-4 fw-semibold rounded-pill"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+                                <a href="/estagio/logout" class="btn btn-danger shadow-sm px-4 fw-semibold rounded-pill"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
                             </li>
                         </ul>
                     </div>
@@ -107,19 +127,19 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
         <nav class="bg-white shadow-sm border-bottom">
             <ul class="nav justify-content-center py-2">
                 <li class="nav-item mx-1">
-                    <a class="nav-link fw-semibold text-dark active" href="../../View/<?php echo $_SESSION['role'] === 'admin' ? 'Admin/portalDoAdmin.php' : 'Supervisor/portalDoSupervisor.php'; ?>">
+                    <a class="nav-link fw-semibold text-dark active" href="/estagio/<?php echo $_SESSION['role'] === 'admin' ? 'admin' : 'supervisor'; ?>">
                         <i class="fas fa-home fa-fw me-1 text-primary"></i> Home
                     </a>
                 </li>
-                
+
                 <li class="nav-item mx-1 dropdown">
                     <a class="nav-link fw-semibold text-dark dropdown-toggle" href="#" id="pedidosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-plus-circle fa-fw me-1 text-success"></i> Fazer Pedidos
                     </a>
                     <ul class="dropdown-menu shadow border-0 mt-2" aria-labelledby="pedidosDropdown">
-                        <li><a class="dropdown-item" href="formularioDeCartaDeEstagio.php"><i class="fas fa-envelope-open-text fa-fw me-2 text-secondary"></i> Pedido de Estágio</a></li>
-                        <li><a class="dropdown-item" href="formularioDeCredencialDeEstagio.php"><i class="fas fa-id-badge fa-fw me-2 text-secondary"></i> Credencial de Estágio</a></li>
-                        <li><a class="dropdown-item" href="formularioDeVisita.php"><i class="fas fa-map-marked-alt fa-fw me-2 text-secondary"></i> Visita de Estágio</a></li>
+                        <li><a class="dropdown-item" href="/estagio/estagio/criar"><i class="fas fa-envelope-open-text fa-fw me-2 text-secondary"></i> Pedido de Estágio</a></li>
+                        <li><a class="dropdown-item" href="/estagio/credencial/criar"><i class="fas fa-id-badge fa-fw me-2 text-secondary"></i> Credencial de Estágio</a></li>
+                        <li><a class="dropdown-item" href="/estagio/visitas/criar"><i class="fas fa-map-marked-alt fa-fw me-2 text-secondary"></i> Visita de Estágio</a></li>
                     </ul>
                 </li>
 
@@ -128,13 +148,13 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
                         <i class="fas fa-list-ul fa-fw me-1 text-info"></i> Listas
                     </a>
                     <ul class="dropdown-menu shadow border-0 mt-2" aria-labelledby="listasDropdown">
-                        <li><a class="dropdown-item" href="listaDePedidos.php"><i class="fas fa-file-alt fa-fw me-2 text-secondary"></i> Pedidos de Estágio</a></li>
-                        <li><a class="dropdown-item" href="listaDePedidosCredencial.php"><i class="fas fa-id-card-clip fa-fw me-2 text-secondary"></i> Pedidos de Credencial</a></li>
-                        <li><a class="dropdown-item" href="listaDePedidosVisita.php"><i class="fas fa-route fa-fw me-2 text-secondary"></i> Pedidos de Visita</a></li>
+                        <li><a class="dropdown-item" href="/estagio/estagio/listar"><i class="fas fa-file-alt fa-fw me-2 text-secondary"></i> Pedidos de Estágio</a></li>
+                        <li><a class="dropdown-item" href="/estagio/credencial/listar"><i class="fas fa-id-card-clip fa-fw me-2 text-secondary"></i> Pedidos de Credencial</a></li>
+                        <li><a class="dropdown-item" href="/estagio/visitas/listar"><i class="fas fa-route fa-fw me-2 text-secondary"></i> Pedidos de Visita</a></li>
                     </ul>
                 </li>
                 <li class="nav-item mx-1">
-                    <a class="nav-link fw-semibold text-dark" href="relatorio.php">
+                    <a class="nav-link fw-semibold text-dark" href="/estagio/relatorio">
                         <i class="fas fa-file-pdf fa-fw me-1 text-danger"></i> Gerar Relatórios
                     </a>
                 </li>

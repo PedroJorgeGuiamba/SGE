@@ -1,8 +1,12 @@
 <?php
 require_once __DIR__ . '/../../Conexao/conector.php';
-session_start();
+require_once __DIR__ . '/../../Helpers/Criptografia.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 $conexao = new Conector();
 $conn    = $conexao->getConexao();
+$criptografia =  new Criptografia();
 $termo = trim($_GET['termo'] ?? '');
 
 // --- Filtro por qualificação do supervisor ---
@@ -64,10 +68,23 @@ if ($termo === '') {
 
 $pedidos = [];
 while ($row = $result->fetch_assoc()) {
-    $pedidos[] = $row;
+    $pedidos[] = [
+        'id_visita' => $row['id_visita'],
+        'nome' => $row['nome'],
+        'apelido' => $row['apelido'],
+        'codigo_formando' => $row['codigo_formando'],
+        'contactoFormando' => $criptografia->descriptografar($row['contactoFormando']),
+        'empresa' => $row['empresa'],
+        'endereco' => $row['endereco'],
+        'nomeSupervisor' => $row['nomeSupervisor'],
+        'contactoSupervisor' => $criptografia->descriptografar($row['contactoSupervisor']),
+        'data_do_pedido' => $row['data_do_pedido'],
+        'dataHoraDaVisita' => $row['dataHoraDaVisita'],
+        'status' => $row['status'],
+        'id_pedido_carta' => $row['id_pedido_carta']
+    ];
 }
 
 header('Content-Type: application/json');
 echo json_encode($pedidos);
 $conn->close();
-?>

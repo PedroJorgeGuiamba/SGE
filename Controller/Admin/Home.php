@@ -4,6 +4,6 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 if (!isset($_SESSION['email']) or $_SESSION['role'] !== 'admin') {
-    header("Location: ../../View/Auth/Login.php");
+    header("Location: /estagio/login");
     exit();
 }

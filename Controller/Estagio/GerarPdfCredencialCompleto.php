@@ -1,9 +1,11 @@
 <?php
 
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
 
 require_once __DIR__ . '/../../Conexao/conector.php';
+require_once __DIR__ . '/../../Helpers/SafeUnlink.php';
 // ─── LOG ──────────────────────────────────────────────────────────────────────
 $logFile = __DIR__ . "/../../Temp/debug_gerar_pdf.log";
 
@@ -28,8 +30,37 @@ function gravarDataLevantamento(int $id): void
         logMsg("ERRO ao gravar data_de_levantamento para ID $id: " . $e->getMessage());
     }
 }
+function notificarFormando(int $idPedidoCarta){
+    try {
+        $conexao = new Conector();
+        $conn    = $conexao->getConexao();
+        // Notifica o formando
+        $stmtFormando = $conn->prepare("
+            SELECT f.usuario_id, p.id_pedido_carta
+                FROM formando f
+                JOIN pedido_carta p ON p.codigo_formando = f.codigo
+                WHERE p.id_pedido_carta = ?
+        ");
+        $stmtFormando->bind_param('i', $idPedidoCarta);
+        $stmtFormando->execute();
+        $formando = $stmtFormando->get_result()->fetch_assoc();
+        $stmtFormando->close();
 
-function logMsg(string $msg): void {
+        if ($formando && $formando['usuario_id']) {
+            $mensagem = "A sua credencial de estágio já foi gerada.";
+            $stmtNotif = $conn->prepare("INSERT INTO notificacao (id_utilizador, mensagem) VALUES (?, ?)");
+            $stmtNotif->bind_param('is', $formando['usuario_id'], $mensagem);
+            $stmtNotif->execute();
+            $stmtNotif->close();
+        }
+    }catch (Exception $e) {
+        // Não interrompe o envio do PDF — apenas regista o erro
+        logMsg("ERRO ao gravar data_de_levantamento para ID $idPedidoCarta: " . $e->getMessage());
+    }
+}
+
+function logMsg(string $msg): void
+{
     global $logFile;
     // Garante que a pasta Temp existe antes de escrever
     $dir = dirname($logFile);
@@ -45,9 +76,14 @@ logMsg("GET: "    . json_encode($_GET));
 logMsg("POST: "   . json_encode($_POST));
 
 // ─── CONFIGURAÇÕES ────────────────────────────────────────────────────────────
-$wkhtmltopdfPath = "C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe";
-$baseUrl         = "http://localhost/estagio/View/estagio/Credencial.php";
+$env = parse_ini_file(__DIR__ . '/../../config/.env');
 
+foreach ($env as $key => $value) {
+    putenv("$key=$value");
+}
+
+$wkhtmltopdfPath = getenv('wkhtmltopdfPath');
+$baseUrl         = "https://localhost/estagio/api/credencial";
 $pdfDir = __DIR__ . "/../../Temp";
 if (!file_exists($pdfDir)) {
     mkdir($pdfDir, 0777, true);
@@ -64,6 +100,7 @@ logMsg("pdfDir: $pdfDir | existe: " . (file_exists($pdfDir) ? 'sim' : 'não'));
 function gerarPdfBytes(int $id, string $pdfDir, string $wkhtmltopdfPath): ?string
 {
     global $baseUrl;
+    $safe = new SafeUnlink();
 
     $pdfFile = $pdfDir . "/tmp_estagio_$id.pdf";
     $url     = $baseUrl . "?id_pedido_carta=$id";
@@ -79,13 +116,14 @@ function gerarPdfBytes(int $id, string $pdfDir, string $wkhtmltopdfPath): ?strin
 
     if ($returnCode === 0 && file_exists($pdfFile) && filesize($pdfFile) > 0) {
         $bytes = file_get_contents($pdfFile);
-        unlink($pdfFile); // apaga imediatamente após ler
+        $safe->safe_unlink($pdfFile, $pdfDir);
+        // unlink($pdfFile);
         logMsg("PDF ID $id lido (" . strlen($bytes) . " bytes). Temp removido.");
         return $bytes;
     }
 
     logMsg("ERRO ao gerar PDF ID $id.");
-    if (file_exists($pdfFile)) unlink($pdfFile);
+    if (file_exists($pdfFile)) $safe->safe_unlink($pdfFile, $pdfDir);
     return null;
 }
 
@@ -113,10 +151,11 @@ if (!empty($_POST['ids']) && is_array($_POST['ids'])) {
         }
 
         gravarDataLevantamento($ids[0]);
+        notificarFormando($ids[0]);
 
         header('Content-Type: application/pdf');
         header("Content-Disposition: inline; filename=\"Pacote_Estagio_Completo_{$ids[0]}.pdf\"");
-        header('Content-Length: ' . strlen($bytes));
+        header('Content-Length: ' . mb_strlen($bytes, '8bit'));
         ob_end_clean();
         echo $bytes;
         exit;
@@ -131,7 +170,7 @@ if (!empty($_POST['ids']) && is_array($_POST['ids'])) {
     }
 
     // Usa ficheiro temporário para o ZIP
-    $zipFile = $pdfDir . "/zip_estagio_" . date('YmdHis') . "_" . rand(1000,9999) . ".zip";
+    $zipFile = $pdfDir . "/zip_estagio_" . date('YmdHis') . "_" . rand(1000, 9999) . ".zip";
     $zip     = new ZipArchive();
 
     if ($zip->open($zipFile, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
@@ -142,12 +181,15 @@ if (!empty($_POST['ids']) && is_array($_POST['ids'])) {
     $erros      = [];
     $adicionados = 0;
 
+    $idsGeradosComSucesso = [];
+
     foreach ($ids as $id) {
         $bytes = gerarPdfBytes($id, $pdfDir, $wkhtmltopdfPath);
         if ($bytes !== null) {
             // addFromString: escreve o conteúdo diretamente no ZIP, sem depender do ficheiro em disco
             $zip->addFromString("Pacote_Estagio_Completo_$id.pdf", $bytes);
             $adicionados++;
+            $idsGeradosComSucesso[] = $id;
             logMsg("ID $id adicionado ao ZIP via addFromString.");
         } else {
             $erros[] = $id;
@@ -168,8 +210,9 @@ if (!empty($_POST['ids']) && is_array($_POST['ids'])) {
         exit;
     }
 
-    foreach ($idsGerados as $id) {
+    foreach ($idsGeradosComSucesso as $id) {
         gravarDataLevantamento($id);
+        notificarFormando($id);
     }
 
 
@@ -181,7 +224,8 @@ if (!empty($_POST['ids']) && is_array($_POST['ids'])) {
     header('Content-Length: ' . filesize($zipFile));
     ob_end_clean();
     readfile($zipFile);
-    unlink($zipFile);
+    // unlink($zipFile);
+    $safe->safe_unlink($zipFile, $pdfDir);
     exit;
 }
 
@@ -196,10 +240,11 @@ if (!empty($_GET['id_pedido_carta']) && (int)$_GET['id_pedido_carta'] > 0) {
     }
 
     gravarDataLevantamento($id);
-    
+    notificarFormando($id);
+
     header('Content-Type: application/pdf');
     header("Content-Disposition: inline; filename=\"Pacote_Estagio_Completo_$id.pdf\"");
-    header('Content-Length: ' . strlen($bytes));
+    header('Content-Length: ' . mb_strlen($bytes, '8bit'));
     ob_end_clean();
     echo $bytes;
     exit;

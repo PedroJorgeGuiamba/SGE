@@ -1,5 +1,5 @@
 <?php
-include '../../Controller/Turmas/CadastrarTurma.php';
+include_once __DIR__ . '/../../Helpers/CSRFProtection.php';
 ?>
 
 <?php require_once __DIR__ . '/../../Includes/header-admin.php' ?>
@@ -13,7 +13,8 @@ include '../../Controller/Turmas/CadastrarTurma.php';
                         <p class="text-muted small">Preencha os campos abaixo para adicionar uma nova turma ao sistema</p>
                     </div>
                     <div class="card-body p-5">
-                        <form action="../../Controller/Turmas/CadastrarTurma.php" method="post">
+                        <form action="/estagio/turma/salvar" method="post">
+                            <?= CSRFProtection::getTokenField() ?>
                             <?php if (isset($_GET['erros'])): ?>
                                 <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
                                     <i class="fas fa-exclamation-circle me-1"></i> <?php echo htmlspecialchars($_GET['erros']); ?>
@@ -80,7 +81,7 @@ include '../../Controller/Turmas/CadastrarTurma.php';
 
         function carregarDados() {
             $.ajax({
-                url: '../../Controller/Qualificacao/getQualificacoes.php',
+                url: '/estagio/api/qualificacao',
                 method: 'GET',
                 success: function(resposta) {
                     $('#qualificacao').html(resposta);
@@ -91,7 +92,7 @@ include '../../Controller/Turmas/CadastrarTurma.php';
             });
 
             $.ajax({
-                url: '../../Controller/Cursos/getCursos.php',
+                url: '/estagio/api/cursos',
                 method: 'GET',
                 success: function(resposta) {
                     $('#curso').html(resposta);

@@ -10,7 +10,9 @@ if (isset($_GET['id_pedido_carta'])) {
 }
 
 if ($id <= 0) {
-    die('ID do pedido não fornecido ou inválido.');
+    http_response_code(404);
+    require 'View/Erros/error.php';
+    exit;
 }
 
 $conexao = new Conector();

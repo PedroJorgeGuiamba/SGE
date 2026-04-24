@@ -1,13 +1,15 @@
 <?php
-if (!isset($_GET['numero'])) {
-    header('Location: portalDeEstudante.php');
+if (!isset($_GET['id_visita'])) {
+    header('Location: ' . ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'supervisor' ? '/estagio/visita/listar' : '/estagio/formando'));
     exit();
-}
-
-$id = $_GET['numero'];
+    }
+    
+$id = $_GET['id_visita'];
 
 require_once __DIR__ . '/../../Conexao/conector.php';
+require_once __DIR__ . '/../../Helpers/Criptografia.php';
 $conexao = new Conector();
+$criptografia = new Criptografia();
 $conn = $conexao->getConexao();
 
 $sql = "SELECT v.*
@@ -21,7 +23,7 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows === 0) {
-    header('Location: portalDeEstudante.php');
+    header('Location: ' . ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'supervisor' ? '/estagio/visita/listar' : '/estagio/formando'));
     exit();
 }
 
@@ -33,7 +35,7 @@ $stmt->close();
     <main class="container mt-4">
         <h2 class="mb-4">Editar Pedido de Visita de Estágio</h2>
 
-        <form id="formEditarPedido" action="../../Controller/Estagio/editarVisita.php" method="POST">
+        <form id="formEditarPedido" action="/estagio/visita/atualizar" method="POST">
             <input type="hidden" name="id_visita" value="<?php echo htmlspecialchars($pedido['id_visita']); ?>">
 
             <div class="row mb-3">
@@ -55,7 +57,7 @@ $stmt->close();
                 </div>
                 <div class="col-md-6">
                     <label for="contactoFormando" class="form-label">Contacto do Formando</label>
-                    <input type="text" class="form-control" id="contactoFormando" name="contactoFormando" value="<?php echo htmlspecialchars($pedido['contactoFormando']); ?>" required>
+                    <input type="text" class="form-control" id="contactoFormando" name="contactoFormando" value="<?php echo $criptografia->descriptografar(htmlspecialchars($pedido['contactoFormando'])); ?>" required>
                     <span class="error_form text-danger small" id="cPrincipal_error_message"></span>
                 </div>
             </div>
@@ -81,19 +83,19 @@ $stmt->close();
                 </div>
                 <div class="col-md-6">
                     <label for="contactoSupervisor" class="form-label">Contacto do Supervisor</label>
-                    <input type="text" class="form-control" id="contactoSupervisor" name="contactoSupervisor" value="<?php echo htmlspecialchars($pedido['contactoSupervisor']); ?>">
+                    <input type="text" class="form-control" id="contactoSupervisor" name="contactoSupervisor" value="<?php echo $criptografia->descriptografar(htmlspecialchars($pedido['contactoSupervisor'])); ?>">
                     <span class="error_form text-danger small" id="cSupervisor_error_message"></span>
                 </div>
             </div>
 
             <div class="mb-3">
                 <label for="dataHoraDaVisita" class="form-label">Data Da Visita</label>
-                <input type="datetime-local" class="form-control" id="dataHoraDaVisita" name="dataHoraDaVisita" value="<?php echo htmlspecialchars($pedido['dataHoraDaVisita']); ?>" required>
+                <input type="datetime-local" class="form-control" id="dataHoraDaVisita" name="dataHoraDaVisita" value="<?php echo htmlspecialchars($pedido['dataHoraDaVisita']); ?>" min="<?php echo date('Y-m-d\TH:i'); ?>" required>
                 <span class="error_form text-danger small" id="dataDaVisita_error_message"></span>
             </div>
             
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <a href="<?php echo $_SESSION['role'] === 'admin' || $_SESSION['role'] === 'supervisor' ? 'listaDePedidosVisita.php' : '../../View/Formando/portalDeEstudante.php'; ?>" class="btn btn-secondary me-md-2">Cancelar</a>
+                <a href="<?php echo $_SESSION['role'] === 'admin' || $_SESSION['role'] === 'supervisor' ? '/estagio/visita/listar' : '/estagio/formando'; ?>" class="btn btn-secondary me-md-2">Cancelar</a>
                 <button type="submit" class="btn btn-primary">Atualizar Pedido</button>
             </div>
         </form>
@@ -114,13 +116,13 @@ $stmt->close();
                     success: function (response) {
                         if (response.success) {
                             alert(response.message);
-                            window.location.href = 'listaDePedidosVisita.php';
+                            window.location.href = '<?php echo $_SESSION['role'] === 'admin' || $_SESSION['role'] === 'supervisor' ? '/estagio/visita/listar' : '/estagio/formando'; ?>';
                         } else {
                             alert(response.message);
                         }
                     },
                     error: function (xhr, status, error) {
-                        console.log('Erro AJAX:', xhr.status, status, error, xhr.responseText); // Log detalhado do erro
+                        console.log('Erro AJAX:', xhr.status, status, error, xhr.responseText);
                         alert('Erro ao processar a requisição: ' + (xhr.responseText || 'Verifique o console para mais detalhes.'));
                     }
                 });

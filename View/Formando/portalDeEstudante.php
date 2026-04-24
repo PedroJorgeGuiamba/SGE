@@ -1,6 +1,8 @@
 <?php
-session_start();
-include '../../Controller/Formando/Home.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+include_once __DIR__ . '/../../Controller/Formando/Home.php';
 require_once __DIR__ . '/../../middleware/auth.php';
 require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
 require_once __DIR__ . '/../../Helpers/NotificationHelper.php';
@@ -14,7 +16,7 @@ $userId = NotificationHelper::sanitizeUserId($_SESSION['usuario_id'] ?? 0);
 // Verificar se o formando já confirmou seu código
 if (strtolower($_SESSION['role'] ?? '') === 'formando') {
     if (!isset($_SESSION['codigo_formando'])) {
-        header("Location: /estagio/View/Auth/ConfirmacaoFormando.php");
+        header("Location: /estagio/login/confirmar-user");
         exit();
     }
 }
@@ -22,16 +24,19 @@ if (strtolower($_SESSION['role'] ?? '') === 'formando') {
 NotificationHelper::handleAction($conn, $userId, $_POST ?? []);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    header("Location: " . $_SERVER['PHP_SELF']);
-    exit;
+    // header("Location: " . $_SERVER['PHP_SELF']);
+    // exit;
 }
 
 $unreadCount = NotificationHelper::getUnreadCount($conn, $userId);
 $notifications = NotificationHelper::getNotifications($conn, $userId);
+
+$themeValue = isset($_SESSION['theme']) ? trim($_SESSION['theme']) : 'light';
+$themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : 'light';
 ?>
 
 <!DOCTYPE html>
-<html lang="pt-pt" data-bs-theme="<?php echo $_SESSION['theme'] ?? 'light'; ?>">
+<html lang="pt-pt" data-bs-theme="<?php echo htmlspecialchars($themeValue, ENT_QUOTES, 'UTF-8') ?? 'light'; ?>">
 
 <head>
     <meta charset="UTF-8">
@@ -53,13 +58,17 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="../../Assets/CSS/global.css">
-    <link rel="stylesheet" href="../../Assets/CSS/notifications.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/formando.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/global.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/notifications.css">
 
     <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+        crossorigin="anonymous"></script>
 
-    <style>
+    <!-- <style>
         /* ── Tabela premium com paleta do projecto ── */
         .portal-section {
             background: linear-gradient(135deg, #f0f4ff 0%, #f8f9fa 100%);
@@ -292,7 +301,7 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
             margin-bottom: 1rem;
             color: #cbd5e1;
         }
-    </style>
+    </style> -->
 </head>
 
 <body>
@@ -344,38 +353,39 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
                                 </button>
                             </li>
                             <!-- Notificações -->
-                            <?php include __DIR__ . '/../../Includes/notification-widget.php'; ?>
+                            <?php include_once __DIR__ . '/../../Includes/notification-widget.php'; ?>
                             <!-- Logout -->
                             <li class="nav-item ms-lg-2">
-                                <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger shadow-sm px-4 fw-semibold rounded-pill">
+                                <a href="/estagio/logout" class="btn btn-danger shadow-sm px-4 fw-semibold rounded-pill">
                                     <i class="fas fa-sign-out-alt me-1"></i> Logout
                                 </a>
                             </li>
                         </ul>
                     </div>
                 </div>
+            </div>
         </nav>
 
         <!-- Nav Secundária -->
         <nav class="bg-white shadow-sm border-bottom">
             <ul class="nav justify-content-center py-2">
                 <li class="nav-item mx-2">
-                    <a class="nav-link active fw-semibold text-dark" aria-current="page" href="#">
+                    <a class="nav-link active fw-semibold text-dark" aria-current="page" href="/estagio/formando">
                         <i class="fas fa-home me-1 text-primary"></i> Home
                     </a>
                 </li>
                 <li class="nav-item mx-2">
-                    <a class="nav-link fw-semibold text-dark" href="../estagio/formularioDeCartaDeEstagio.php">
+                    <a class="nav-link fw-semibold text-dark" href="/estagio/estagio/criar">
                         <i class="fas fa-file-alt me-1 text-primary"></i> Pedido de Estágio
                     </a>
                 </li>
                 <li class="nav-item mx-2">
-                    <a class="nav-link fw-semibold text-dark" href="../estagio/formularioDeCredencialDeEstagio.php">
+                    <a class="nav-link fw-semibold text-dark" href="/estagio/credencial/criar">
                         <i class="fas fa-id-card me-1 text-primary"></i> Credencial de Estágio
                     </a>
                 </li>
                 <li class="nav-item mx-2">
-                    <a class="nav-link fw-semibold text-dark" href="../estagio/formularioDeVisita.php">
+                    <a class="nav-link fw-semibold text-dark" href="/estagio/visita/criar">
                         <i class="fas fa-calendar-check me-1 text-primary"></i> Visita de Estágio
                     </a>
                 </li>
@@ -399,13 +409,13 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
 
             <!-- Acções rápidas -->
             <div class="quick-actions">
-                <a href="../estagio/formularioDeCartaDeEstagio.php" class="quick-action-btn primary">
+                <a href="/estagio/estagio/criar" class="quick-action-btn primary">
                     <i class="fas fa-plus-circle"></i> Novo Pedido de Estágio
                 </a>
-                <a href="../estagio/formularioDeCredencialDeEstagio.php" class="quick-action-btn outline">
+                <a href="/estagio/credencial/criar" class="quick-action-btn outline">
                     <i class="fas fa-id-badge"></i> Solicitar Credencial
                 </a>
-                <a href="../estagio/formularioDeVisita.php" class="quick-action-btn outline">
+                <a href="/estagio/visita/criar" class="quick-action-btn outline">
                     <i class="fas fa-calendar-check"></i> Solicitar Visita
                 </a>
             </div>
@@ -473,6 +483,16 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
             const rowsPerPage = 4;
             let pedidosData = [];
 
+            function escapeHtml(str) {
+                if (!str) return '';
+                return str
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            }
+
             function renderTable() {
                 $('#pedidosTbody').empty();
                 const start = (currentPage - 1) * rowsPerPage;
@@ -497,14 +517,14 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
                             <tr>
                                 <td><input type="checkbox" class="form-check-input select-checkbox" value="${pedido.id_pedido_carta}"></td>
                                 <td><span class="fw-semibold text-primary">${pedido.numero}</span></td>
-                                <td>${pedido.nome}</td>
-                                <td>${pedido.apelido}</td>
+                                <td>${escapeHtml(pedido.nome)}</td>
+                                <td>${escapeHtml(pedido.apelido)}</td>
                                 <td><code style="color:#3a4c91;">${pedido.codigo_formando}</code></td>
                                 <td>${pedido.qualificacao_descricao ?? pedido.qualificacao}</td>
                                 <td>${pedido.turma}</td>
                                 <td>${pedido.data_do_pedido.split('-').reverse().join('/')}</td>
                                 <td>${pedido.hora_do_pedido}</td>
-                                <td>${pedido.empresa}</td>
+                                <td>${escapeHtml(pedido.empresa)}</td>
                                 <td>${pedido.contactoPrincipal}</td>
                                 <td>${pedido.contactoSecundario}</td>
                                 <td>${pedido.email}</td>
@@ -537,10 +557,42 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
             }
 
             function buscarPedidos(pesquisa = '') {
-                $.get('../../Controller/Estagio/search_historico_pedidos.php', { termo: pesquisa }, function(data) {
-                    pedidosData = data;
-                    currentPage = 1;
-                    renderTable();
+                // $.get('/estagio/api/historico-pedidos', { termo: pesquisa }, function(data) {
+                //     pedidosData = data;
+                //     currentPage = 1;
+                //     renderTable();
+                // });
+
+                $.ajax({
+                    url: '/estagio/api/historico-pedidos',
+                    method: 'GET',
+                    data: {
+                        termo: pesquisa
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.error) {
+                            $('#pedidosTbody').html(`
+                                <tr><td colspan="15" class="text-center text-danger py-4">
+                                    <i class="fas fa-exclamation-triangle fa-2x mb-2 d-block"></i>
+                                    ${data.error}
+                                </td></tr>
+                            `);
+                            return;
+                        }
+                        pedidosData = Array.isArray(data) ? data : [];
+                        currentPage = 1;
+                        renderTable();
+                    },
+                    error: function(xhr) {
+                        console.error('Erro:', xhr.responseText);
+                        $('#pedidosTbody').html(`
+                            <tr><td colspan="15" class="text-center text-danger py-4">
+                                <i class="fas fa-database fa-2x mb-2 d-block"></i>
+                                Erro ao carregar dados do servidor
+                            </td></tr>
+                        `);
+                    }
                 });
             }
 
@@ -564,7 +616,9 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
                     $.ajax({
                         url: '../../Controller/Estagio/remover_pedido.php',
                         type: 'POST',
-                        data: { id_pedido_carta: id },
+                        data: {
+                            id_pedido_carta: id
+                        },
                         dataType: 'json',
                         success: function(response) {
                             if (response.success) {
@@ -606,4 +660,3 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
     </button>
 </div>
 </td> -->
-

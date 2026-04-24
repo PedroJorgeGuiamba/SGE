@@ -25,7 +25,7 @@ $numero = intval($_GET['numero']);
                 </div>
             <?php endif; ?>
 
-            <form action="../../Controller/Estagio/avaliarEstagio.php?numero=<?php echo $numero; ?>" method="post" id="formularioAvaliacao" enctype="multipart/form-data">
+            <form action="../../Controller/Estagio/avaliarEstagio.php?numero=<?php echo htmlspecialchars($numero, ENT_QUOTES, 'UTF-8'); ?>" method="post" id="formularioAvaliacao" enctype="multipart/form-data">
                 <div class="row">
                     <div class="form-group col-md-4">
                         <label for="resultado" class="form-label">Resultado</label>

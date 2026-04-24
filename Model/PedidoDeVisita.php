@@ -1,9 +1,7 @@
 <?php
-require_once __DIR__ . '/../Conexao/conector.php';
 
 class PedidoDeVisita
 {
-    private $conn;
     private $id_visita;
     private $id_pedido_carta;
     private $codigoFormando;
@@ -14,17 +12,6 @@ class PedidoDeVisita
     private $contactoSupervisor;
     private $dataHoraVisita;
     private $dataPedido;
-
-    public function __construct($conn = null)
-    {
-        if ($conn instanceof mysqli) {
-            $this->conn = $conn;
-            return;
-        }
-
-        $conexao = new Conector();
-        $this->conn = $conexao->getConexao();
-    }
 
     // Getters e setters
     public function setIdVisita($id)
@@ -76,9 +63,9 @@ class PedidoDeVisita
         $this->dataPedido = $dataPedido;
     }
 
-    public function buscarNomeEApelido(int $codigo): ?array
+    public function buscarNomeEApelido(int $codigo, mysqli $conn): ?array
     {
-        $stmt = $this->conn->prepare("SELECT nome, apelido FROM formando WHERE codigo = ?");
+        $stmt = $conn->prepare("SELECT nome, apelido FROM formando WHERE codigo = ?");
         if ($stmt === false) {
             return null;
         }
@@ -90,9 +77,9 @@ class PedidoDeVisita
         return $result->num_rows > 0 ? $result->fetch_assoc() : null;
     }
 
-    public function salvar(string $nome, string $apelido): bool
+    public function salvar(string $nome, string $apelido, mysqli $conn): bool
     {
-        $stmt = $this->conn->prepare("INSERT INTO visita_estagio (id_pedido_carta, codigo_formando, nome, apelido, contactoFormando, empresa, endereco, nomeSupervisor, contactoSupervisor, dataHoraDaVisita, data_do_pedido) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO visita_estagio (id_pedido_carta, codigo_formando, nome, apelido, contactoFormando, empresa, endereco, nomeSupervisor, contactoSupervisor, dataHoraDaVisita, data_do_pedido) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         if (!$stmt) {
             return false;
@@ -115,9 +102,9 @@ class PedidoDeVisita
 
         return $stmt->execute();
     }
-    public function actualizar(string $nome, string $apelido, int $codigo_formando, string $contactoFormando, string $empresa, string $endereco, string $nomeSupervisor, string $contactoSupervisor, string $dataHoraDaVisita, int $id_visita): bool
+    public function actualizar(string $nome, string $apelido, int $codigo_formando, string $contactoFormando, string $empresa, string $endereco, string $nomeSupervisor, string $contactoSupervisor, string $dataHoraDaVisita, int $id_visita, mysqli $conn): bool
     {
-        $stmt= $this->conn->prepare("UPDATE visita_estagio SET
+        $stmt= $conn->prepare("UPDATE visita_estagio SET
                     nome = ?,
                     apelido = ?,
                     codigo_formando = ?,

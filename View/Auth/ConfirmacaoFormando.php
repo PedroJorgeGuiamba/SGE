@@ -9,18 +9,20 @@ header("X-Content-Type-Options: nosniff");
 header("X-Frame-Options: DENY");
 header("X-XSS-Protection: 1; mode=block");
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Verificar se o usuário está logado e é um formando
 if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['role']) || strtolower($_SESSION['role']) !== 'formando') {
-    header("Location: /estagio/View/Auth/login.php");
+    header("Location: /estagio/login");
     exit();
 }
 
 // Verificar se o usuário já confirmou o código do formando
 if (isset($_SESSION['codigo_formando'])) {
     // Usuário já confirmou, redirecionar para o portal
-    header("Location: /estagio/View/Formando/portalDeEstudante.php");
+    header("Location: /estagio/formando");
     exit();
 }
 
@@ -54,13 +56,13 @@ $lockoutTime = $controller->getLockoutRemainingTime();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../../Assets/CSS/global.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/global.css">
     <style>
         /* ====== PALETA DO PROJECTO SGE ====== */
         :root {
-            --primary:   #3a4c91;
+            --primary: #3a4c91;
             --secondary: #3c9bff;
-            --accent:    #0d6efd;
+            --accent: #0d6efd;
         }
 
         .confirmation-container {
@@ -311,7 +313,7 @@ $lockoutTime = $controller->getLockoutRemainingTime();
                 </button>
             </form>
             <div class="text-center mt-3">
-                <a href="/estagio/View/Auth/login.php" class="btn btn-outline-secondary">
+                <a href="/estagio/login" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-2"></i>Voltar ao Login
                 </a>
             </div>
@@ -344,7 +346,7 @@ $lockoutTime = $controller->getLockoutRemainingTime();
                     clearInterval(timer);
                     countdownElement.textContent = '0m 0s';
                     // Redirect to login after lockout period
-                    window.location.href = '/estagio/View/Auth/Login.php';
+                    window.location.href = '/estagio/login';
                 } else {
                     timeLeft--;
                 }

@@ -1,42 +1,65 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 
 require_once __DIR__ . '/../../Model/PedidoDeCredencial.php';
+require_once __DIR__ . '/../../Model/Notificacao.php';
 require_once __DIR__ . '/../../Helpers/Actividade.php';
 require_once __DIR__ . '/../../Conexao/conector.php';
 require_once __DIR__ . '/../../Helpers/CSRFProtection.php';
+require_once __DIR__ . '/../../Helpers/Criptografia.php';
 
 class FormularioDeCredencialDeEstagio
 {
+    private Notificacao $notificacao;
+    private mysqli $conn;
+    private Criptografia $criptografia;
+    public function __construct()
+    {
+        $conexao = new Conector();
+        $this->conn = $conexao->getConexao();
+        $this->notificacao = new Notificacao();
+        $this->criptografia = new Criptografia();
+    }
     public function pedidoCredencial()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("LOCATION: /estagio/View/estagio/formularioDeCredencialDeEstagio.php?erros=" . urlencode("Metodo da Requisicao Invalido"));
+            header("LOCATION: /estagio/credencial/criar?erros=" . urlencode("Metodo da Requisicao Invalido"));
             exit();
         }
-            
-        $conn = null;
-            
+
         try {
             $token = $_POST['csrf_token'] ?? '';
             CSRFProtection::validateToken($token);
-            
+
             date_default_timezone_set('Africa/Maputo');
 
-            $conexao = new Conector();
-            $conn = $conexao->getConexao();
-            $conn->begin_transaction();
+            $this->conn->begin_transaction();
 
-            $pedido = new PedidoDeCredencial($conn);
-            
-            $codigoFormando = isset($_POST['codigoFormando']) ? (int) $_POST['codigoFormando'] : null;
+            $pedido = new PedidoDeCredencial();
+
+            $codigoFormando = isset($_POST['codigoFormando']) && is_numeric($_POST['codigoFormando']) ? (int) $_POST['codigoFormando'] : null;
             $empresa = strtoupper(trim($_POST['empresa'] ?? ''));
+            $email = trim(filter_var($_POST['email'], FILTER_SANITIZE_EMAIL) ?? '');
 
-            $dadosFormando = $pedido->buscarNomeEApelido((int) $codigoFormando);
+            if (empty($codigoFormando) || empty($empresa)) {
+                header("Location: /estagio/credencial/criar?erros=" . htmlspecialchars("Por favor, certifique-se de preencher todos os campos."));
+                exit();
+            }
+
+            if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                header("Location: /estagio/credencial/criar?erros=" . htmlspecialchars("Por favor, insira um endereço de email válido."));
+                exit();
+            }
+
+            $dadosFormando = $pedido->buscarNomeEApelido((int) $codigoFormando, $this->conn);
             if ($dadosFormando === null) {
+                $this->conn->rollback();
                 throw new RuntimeException("Formando nao encontrado");
             }
-            
+
             $anoAtual = (int) date('Y');
             $sql = "
                 SELECT DISTINCT COALESCE(MAX(id_pedido_carta), 0) AS ultimo_id
@@ -46,57 +69,60 @@ class FormularioDeCredencialDeEstagio
                 AND empresa = ?
                 FOR UPDATE
             ";
-            $stmt = $conn->prepare($sql);
+            $stmt = $this->conn->prepare($sql);
             $stmt->bind_param("iis", $anoAtual, $codigoFormando, $empresa);
             $stmt->execute();
             $resultadoNumero = $stmt->get_result()->fetch_assoc();
 
             if ($resultadoNumero['ultimo_id'] <= 0) {
+                $this->conn->rollback();
                 throw new RuntimeException("Nao foi possivel obter o ID do pedido");
             }
 
             $pedido->setIdPedido($resultadoNumero['ultimo_id']);
             $pedido->setCodigoFormando((int) $codigoFormando);
-            $pedido->setContactoFormando(trim($_POST['contactoFormando'] ?? ''));
-            $pedido->setEmail(trim($_POST['email'] ?? ''));
+            $pedido->setContactoFormando($this->criptografia->criptografar(trim($_POST['contactoFormando'] ?? '')));
+            $pedido->setEmail($this->criptografia->criptografar($email));
             $pedido->setEmpresa($empresa);
             $pedido->setDataPedido(date('Y-m-d'));
 
-            $nome = $dadosFormando['nome'];
-            $apelido = $dadosFormando['apelido'];
+            $nome = trim($dadosFormando['nome']) ?? '';
+            $apelido = trim($dadosFormando['apelido']) ?? '';
 
-            if (!$pedido->salvar($nome, $apelido)) {
+            if (!$pedido->salvar($nome, $apelido, $this->conn)) {
+                $this->conn->rollback();
                 throw new RuntimeException("Erro ao Salvar Pedido");
             }
 
-            if (isset($_SESSION['sessao_id'])) {
+            if (!empty($_SESSION['sessao_id'])) {
                 registrarAtividade($_SESSION['sessao_id'], "pedido de visita de estagio realizado", "CRIACAO");
             }
 
             if (!empty($_SESSION['usuario_id'])) {
                 $mensagem = "O seu pedido de Credencial foi processado com sucesso. Ainda esta pendente de verificacao por um administrador.";
-                $stmtNotificacao = $conn->prepare("INSERT INTO notificacao (id_utilizador, mensagem) VALUES (?, ?)");
-                $stmtNotificacao->bind_param("is", $_SESSION['usuario_id'], $mensagem);
-                $stmtNotificacao->execute();
+
+                $this->notificacao->setId_Utilizador($_SESSION['usuario_id']);
+                $this->notificacao->setMensagem($mensagem);
+                $this->notificacao->salvar($this->conn);
             }
 
-            $conn->commit();
+            $this->conn->commit();
 
             if (($_SESSION['role'] ?? '') !== 'formando') {
-                header("Location: /estagio/View/Estagio/listaDePedidos.php");
+                header("Location: /estagio/credencial/listar");
             } else {
-                header("Location: /estagio/View/Estagio/formularioDeCredencialDeEstagio.php");
+                header("Location: /estagio/credencial/criar");
             }
             exit();
         } catch (Throwable $e) {
-            if ($conn instanceof mysqli) {
+            if ($this->conn instanceof mysqli) {
                 try {
-                    $conn->rollback();
+                    $this->conn->rollback();
                 } catch (Throwable $rollbackError) {
                 }
             }
 
-            header("LOCATION: /estagio/View/estagio/formularioDeCredencialDeEstagio.php?erros=" . urlencode("Erro no sistema: " . $e->getMessage()));
+            header("LOCATION: /estagio/credencial/criar?erros=" . urlencode("Erro no sistema: " . $e->getMessage()));
             exit();
         }
     }

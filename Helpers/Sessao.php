@@ -1,8 +1,37 @@
 <?php
 require_once __DIR__ . '/../Conexao/conector.php';
 
+function configurarCookieSessao()
+{
+    if (session_status() === PHP_SESSION_NONE) {
+        session_set_cookie_params([
+            'lifetime' => 86400,
+            'path' => '/',
+            'domain' => '',
+            'secure' => false,
+            'httponly' => true,
+            'samesite' => 'Strict'
+        ]);
+
+        session_name('SESSID');
+    }
+}
+
 function iniciarSessao($utilizador_id)
 {
+    configurarCookieSessao();
+
+    if (session_status() === PHP_SESSION_NONE) {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+    }
+
+    $utilizador_id = intval($utilizador_id);
+    if ($utilizador_id <= 0) {
+        throw new Exception('ID de usuário inválido para iniciar sessão.');
+    }
+
     $utilizador_id = intval($utilizador_id);
     if ($utilizador_id <= 0) {
         throw new Exception('ID de usuário inválido para iniciar sessão.');
@@ -37,16 +66,21 @@ function iniciarSessao($utilizador_id)
         'samesite' => 'Strict'
     ]);
 
-
     return $sessaoId;
 }
 
 function terminarSessao()
 {
-    session_start();
+    configurarCookieSessao();
+
+    if (session_status() === PHP_SESSION_NONE) {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+    }
 
     if (!isset($_SESSION['sessao_id'])) {
-        header("Location: ../View/Auth/Login.php");
+        header("Location: /estagio/login");
         exit();
     }
 
@@ -61,12 +95,12 @@ function terminarSessao()
 
     require_once __DIR__ . '/Actividade.php';
     registrarAtividade($_SESSION['sessao_id'], "Logout do usuário", "LOGOUT");
-    
+
     session_unset();
     session_destroy();
-    
+
     setcookie("token_sessao", "", time() - 3600, "/");
-    header("Location: /estagio/View/Auth/Login.php");
+    header("Location: /estagio/login");
     exit();
 }
 
@@ -75,7 +109,7 @@ function selecionarSessao($token, $seValido = 1)
     if (empty($token) || strlen($token) !== 64 || !ctype_xdigit($token)) {
         return null;
     }
-    
+
     $conexao = new Conector();
     $conn = $conexao->getConexao();
 

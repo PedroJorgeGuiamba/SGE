@@ -1,20 +1,10 @@
 <?php
-require_once __DIR__ . '/../Conexao/conector.php';
-
 class Turma
 {
-    private $conn;
-
     private $codigo;
     private $nome;
     private $codigoCurso;
     private $codigoQualificacao;
-
-    public function __construct()
-    {
-        $conexao = new Conector();
-        $this->conn = $conexao->getConexao();
-    }
 
     // Getters e setters
     public function setCodigo(int $codigo)
@@ -37,9 +27,9 @@ class Turma
         $this->codigoQualificacao = $codigoQualificacao;
     }
 
-    public function salvar(): bool
+    public function salvar(mysqli $conn): bool
     {
-        $stmt = $this->conn->prepare("INSERT INTO turma (codigo, nome, codigo_curso, codigo_qualificacao) VALUES (?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO turma (codigo, nome, codigo_curso, codigo_qualificacao) VALUES (?, ?, ?, ?)");
 
         if (!$stmt) {
             // Erro na preparação da query

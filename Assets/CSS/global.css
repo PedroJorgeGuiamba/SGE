@@ -562,3 +562,21 @@ header nav ul li.nav-item ul.dropdown-menu li a.dropdown-item {
 .auth-links a:hover {
     text-decoration: underline;
 }
+
+button {
+    padding-bottom: 110px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    color: #6c757d;
+}
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+

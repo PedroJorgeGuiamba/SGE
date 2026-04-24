@@ -1,5 +1,5 @@
 <?php
-require_once '../../Conexao/conector.php';
+require_once __DIR__ . '/../../Conexao/conector.php';
 
 
 $con = new Conector();

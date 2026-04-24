@@ -1,5 +1,8 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 
 require_once __DIR__ . '/../../Model/avaliarEstagio.php';
 require_once __DIR__ . '/../../Helpers/Actividade.php';
@@ -33,7 +36,7 @@ class AvaliarEstagioController
             $row = $result->fetch_assoc();
             $numero_pedido = $row['numero_carta'];
             $avaliarEstagio->setNumPedido($numero_pedido);
-        
+
             $resultadoRaw = trim($_POST['resultado'] ?? '');
             $allowedEstagioStatuses = ['A', 'NA'];
             $resultado = $resultadoRaw;
@@ -52,7 +55,7 @@ class AvaliarEstagioController
             $row = $result->fetch_assoc();
             $qualificacao = $row['qualificacao'];
             $avaliarEstagio->setQualificacao($qualificacao);
-            
+
             $uploadDirDoc = "../../uploads/avaliacaoEstagios/";
             if (!file_exists($uploadDirDoc)) {
                 mkdir($uploadDirDoc, 0777, true);
@@ -80,7 +83,7 @@ class AvaliarEstagioController
                 throw new Exception('Erro ao salvar a avaliação no banco de dados.');
             }
 
-            if (isset($_SESSION['sessao_id'])) {
+            if (!empty($_SESSION['sessao_id'])) {
                 registrarAtividade($_SESSION['sessao_id'], "Avaliação de estágio registrada para resposta ID: $id_resposta", "CRIACAO");
             }
 

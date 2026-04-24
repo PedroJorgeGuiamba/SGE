@@ -17,8 +17,8 @@
 
             <div class="card-body p-4 pt-0">
                 <div class="mb-3 d-flex gap-2">
-                    <a href="formularioDeCredencialDeEstagio.php" class="btn btn-primary shadow-sm"><i class="fas fa-plus-circle me-1"></i> Novo Pedido</a>
-                    <a href="listaDePedidosCredencial.php" class="btn btn-success shadow-sm"><i class="fas fa-list-ul me-1"></i>Lista Ativa</a>
+                    <a href="/estagio/credencial/criar" class="btn btn-primary shadow-sm"><i class="fas fa-plus-circle me-1"></i> Novo Pedido</a>
+                    <a href="/estagio/credencial/listar" class="btn btn-success shadow-sm"><i class="fas fa-list-ul me-1"></i>Lista Ativa</a>
                     <button type="submit" id="printSelected" class="btn btn-secondary shadow-sm"><i class="fas fa-file-archive me-1"></i> Gerar Selecionados (ZIP)</button>
                     <button id="deleteSelected" class="btn btn-danger shadow-sm"><i class="fas fa-trash-alt me-1"></i> Deletar Selecionados</button>
                 </div>
@@ -66,6 +66,22 @@
                 const end = start + rowsPerPage;
                 const pageData = pedidosData.slice(start, end);
 
+                if(pedidosData.length == 0){
+                    $('#pedidosTbody').append(`
+                        <tr>
+                            <td colspan="15" class="text-center">
+                                <div class="empty-state">
+                                    <i class="fas fa-inbox"></i>
+                                    <p class="mb-0">Nenhum pedido encontrado</p>
+                                    <small class="text-muted">Tente ajustar os filtros ou criar um novo pedido</small>
+                                </div>
+                            </td>
+                        </tr>
+                    `);
+                    renderPagination(0);
+                    return;
+                }
+                
                 pageData.forEach(pedido => {
                     $('#pedidosTbody').append(`
                         <tr>
@@ -84,10 +100,10 @@
                                     <button class="btn btn-sm btn-primary gerar-pdf-completo-btn" data-id="${pedido.id_pedido_carta}" title="Gerar PDF">
                                         <i class="fas fa-file-pdf"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-warning editar-btn" data-id="${pedido.id_pedido_carta}" title="Editar" >
+                                    <button class="btn btn-sm btn-warning editar-btn" data-id="${pedido.id_credencial}" title="Editar" >
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-danger remover-btn" data-id="${pedido.id_pedido_carta}" title="Remover">
+                                    <button class="btn btn-sm btn-danger remover-btn" data-id="${pedido.id_credencial}" title="Remover">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </div>
@@ -119,14 +135,36 @@
             }
 
             function buscarPedidos(pesquisa = '') {
-                $.get('../../Controller/Estagio/search_historico_credencial.php', { termo: pesquisa }, function(data) {
-                    pedidosData = data;
-                    currentPage = 1;
-                    renderTable();
+                $.ajax({
+                    url: '/estagio/api/historico-credencial',
+                    method: 'GET',
+                    data: { termo: pesquisa },
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.error) {
+                            $('#pedidosTbody').html(`
+                                <tr><td colspan="15" class="text-center text-danger py-4">
+                                    <i class="fas fa-exclamation-triangle fa-2x mb-2 d-block"></i>
+                                    ${data.error}
+                                </td></tr>
+                            `);
+                            return;
+                        }
+                        pedidosData = Array.isArray(data) ? data : [];
+                        currentPage = 1;
+                        renderTable();
+                    },
+                    error: function(xhr) {
+                        console.error('Erro:', xhr.responseText);
+                        $('#pedidosTbody').html(`
+                            <tr><td colspan="15" class="text-center text-danger py-4">
+                                <i class="fas fa-database fa-2x mb-2 d-block"></i>
+                                Erro ao carregar dados do servidor
+                            </td></tr>
+                        `);
+                    }
                 });
             }
-
-            buscarPedidos('');
 
             $('#searchInput').on('input', function() {
                 buscarPedidos($(this).val().trim());
@@ -134,12 +172,12 @@
 
             $(document).on('click','.gerar-pdf-completo-btn', function(){
                 var id = $(this).data('id');
-                window.location.href = '../../Controller/Estagio/GerarPdfCredencialCompleto.php?id_pedido_carta=' + id;
+                window.location.href = '/estagio/credencial/gerarPDF/' + id;
             } )
 
             $(document).on('click', '.editar-btn', function() {
                 var id = $(this).data('id');
-                window.location.href = 'editarPedido.php?numero=' + id;
+                window.location.href = '/estagio/credencial/editar/' + id;
             });
 
             $(document).on('click', '.remover-btn', function() {
@@ -148,9 +186,9 @@
                 // Confirmação antes de remover
                 if (confirm('Tem certeza que deseja remover o pedido #' + id + '?')) {
                     $.ajax({
-                        url: '../../Controller/Estagio/remover_pedido.php',
+                        url: '/estagio/credencial/remover',
                         type: 'POST',
-                        data: { id_pedido_carta: id },
+                        data: { id_credencial: id },
                         dataType: 'json',
                         success: function(response) {
                             if (response.success) {
@@ -172,13 +210,11 @@
                 $('.select-checkbox').prop('checked', this.checked);
             });
 
-            // Atualiza o "Select All" quando desmarcar um checkbox
             $(document).on('change', '.select-checkbox', function() {
                 const allChecked = $('.select-checkbox').length === $('.select-checkbox:checked').length;
                 $('#selectAll').prop('checked', allChecked);
             });
 
-            // Botão GERAR TODOS SELECIONADOS (ZIP)
             $('#printSelected').on('click', function(e) {
                 e.preventDefault();
 
@@ -203,7 +239,7 @@
                 $btn.prop('disabled', true).text('A gerar ZIP...');
 
                 // Usa fetch com blob — evita navegação para página branca
-                fetch('../../Controller/Estagio/GerarPdfCredencialCompleto.php', {
+                fetch('/estagio/credencial/gerarPDF', {
                     method: 'POST',
                     body: formData
                 })
@@ -254,6 +290,54 @@
                     $btn.prop('disabled', false).text('Gerar todos selecionados (ZIP)');
                 });
             });
+
+            $('#deleteSelected').on('click', function() {
+                const selectedIds = [];
+                $('.select-checkbox:checked').each(function() {
+                    const id = parseInt($(this).val());
+                    if (!isNaN(id) && id > 0) {
+                        selectedIds.push(id);
+                    }
+                });
+                
+                console.log('IDs selecionados (números):', selectedIds);
+                
+                if (selectedIds.length === 0) {
+                    alert('Selecione pelo menos um pedido para remover.');
+                    return;
+                }
+                
+                if (confirm(`Tem certeza que deseja remover ${selectedIds.length} pedido(s)?`)) {
+                    const $btn = $(this);
+                    $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Processando...');
+                    
+                    $.ajax({
+                        url: '/estagio/credencial/remover',
+                        type: 'POST',
+                        contentType: 'application/json', 
+                        data: JSON.stringify({ ids: selectedIds }),
+                        dataType: 'json',
+                        success: function(response) {
+                            console.log('Resposta:', response);
+                            if (response.success) {
+                                alert(response.message);
+                                buscarPedidos($('#searchInput').val().trim());
+                            } else {
+                                alert('Erro: ' + response.error);
+                            }
+                        },
+                        error: function(xhr) {
+                            console.error('Erro:', xhr.responseText);
+                            alert('Erro ao comunicar com o servidor');
+                        },
+                        complete: function() {
+                            $btn.prop('disabled', false).html('<i class="fas fa-trash-alt me-1"></i> Deletar Selecionados');
+                        }
+                    });
+                }
+            });
+    
+            buscarPedidos('');
         });
 
     </script>

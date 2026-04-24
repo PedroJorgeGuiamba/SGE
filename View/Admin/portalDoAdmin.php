@@ -50,7 +50,7 @@ if ($formandos_per_curso_query) {
 
 <section class="dashboard-header text-center bg-white border-bottom shadow-sm py-5 mb-4" style="margin-top: 200px;">
     <div class="container">
-        <h1 class="display-5 fw-bold text-primary"><i class="fas fa-chart-line me-3"></i>Resumo dos Dados Geral</h1>
+        <h1 class="display-5 fw-bold"><i class="fas fa-chart-line me-3"></i>Resumo dos Dados Geral</h1>
         <p class="lead text-muted">Acompanhe e analise as métricas vitais do sistema</p>
     </div>
 </section>

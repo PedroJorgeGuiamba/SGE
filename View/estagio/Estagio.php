@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../Conexao/conector.php';
+require_once __DIR__ . '/../../Helpers/Criptografia.php';
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 $id = 0;
@@ -10,11 +11,14 @@ if (isset($_GET['id_pedido_carta'])) {
 }
 
 if ($id <= 0) {
-    die('ID do pedido não fornecido ou inválido.');
+    http_response_code(404);
+    require 'View/Erros/error.php';
+    exit;
 }
 
 $conexao = new Conector();
 $conn = $conexao->getConexao();
+$criptografia = new Criptografia();
 
 $sql = "SELECT
             p.*,
@@ -64,9 +68,9 @@ $ano = date('Y', strtotime($dados['data_do_pedido'] ?? ''));
 $ref = $dados['numero'];
 $coordenador = $dados['nomeS'];
 $area = $dados['area'];
-$contacto1 = htmlspecialchars($dados['contactoPrincipal'] ?? '');
-$contacto2 = htmlspecialchars($dados['contactoSecundario'] ?? '');
-$email = htmlspecialchars($dados['email'] ?? '');
+$contacto1 = $criptografia->descriptografar(htmlspecialchars($dados['contactoPrincipal'] ?? ''));
+$contacto2 = $criptografia->descriptografar(htmlspecialchars($dados['contactoSecundario'] ?? ''));
+$email = $criptografia->descriptografar(htmlspecialchars($dados['email'] ?? ''));
 $curso = htmlspecialchars($dados['curso']);
 ?>
 
@@ -74,34 +78,8 @@ $curso = htmlspecialchars($dados['curso']);
 <html lang="pt-pt">
 <head>
     <meta charset="utf-8">
-    <title>Pacote Completo Estágio - <?= $nomeCompleto ?></title>
-    <style>
-        body { 
-            font-family: 'Times New Roman', serif; 
-            font-size: 13pt; 
-            line-height: 1.6; 
-            margin: 50px 70px 50px 80px; 
-        }
-        header {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            border-bottom: 1px solid black;
-            padding-bottom: 10px;
-            margin-bottom: 30px;
-        }
-        header img { width: 100px; }
-        .ref { margin: 20px 0; }
-        .center { text-align: center; }
-        .bold { font-weight: bold; }
-        .underline { text-decoration: underline; }
-        .assinatura { margin-top: 60px; text-align: center; }
-        footer { 
-            position: fixed; bottom: 40px; left: 0; right: 0; font-size: 9pt; text-align: center; border-top: 1px solid black; padding-top: 8px; }
-        .page-break { page-break-after: always; }
-        ul { padding-left: 40px; }
-        li { margin-bottom: 8px; }
-    </style>
+    <title>Carta de Estágio - <?= $nomeCompleto ?></title>
+    <link rel="stylesheet" href="/estagio/Assets/CSS/carta.css">
 </head>
 <body>
 

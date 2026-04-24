@@ -1,6 +1,6 @@
 <?php
-include_once __DIR__ . '/../Helpers/CSRFProtection.php';
-require_once __DIR__ . '/../Helpers/SecurityHeaders.php';
+include_once __DIR__ . '/../../Helpers/CSRFProtection.php';
+require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
 
 SecurityHeaders::setLogin();
 
@@ -50,7 +50,13 @@ http_response_code($error_code);
                     </button>
                     <div class="collapse navbar-collapse" id="navbarText">
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                            <li><a class="nav-link" href="../Login.php">Voltar ao Login</a></li>
+                            <li><a class="nav-link fw-semibold text-dark active" href="/estagio/<?php echo $_SESSION['role'] === 'admin'
+                                                                ? 'admin'
+                                                                : ($_SESSION['role'] === 'supervisor'
+                                                                    ? 'supervisor'
+                                                                    : 'formando'); ?>">
+                        <i class="fas fa-home fa-fw me-1 text-primary"></i> Home
+                    </a></li>
                         </ul>
                     </div>
                 </div>
@@ -66,12 +72,18 @@ http_response_code($error_code);
         </div>
         <div class="form-group">
             <div class="col-md-3">
-                <button type="button" class="btn btn-primary form-control" onclick="location.href='../Login.php';">Voltar ao Login</button>
+                <a class="btn btn-primary form-control" href="/estagio/<?php echo $_SESSION['role'] === 'admin'
+                                                                ? 'admin'
+                                                                : ($_SESSION['role'] === 'supervisor'
+                                                                    ? 'supervisor'
+                                                                    : 'formando'); ?>">
+                        <i class="fas fa-home fa-fw me-1 text-primary"></i> Home
+                    </a>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script src="../../Assets/JS/tema.js"></script>
+    <script src="/estagio/Assets/JS/tema.js"></script>
 </body>
 </html>

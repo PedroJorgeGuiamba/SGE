@@ -1,10 +1,12 @@
 <?php
-namespace Models;
+require_once __DIR__ . '/../Model/Pessoa.php';
 
-use DateTime;
+// use DateTime;
+use Models\Pessoa;
 
 class Formador extends Pessoa{
-    private string $profissao;
+    private int $codigo;
+    private int $userId;
 
     public function __construct(
         string $nome,
@@ -16,27 +18,77 @@ class Formador extends Pessoa{
         string $numeroDeDocumento,
         string $localEmitido,
         DateTime $dataDeEmissao,
-        int $NUIT,
-        int $Telefone,
+        string $NUIT,
+        string $Telefone,
         string $email,
-        string $profissao
+        int $userId
     ) {
-        parent::__construct(
+        parent::__construct($nome, $apelido,  $dataDeNascimento,$naturalidade, $tipoDeDocumento, $numeroDeDocumento, $localEmitido, $dataDeEmissao, $NUIT, $Telefone, $email);
+        $this->codigo = $codigo;
+        $this->userId = $userId;
+    }
+
+    public function setUserId(int $userId): void
+    {
+        $this->userId = $userId;
+    }
+
+    public function getUserId(): int
+    {
+        return $this->userId;
+    }
+
+    public function salvar($conn): bool
+    {
+        $stmt = $conn->prepare(
+            "INSERT INTO formador (codigo, nome, apelido, dataDeNascimento, naturalidade, tipoDeDocumento, numeroDeDocumento, localEmitido, dataDeEmissao, NUIT, telefone, email, profissao, usuario_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'formador', ?)"
+        );
+
+        if (!$stmt) {
+            error_log("Erro na preparação da query: " . $conn->error);
+            return false;
+        }
+
+        // Converter DateTime para string no formato 'Y-m-d' para o banco de dados
+        $dataNascimento = $this->getDataDeNascimento()->format('Y-m-d');
+        $dataEmissao = $this->getDataDeEmissao()->format('Y-m-d');
+
+        $nome = $this->getNome();
+        $apelido = $this->getApelido();
+        $dataNascimento = $this->getDataDeNascimento()->format('Y-m-d');
+        $naturalidade = $this->getNaturalidade();
+        $tipoDeDocumento = $this->getTipoDeDocumento();
+        $numeroDeDocumento = $this->getNumeroDeDocumento();
+        $localEmitido = $this->getLocalEmitido();
+        $dataEmissao = $this->getDataDeEmissao()->format('Y-m-d');
+        $nuit = $this->getNUIT();
+        $telefone = $this->getTelefone();
+        $email = $this->getEmail();
+
+        $stmt->bind_param(
+            "isssssssssssi",
+            $this->codigo,
             $nome,
             $apelido,
-            $codigo,
-            $dataDeNascimento,
+            $dataNascimento,
             $naturalidade,
             $tipoDeDocumento,
             $numeroDeDocumento,
             $localEmitido,
-            $dataDeEmissao,
-            $NUIT,
-            $Telefone,
-            $email
+            $dataEmissao,
+            $nuit,
+            $telefone,
+            $email,
+            $this->userId
         );
 
-        $this->profissao = $profissao;
+        $result = $stmt->execute();
+        if (!$result) {
+            error_log("Erro na execução da query: " . $stmt->error);
+        }
+
+        $stmt->close();
+        return $result;
     }
 }
 ?>

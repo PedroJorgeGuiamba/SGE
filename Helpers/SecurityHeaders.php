@@ -38,9 +38,9 @@ class SecurityHeaders {
     private static function getLoginCSP() {
         return "default-src 'self'; " .
                 "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://code.jquery.com; " .
-                "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " .
+                "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " .
                 "img-src 'self' data: https:; " .
-                "font-src 'self' https://cdn.jsdelivr.net; " .
+                "font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " .
                 "connect-src 'self' http://localhost; " .
                 "frame-ancestors 'none'";
     }

@@ -1,5 +1,8 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 
 require_once __DIR__ . '/../../Model/Resposta.php';
 require_once __DIR__ . '/../../Model/Estagio.php';
@@ -17,9 +20,10 @@ class RespostaCarta
         try {
             $conexao = new Conector();
             $conn = $conexao->getConexao();
+            $conn->begin_transaction();
             $resposta = new Resposta($conn);
             $estagio = new Estagio();
-            
+
             $numeroRaw = $_POST['numero'] ?? '';
             $numero = filter_var($numeroRaw, FILTER_SANITIZE_NUMBER_INT);
             $numero = $numero !== false && $numero !== '' ? intval($numero) : 0;
@@ -97,7 +101,7 @@ class RespostaCarta
                 exit();
             }
 
-            if (isset($_SESSION['sessao_id'])) {
+            if (!empty($_SESSION['sessao_id'])) {
                 registrarAtividade($_SESSION['sessao_id'], "resposta de carta de estágio realizado", "CRIACAO");
             }
 
@@ -106,7 +110,7 @@ class RespostaCarta
                 throw new RuntimeException("Nao foi possivel obter o ID da resposta");
             }
 
-            if($status == 'Aceito'){
+            if ($status == 'Aceito') {
                 $sql = "SELECT
                         p.*,
                         s.id_supervisor as id_s,
@@ -139,7 +143,7 @@ class RespostaCarta
                 $estagio->setId_empresa($empresa);
 
                 if (method_exists($estagio, 'salvarNoEdit')) {
-                    if($estagio->salvar($conn)){
+                    if ($estagio->salvar($conn)) {
                         $sqlEstagio = "SELECT id_estagio FROM estagio ORDER BY id_estagio DESC LIMIT 1";
                         $result = $conn->query($sqlEstagio);
                         $lastIdFromQueryINSERT = $result && $result->num_rows > 0 ? $result->fetch_assoc()['id_estagio'] : 0;
@@ -150,14 +154,24 @@ class RespostaCarta
                         $stmtINSERT->execute();
                     }
                 }
-                
             }
+
+            $conn->commit();
 
             $_SESSION['flash_success'] = 'resposta de carta enviado com sucesso!';
             header("Location: /estagio/View/estagio/respostaCarta.php");
             exit;
         } catch (Exception $e) {
-            echo "Erro no sistema: " . $e->getMessage();
+            if ($conn instanceof mysqli) {
+                try {
+                    $conn->rollback();
+                } catch (Throwable $rollbackError) {
+                    // No-op: rollback best effort.
+                }
+            }
+
+            header("LOCATION: /estagio/View/estagio/adicionarRespostaCarta.php?erros=" . urlencode("Erro no sistema."));
+            exit();
         }
     }
 }

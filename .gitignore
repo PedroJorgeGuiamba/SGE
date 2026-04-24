@@ -19,3 +19,7 @@ config/*
 !config/.gitkeep
 
 config/.env
+
+custom_wordlist.txt
+
+curupira/

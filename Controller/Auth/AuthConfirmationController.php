@@ -12,13 +12,15 @@ header("X-Content-Type-Options: nosniff");
 header("X-Frame-Options: DENY");
 header("X-XSS-Protection: 1; mode=block");
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
 
 class AuthConfirmationController
 {
     private $conn;
-    private $criptografia;
-    private $error;
+    private Criptografia $criptografia;
+    private ?string $error;
 
     public function __construct()
     {
@@ -31,7 +33,7 @@ class AuthConfirmationController
     public function verificar()
     {
         if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Método inválido."));
+            header("Location: /estagio/validar?erros=" . urldecode("Método inválido."));
             exit();
         }
 
@@ -39,45 +41,49 @@ class AuthConfirmationController
             CSRFProtection::validateToken($_POST['csrf_token'] ?? '');
         } catch (Exception $e) {
             error_log("CSRF Validation Failed: " . $e->getMessage());
-            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Token de segurança inválido. Recarregue a página e tente novamente."));
+            header("Location: /estagio/validar?erros=" . urldecode("Token de segurança inválido. Recarregue a página e tente novamente."));
             exit();
         }
 
         $codigo = trim($_POST['codigo'] ?? '');
         if (!preg_match('/^\d{6}$/', $codigo) || !ctype_digit($codigo) || strlen($codigo) !== 6) {
-            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Código inválido. Deve ter exatamente 6 dígitos."));
+            header("Location: /estagio/validar?erros=" . urldecode("Código inválido. Deve ter exatamente 6 dígitos."));
             exit();
         }
 
         $user_id_criptografado = $_SESSION['pending_user_id'] ?? null;
         if (!$user_id_criptografado) {
-            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Sessão expirou. Faça login novamente."));
+            header("Location: /estagio/validar?erros=" . urldecode("Sessão expirou. Faça login novamente."));
             exit();
         }
         $user_id = $this->criptografia->descriptografar($user_id_criptografado);
         if (!$user_id) {
-            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Erro ao descriptografar ID do usuário. Faça login novamente."));
+            header("Location: /estagio/validar?erros=" . urldecode("Erro ao descriptografar ID do usuário. Faça login novamente."));
             exit();
         }
 
         $user_id = intval($user_id);
         if ($user_id <= 0) {
-            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("ID de usuário inválido."));
+            header("Location: /estagio/validar?erros=" . urldecode("ID de usuário inválido."));
             exit();
         }
+
+        $this->conn->begin_transaction();
 
         $sql = "SELECT * FROM user_otps WHERE user_id = ? ORDER BY created_at DESC LIMIT 1";
         $stmt = $this->conn->prepare($sql);
 
         if (!$stmt) {
-            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Erro interno" ));
+            $this->conn->rollback();
+            header("Location: /estagio/validar?erros=" . urldecode("Erro interno"));
             exit();
         }
 
         $stmt->bind_param("i", $user_id);
 
         if (!$stmt->execute()) {
-            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Erro ao verificar código."));
+            $this->conn->rollback();
+            header("Location: /estagio/validar?erros=" . urldecode("Erro ao verificar código."));
             exit();
         }
 
@@ -85,32 +91,38 @@ class AuthConfirmationController
         $stmt->close();
 
         if (!$otp) {
-            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Nenhum código encontrado."));
+            $this->conn->rollback();
+            header("Location: /estagio/validar?erros=" . urldecode("Nenhum código encontrado."));
             exit();
         }
         if ($otp['is_used']) {
-            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Código já usado."));
+            $this->conn->rollback();
+            header("Location: /estagio/validar?erros=" . urldecode("Código já usado."));
             exit();
         }
         if (strtotime($otp['expires_at']) < time()) {
-            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Código expirado."));
+            $this->conn->rollback();
+            header("Location: /estagio/validar?erros=" . urldecode("Código expirado."));
             exit();
         }
 
         if (!hash_equals($otp['otp_code'], $codigo)) {
-            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Código inválido"));
+            $this->conn->rollback();
+            header("Location: /estagio/validar?erros=" . urldecode("Código inválido"));
             exit();
         }
 
         $user = $this->getUserById($user_id);
         if (!$user) {
-            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Usuário não encontrado."));
+            $this->conn->rollback();
+            header("Location: /estagio/validar?erros=" . urldecode("Usuário não encontrado."));
             exit();
         }
 
         $email_descriptografado = $this->criptografia->descriptografar($user['email']);
         if (!$email_descriptografado) {
-            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Erro ao descriptografar e-mail do usuário."));
+            $this->conn->rollback();
+            header("Location: /estagio/validar?erros=" . urldecode("Erro ao descriptografar e-mail do usuário."));
             exit();
         }
 
@@ -118,16 +130,20 @@ class AuthConfirmationController
         $stmtUpdate = $this->conn->prepare($sqlUpdate);
 
         if (!$stmtUpdate) {
-            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Erro ao Actualizar Estado do OTP."));
+            $this->conn->rollback();
+            header("Location: /estagio/validar?erros=" . urldecode("Erro ao Actualizar Estado do OTP."));
             exit();
         }
 
         $stmtUpdate->bind_param("i", $otp['id']);
         if (!$stmtUpdate->execute()) {
             $stmtUpdate->close();
-            header("Location: /estagio/View/Auth/ValidarUser.php?erros=" . urldecode("Erro ao processar código."));
+            $this->conn->rollback();
+            header("Location: /estagio/validar?erros=" . urldecode("Erro ao processar código."));
             exit();
         }
+
+        $this->conn->commit();
         $stmtUpdate->close();
 
         $_SESSION['email'] = $email_descriptografado;
@@ -144,19 +160,19 @@ class AuthConfirmationController
         $role = strtolower($user['role']);
         switch ($role) {
             case 'formando':
-                header("Location: /estagio/View/Auth/ConfirmacaoFormando.php");
+                header("Location: /estagio/login/confirmar-user");
                 break;
             case 'supervisor':
-                header("Location: /estagio/View/Supervisor/portalDoSupervisor.php");
+                header("Location: /estagio/supervisor");
                 break;
             case 'formador':
-                header("Location: /estagio/View/Formador/portalDoFormador.php");
+                header("Location: /estagio/formador");
                 break;
             case 'admin':
-                header("Location: /estagio/View/Admin/portalDoAdmin.php");
+                header("Location: /estagio/admin");
                 break;
             case 'seguranca':
-                header("Location: /estagio/View/Seguranca/portalDoSeguranca.php");
+                header("Location: /estagio/seguranca");
                 break;
             default:
                 registrarAtividade($sessaoId, "Tentativa de redirecionamento com role inválida: {$role}", "ERROR");

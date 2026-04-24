@@ -1,26 +1,30 @@
 <?php
 require_once __DIR__ . '/../../Conexao/conector.php';
 require_once __DIR__ . '/../../Helpers/Actividade.php';
-session_start();
+require_once __DIR__ . '/../../Model/Notificacao.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['success' => false, 'error' => 'Método inválido']);
+    echo json_encode(['success' => false, 'error' => 'Método inválido'], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
     exit;
 }
 
 if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'supervisor'])) {
-    echo json_encode(['success' => false, 'error' => 'Sem permissão']);
+    echo json_encode(['success' => false, 'error' => 'Sem permissão'], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
     exit;
 }
 
 $idPedidoVisita = isset($_POST['id_visita']) ? (int) $_POST['id_visita'] : 0;
 if (!$idPedidoVisita) {
-    echo json_encode(['success' => false, 'error' => 'ID inválido']);
+    echo json_encode(['success' => false, 'error' => 'ID inválido'], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
     exit;
 }
 
+$notificacao = new Notificacao();
 $conexao = new Conector();
 $conn = $conexao->getConexao();
 $conn->begin_transaction();
@@ -54,20 +58,19 @@ try {
 
     if ($formando && $formando['usuario_id']) {
         $mensagem = "O seu pedido de visita de estágio foi aprovado.";
-        $stmtNotif = $conn->prepare("INSERT INTO notificacao (id_utilizador, mensagem) VALUES (?, ?)");
-        $stmtNotif->bind_param('is', $formando['usuario_id'], $mensagem);
-        $stmtNotif->execute();
-        $stmtNotif->close();
+        $notificacao->setId_Utilizador($formando['usuario_id']);
+        $notificacao->setMensagem($mensagem);
+        $notificacao->salvar($conn);
     }
 
-    if (isset($_SESSION['sessao_id'])) {
+    if (!empty($_SESSION['sessao_id'])) {
         registrarAtividade($_SESSION['sessao_id'], "Visita de estágio aprovada (pedido #$idPedidoVisita)", "ACTUALIZACAO");
     }
 
     $conn->commit();
-    echo json_encode(['success' => true, 'message' => 'Visita aprovada com sucesso']);
+    echo json_encode(['success' => true, 'message' => 'Visita aprovada com sucesso'], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 } catch (Throwable $e) {
     $conn->rollback();
-    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    echo json_encode(['success' => false, 'error' => $e->getMessage()], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 }
 $conn->close();

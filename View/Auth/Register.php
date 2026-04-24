@@ -7,7 +7,7 @@ include_once __DIR__ . '/../../Helpers/CSRFProtection.php';
 require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
 SecurityHeaders::setLogin();
 
-include_once '../../Controller/Auth/RegisterController.php';
+// include_once '../../Controller/Auth/RegisterController.php';
 ?>
 
 <!DOCTYPE html>
@@ -16,12 +16,12 @@ include_once '../../Controller/Auth/RegisterController.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Register</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Fazer link do CSS Global -->
-    <link rel="stylesheet" href="../../Assets/CSS/global.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/global.css">
     <!-- FontAwesome para icones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -39,7 +39,7 @@ include_once '../../Controller/Auth/RegisterController.php';
             <h3 class="auth-title">Registo de Utilizador</h3>
             <p class="auth-subtitle">Crie uma conta para aceder ao sistema</p>
 
-            <form method="post">
+            <form method="post" action="/estagio/register/salvar">
                 <?= CSRFProtection::getTokenField() ?>
                 
                 <?php if (isset($_GET['erros'])): ?>
@@ -85,8 +85,8 @@ include_once '../../Controller/Auth/RegisterController.php';
                 </div>
 
                 <div class="auth-links">
-                    <p class="text-muted mb-0">Já possui uma conta? <a href="Login.php">Inicie Sessão</a></p>
-                    <p class="mt-2"><a href="../../Index.php" class="text-secondary"><i class="fas fa-arrow-left me-1"></i> Voltar à Home</a></p>
+                    <p class="text-muted mb-0">Já possui uma conta? <a href="/estagio/login/">Inicie Sessão</a></p>
+                    <p class="mt-2"><a href="/estagio/" class="text-secondary"><i class="fas fa-arrow-left me-1"></i> Voltar à Home</a></p>
                 </div>
             </form>
         </div>

@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once __DIR__ . '/../../Helpers/CSRFProtection.php';
 require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
 require_once __DIR__ . '/../../Conexao/conector.php';
@@ -28,13 +30,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'email'              => trim($_POST['email'] ?? ''),
         ];
 
-        header("Location: " . $_SERVER['PHP_SELF']);
+        header("Location: /estagio/estagio/preview");
         exit();
     }
 }
 
 if (empty($_SESSION['preview_pedido'])) {
-    header("Location: formularioDeCartaDeEstagio.php");
+    header("Location: /estagio/estagio/criar");
     exit();
 }
 
@@ -87,9 +89,13 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
 // Flash error vindo do CSRF ou de outro redirecionamento
 $flashError = $_SESSION['flash_error'] ?? null;
 unset($_SESSION['flash_error']);
+
+$themeValue = isset($_SESSION['theme']) ? trim($_SESSION['theme']) : 'light';
+$themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : 'light';
 ?>
 <!DOCTYPE html>
-<html lang="pt-pt" data-bs-theme="<?php echo $_SESSION['theme'] ?? 'light'; ?>">
+<html lang="pt-pt" data-bs-theme="<?php echo htmlspecialchars($themeValue, ENT_QUOTES, 'UTF-8'); ?>">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -98,10 +104,14 @@ unset($_SESSION['flash_error']);
     <!-- BootStrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <!-- CSS -->
-    <link rel="stylesheet" href="../../Assets/CSS/global.css">
-    <link rel="stylesheet" href="../../Assets/CSS/notifications.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/global.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/preview.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/notifications.css">
     <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+        crossorigin="anonymous"></script>
     <!-- Fallback local para jQuery -->
     <script>
         window.jQuery || document.write('<script src="../../Scripts/jquery-3.6.0.min.js"><\/script>');
@@ -110,7 +120,7 @@ unset($_SESSION['flash_error']);
     <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
     <link href='https://cdn.boxicons.com/fonts/brands/boxicons-brands.min.css' rel='stylesheet'>
 
-    <style>
+    <!-- <style>
         /* ====== PREVIEW CARD OVERRIDE ====== */
         .preview-wrapper {
             max-width: 900px;
@@ -238,7 +248,7 @@ unset($_SESSION['flash_error']);
                 width: 100%;
             }
         }
-    </style>
+    </style> -->
 </head>
 
 <body>
@@ -285,7 +295,7 @@ unset($_SESSION['flash_error']);
                             </li>
                             <?php include __DIR__ . '/../../Includes/notification-widget.php'; ?>
                             <li class="nav-item ms-3">
-                                <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger shadow-sm px-4 fw-semibold rounded-pill"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+                                <a href="/estagio/logout" class="btn btn-danger shadow-sm px-4 fw-semibold rounded-pill"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
                             </li>
                         </ul>
                     </div>
@@ -298,14 +308,14 @@ unset($_SESSION['flash_error']);
             <ul class="nav justify-content-center py-2">
                 <li class="nav-item mx-1">
                     <a class="nav-link fw-semibold text-dark active" href="../../View/<?php echo $_SESSION['role'] === 'admin'
-                                                                ? 'Admin/portalDoAdmin.php'
-                                                                : ($_SESSION['role'] === 'supervisor'
-                                                                    ? 'Supervisor/portalDoSupervisor.php'
-                                                                    : 'Formando/portalDeEstudante.php'); ?>">
+                                                                                            ? 'Admin/portalDoAdmin.php'
+                                                                                            : ($_SESSION['role'] === 'supervisor'
+                                                                                                ? 'Supervisor/portalDoSupervisor.php'
+                                                                                                : 'Formando/portalDeEstudante.php'); ?>">
                         <i class="fas fa-home fa-fw me-1 text-primary"></i> Home
                     </a>
                 </li>
-                
+
                 <li class="nav-item mx-1 dropdown">
                     <a class="nav-link fw-semibold text-dark dropdown-toggle" href="#" id="pedidosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-plus-circle fa-fw me-1 text-success"></i> Fazer Pedidos
@@ -318,21 +328,21 @@ unset($_SESSION['flash_error']);
                 </li>
 
                 <?php if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'supervisor'): ?>
-                <li class="nav-item mx-1 dropdown">
-                    <a class="nav-link fw-semibold text-dark dropdown-toggle" href="#" id="listasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-list-ul fa-fw me-1 text-info"></i> Listas
-                    </a>
-                    <ul class="dropdown-menu shadow border-0 mt-2" aria-labelledby="listasDropdown">
-                        <li><a class="dropdown-item" href="listaDePedidos.php"><i class="fas fa-file-alt fa-fw me-2 text-secondary"></i> Pedidos de Estágio</a></li>
-                        <li><a class="dropdown-item" href="listaDePedidosCredencial.php"><i class="fas fa-id-card-clip fa-fw me-2 text-secondary"></i> Pedidos de Credencial</a></li>
-                        <li><a class="dropdown-item" href="listaDePedidosVisita.php"><i class="fas fa-route fa-fw me-2 text-secondary"></i> Pedidos de Visita</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item mx-1">
-                    <a class="nav-link fw-semibold text-dark" href="relatorio.php">
-                        <i class="fas fa-file-pdf fa-fw me-1 text-danger"></i> Gerar Relatórios
-                    </a>
-                </li>
+                    <li class="nav-item mx-1 dropdown">
+                        <a class="nav-link fw-semibold text-dark dropdown-toggle" href="#" id="listasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-list-ul fa-fw me-1 text-info"></i> Listas
+                        </a>
+                        <ul class="dropdown-menu shadow border-0 mt-2" aria-labelledby="listasDropdown">
+                            <li><a class="dropdown-item" href="listaDePedidos.php"><i class="fas fa-file-alt fa-fw me-2 text-secondary"></i> Pedidos de Estágio</a></li>
+                            <li><a class="dropdown-item" href="listaDePedidosCredencial.php"><i class="fas fa-id-card-clip fa-fw me-2 text-secondary"></i> Pedidos de Credencial</a></li>
+                            <li><a class="dropdown-item" href="listaDePedidosVisita.php"><i class="fas fa-route fa-fw me-2 text-secondary"></i> Pedidos de Visita</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item mx-1">
+                        <a class="nav-link fw-semibold text-dark" href="relatorio.php">
+                            <i class="fas fa-file-pdf fa-fw me-1 text-danger"></i> Gerar Relatórios
+                        </a>
+                    </li>
                 <?php endif; ?>
             </ul>
         </nav>
@@ -368,92 +378,92 @@ unset($_SESSION['flash_error']);
 
                             <?php else: ?>
 
-                            <!-- Secção: Formando -->
-                            <div class="mb-4">
-                                <div class="section-label">
-                                    <i class="fas fa-user"></i> Dados do formando
+                                <!-- Secção: Formando -->
+                                <div class="mb-4">
+                                    <div class="section-label">
+                                        <i class="fas fa-user"></i> Dados do formando
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <div class="field-card">
+                                                <p class="field-label">Código</p>
+                                                <p class="field-value"><?php echo htmlspecialchars($dados['codigoFormando']); ?></p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="field-card">
+                                                <p class="field-label">Nome</p>
+                                                <p class="field-value"><?php echo htmlspecialchars($dadosFormando['nome']); ?></p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="field-card">
+                                                <p class="field-label">Apelido</p>
+                                                <p class="field-value"><?php echo htmlspecialchars($dadosFormando['apelido']); ?></p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="row g-3">
-                                    <div class="col-md-4">
-                                        <div class="field-card">
-                                            <p class="field-label">Código</p>
-                                            <p class="field-value"><?php echo htmlspecialchars($dados['codigoFormando']); ?></p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="field-card">
-                                            <p class="field-label">Nome</p>
-                                            <p class="field-value"><?php echo htmlspecialchars($dadosFormando['nome']); ?></p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="field-card">
-                                            <p class="field-label">Apelido</p>
-                                            <p class="field-value"><?php echo htmlspecialchars($dadosFormando['apelido']); ?></p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <!-- Secção: Académico -->
-                            <div class="mb-4">
-                                <div class="section-label">
-                                    <i class="fas fa-graduation-cap"></i> Dados académicos
-                                </div>
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <div class="field-card">
-                                            <p class="field-label">Qualificação</p>
-                                            <p class="field-value"><?php echo htmlspecialchars($nomeQualificacao); ?></p>
+                                <!-- Secção: Académico -->
+                                <div class="mb-4">
+                                    <div class="section-label">
+                                        <i class="fas fa-graduation-cap"></i> Dados académicos
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="field-card">
+                                                <p class="field-label">Qualificação</p>
+                                                <p class="field-value"><?php echo htmlspecialchars($nomeQualificacao); ?></p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="field-card">
+                                                <p class="field-label">Turma</p>
+                                                <p class="field-value"><?php echo htmlspecialchars($nomeTurma); ?></p>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="field-card">
-                                            <p class="field-label">Turma</p>
-                                            <p class="field-value"><?php echo htmlspecialchars($nomeTurma); ?></p>
-                                        </div>
-                                    </div>
                                 </div>
-                            </div>
 
-                            <!-- Secção: Pedido -->
-                            <div class="mb-4">
-                                <div class="section-label">
-                                    <i class="fas fa-briefcase"></i> Dados do pedido
+                                <!-- Secção: Pedido -->
+                                <div class="mb-4">
+                                    <div class="section-label">
+                                        <i class="fas fa-briefcase"></i> Dados do pedido
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <div class="field-card">
+                                                <p class="field-label">Empresa</p>
+                                                <p class="field-value"><?php echo htmlspecialchars($dados['empresa']); ?></p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="field-card">
+                                                <p class="field-label">Contacto principal</p>
+                                                <p class="field-value"><?php echo htmlspecialchars($dados['contactoPrincipal']); ?></p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="field-card">
+                                                <p class="field-label">Contacto secundário</p>
+                                                <p class="field-value"><?php echo htmlspecialchars($dados['contactoSecundario']); ?></p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="field-card">
+                                                <p class="field-label">Email pessoal</p>
+                                                <p class="field-value"><?php echo htmlspecialchars($dados['email']); ?></p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="row g-3">
-                                    <div class="col-12">
-                                        <div class="field-card">
-                                            <p class="field-label">Empresa</p>
-                                            <p class="field-value"><?php echo htmlspecialchars($dados['empresa']); ?></p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="field-card">
-                                            <p class="field-label">Contacto principal</p>
-                                            <p class="field-value"><?php echo htmlspecialchars($dados['contactoPrincipal']); ?></p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="field-card">
-                                            <p class="field-label">Contacto secundário</p>
-                                            <p class="field-value"><?php echo htmlspecialchars($dados['contactoSecundario']); ?></p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="field-card">
-                                            <p class="field-label">Email pessoal</p>
-                                            <p class="field-value"><?php echo htmlspecialchars($dados['email']); ?></p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <!-- Aviso -->
-                            <div class="alert alert-warning d-flex align-items-center gap-2 py-2 mb-0">
-                                <i class="fas fa-info-circle" style="font-size:13px"></i>
-                                <small>Após confirmação, o pedido ficará <strong>pendente</strong> de aprovação por um administrador.</small>
-                            </div>
+                                <!-- Aviso -->
+                                <div class="alert alert-warning d-flex align-items-center gap-2 py-2 mb-0">
+                                    <i class="fas fa-info-circle" style="font-size:13px"></i>
+                                    <small>Após confirmação, o pedido ficará <strong>pendente</strong> de aprovação por um administrador.</small>
+                                </div>
 
                             <?php endif; ?>
                         </div>
@@ -464,13 +474,13 @@ unset($_SESSION['flash_error']);
                             </a>
 
                             <?php if ($dadosFormando): ?>
-                            <form action="../../Controller/Estagio/FormularioDeCartaDeEstagio.php" method="POST">
-                                <?php echo CSRFProtection::getTokenField(); ?>
-                                <input type="hidden" name="fromPreview" value="1">
-                                <button type="submit" class="btn btn-success shadow-sm px-5 py-2 fw-bold text-white">
-                                    <i class="fas fa-check me-1"></i> Confirmar e enviar
-                                </button>
-                            </form>
+                                <form action="/estagio/estagio/salvar" method="POST">
+                                    <?php echo CSRFProtection::getTokenField(); ?>
+                                    <input type="hidden" name="fromPreview" value="1">
+                                    <button type="submit" class="btn btn-success shadow-sm px-5 py-2 fw-bold text-white">
+                                        <i class="fas fa-check me-1"></i> Confirmar e enviar
+                                    </button>
+                                </form>
                             <?php endif; ?>
                         </div>
 

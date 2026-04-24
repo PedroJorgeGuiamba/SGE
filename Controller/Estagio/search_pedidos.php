@@ -1,9 +1,12 @@
 <?php
 require_once __DIR__ . '/../../Conexao/conector.php';
-session_start();
-
+require_once __DIR__ . '/../../Helpers/Criptografia.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 $conexao = new Conector();
 $conn    = $conexao->getConexao();
+$criptografia = new Criptografia();
 
 $termo = trim($_GET['termo'] ?? '');
 
@@ -44,7 +47,6 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'formando' && isset($_SESS
     $codigoFormando = (int) $_SESSION['codigo_formando'];
 
     $filtroAdicional = "AND codigo_formando = $codigoFormando";
-    
 }
 
 if ($termo === '') {
@@ -52,18 +54,17 @@ if ($termo === '') {
         SELECT p.*, q.descricao AS qualificacao_descricao, t.nome AS turma
         FROM pedido_carta p
         LEFT JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
-        LEFT JOIN turma t ON t.codigo_qualificacao = q.id_qualificacao
+        LEFT JOIN turma t ON p.codigo_turma = t.codigo
         WHERE $filtroBase $filtroAdicional
         ORDER BY p.id_pedido_carta DESC
     ";
     $result = $conn->query($sql);
-
 } else {
     $sql = "
         SELECT p.*, q.descricao AS qualificacao_descricao, t.nome AS turma
         FROM pedido_carta p
         LEFT JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
-        LEFT JOIN turma t ON p.qualificacao = t.codigo_qualificacao
+        LEFT JOIN turma t ON p.codigo_turma = t.codigo
         WHERE $filtroBase $filtroAdicional
           AND (p.empresa LIKE ? OR p.nome LIKE ? OR p.apelido LIKE ? OR p.email LIKE ?)
         ORDER BY p.id_pedido_carta DESC
@@ -77,10 +78,24 @@ if ($termo === '') {
 
 $pedidos = [];
 while ($row = $result->fetch_assoc()) {
-    $pedidos[] = $row;
+    $pedidos[] = [
+        'id_pedido_carta' => $row['id_pedido_carta'],
+        'numero' => $row['numero'],
+        'nome' => $row['nome'],
+        'apelido' => $row['apelido'],
+        'codigo_formando' => $row['codigo_formando'],
+        'qualificacao_descricao' => $row['qualificacao_descricao'],
+        'qualificacao' => $row['qualificacao'],
+        'turma' => $row['turma'],
+        'data_do_pedido' => $row['data_do_pedido'],
+        'hora_do_pedido' => $row['hora_do_pedido'],
+        'empresa' => $row['empresa'],
+        'contactoPrincipal' => $criptografia->descriptografar($row['contactoPrincipal']),
+        'contactoSecundario' => $criptografia->descriptografar($row['contactoSecundario']),
+        'email' => $criptografia->descriptografar($row['email'])
+    ];
 }
 
 header('Content-Type: application/json');
 echo json_encode($pedidos);
 $conn->close();
-?>

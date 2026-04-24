@@ -62,7 +62,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="View/Auth/Login.php" class="btn btn-primary">Login</a>
+                                <a href="/estagio/login" class="btn btn-primary">Login</a>
                             </li>
                         </ul>
                     </div>
@@ -109,7 +109,7 @@
                     <div class="carousel-caption">
                         <h1>Inovação e Tecnologia</h1>
                         <p>Acompanhamos a evolução preparando-o para o mercado de trabalho do futuro.</p>
-                        <a href="View/Auth/Login.php" class="btn btn-outline-light btn-lg mt-3">Faça Login</a>
+                        <a href="/estagio/login" class="btn btn-outline-light btn-lg mt-3">Faça Login</a>
                     </div>
                 </div>
                 <!-- Slide 3 -->
@@ -267,20 +267,7 @@
         </section>
     </main>
     <!-- Rodapé -->
-    <footer>
-        <div class="container-footer">
-            <p> &copy; <?php echo date("Y"); ?> - TRANSCOM . DIREITOS RESERVADOS . DESIGN & DEVELOPMENT
-                <span>TRANSCOM</span></p>
-        </div>
-    </footer>
-    <!-- Scripts do BootStrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-        </script>
-    <script>
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-    </script>
+    <?php require_once __DIR__ . '/Includes/footer.php'?>
 </body>
 
 </html>

@@ -10,7 +10,7 @@
                         <p class="text-muted small">Preencha os campos abaixo para adicionar um novo curso ao sistema</p>
                     </div>
                     <div class="card-body p-5">
-                        <form action="../../Controller/Cursos/CadastrarCurso.php" method="post">
+                        <form action="/estagio/cursos/salvar" method="post">
                             <?php if (isset($_GET['erros'])): ?>
                                 <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
                                     <i class="fas fa-exclamation-circle me-1"></i> <?php echo htmlspecialchars($_GET['erros']); ?>
@@ -86,7 +86,7 @@
 
         function carregarDados() {
             $.ajax({
-                url: '../../Controller/Qualificacao/getQualificacoes.php',
+                url: '/estagio/api/qualificacao',
                 method: 'GET',
                 success: function (resposta) {
                     $('#qualificacao').html(resposta);

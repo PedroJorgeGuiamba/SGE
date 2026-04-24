@@ -56,7 +56,7 @@ class AuthMiddleware
             session_destroy();
         }
         
-        header("Location: /estagio/View/Auth/Login.php");
+        header("Location: /estagio/login");
         exit();
     }
 

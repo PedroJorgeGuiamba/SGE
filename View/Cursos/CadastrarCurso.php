@@ -11,6 +11,7 @@
                     </div>
                     <div class="card-body p-5">
                         <form action="/estagio/cursos/salvar" method="post">
+                            <?php echo CSRFProtection::getTokenField(); ?>
                             <?php if (isset($_GET['erros'])): ?>
                                 <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
                                     <i class="fas fa-exclamation-circle me-1"></i> <?php echo htmlspecialchars($_GET['erros']); ?>

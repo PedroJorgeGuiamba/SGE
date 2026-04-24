@@ -5,6 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once __DIR__ . '/../../Conexao/conector.php';
 require_once __DIR__ . '/../../Model/PedidoDeCredencial.php';
 require_once __DIR__ . '/../../Helpers/Criptografia.php';
+require_once __DIR__ . '/../../Helpers/CSRFProtection.php';
 
 class EditarPedidoCredencial
 {
@@ -24,6 +25,12 @@ class EditarPedidoCredencial
             echo json_encode(['success' => false, 'message' => 'Método de requisição inválido']);
         }
         try {
+            $token = $_POST['csrf_token'] ?? '';
+            try {
+                CSRFProtection::validateToken($token);
+            } catch (ErrorException $e) {
+                echo json_encode(['success' => false, 'message' => $e]);
+            }
 
             $this->conn->begin_transaction();
 

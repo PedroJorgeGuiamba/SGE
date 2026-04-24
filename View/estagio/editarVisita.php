@@ -8,6 +8,7 @@ $id = $_GET['id_visita'];
 
 require_once __DIR__ . '/../../Conexao/conector.php';
 require_once __DIR__ . '/../../Helpers/Criptografia.php';
+require_once __DIR__ . '/../../Helpers/CSRFProtection.php';
 $conexao = new Conector();
 $criptografia = new Criptografia();
 $conn = $conexao->getConexao();
@@ -36,6 +37,7 @@ $stmt->close();
         <h2 class="mb-4">Editar Pedido de Visita de Estágio</h2>
 
         <form id="formEditarPedido" action="/estagio/visita/atualizar" method="POST">
+            <?php echo CSRFProtection::getTokenField(); ?>
             <input type="hidden" name="id_visita" value="<?php echo htmlspecialchars($pedido['id_visita']); ?>">
 
             <div class="row mb-3">

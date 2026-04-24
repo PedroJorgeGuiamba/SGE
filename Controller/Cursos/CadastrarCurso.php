@@ -6,6 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once __DIR__ . '/../../Model/Curso.php';
 require_once __DIR__ . '/../../Model/Notificacao.php';
 require_once __DIR__ . '/../../Helpers/Actividade.php';
+require_once __DIR__ . '/../../Helpers/CSRFProtection.php';
 require_once __DIR__ . '/../../Conexao/conector.php';
 
 class CadastrarCurso
@@ -28,6 +29,12 @@ class CadastrarCurso
             exit();
         }
         try {
+            $token = $_POST['csrf_token'] ?? '';
+            try {
+                CSRFProtection::validateToken($token);
+            } catch (ErrorException $e) {
+                header("LOCATION: /estagio/cursos/criar?erros=" . urlencode($e));
+            }
 
             $codigo = isset($_POST['codigoCurso']) ? (int) $_POST['codigoCurso'] : null;
             $nome = trim($_POST['nomeCurso'] ?? '');

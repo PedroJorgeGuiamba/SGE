@@ -30,10 +30,61 @@ class AuthController
         $this->usuario = new Usuario();
     }
 
+    private function verifyRecaptcha($token, $siteKey, $projectId, $apiKey)
+    {
+        if (empty($token)) {
+            return ['success' => false, 'error' => 'Token não fornecido'];
+        }
+
+        $url = "https://recaptchaenterprise.googleapis.com/v1/projects/{$projectId}/assessments?key={$apiKey}";
+        
+        $data = [
+            'event' => [
+                'token' => $token,
+                'siteKey' => $siteKey,
+                'expectedAction' => 'LOGIN'
+            ]
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode !== 200) {
+            $errorData = json_decode($response, true);
+            $errorMsg = $errorData['error']['message'] ?? 'Erro desconhecido';
+            return ['success' => false, 'error' => $errorMsg];
+        }
+
+        $responseData = json_decode($response, true);
+
+        if (!isset($responseData['tokenProperties']['valid']) || !$responseData['tokenProperties']['valid']) {
+            return ['success' => false, 'error' => 'Token inválido ou expirado'];
+        }
+
+        if (($responseData['tokenProperties']['action'] ?? '') !== 'LOGIN') {
+            return ['success' => false, 'error' => 'Ação de segurança inválida'];
+        }
+
+        $score = $responseData['riskAnalysis']['score'] ?? 0.0;
+        if ($score < 0.5) {
+            return ['success' => false, 'error' => "Score muito baixo: {$score}"];
+        }
+
+        return ['success' => true, 'score' => $score];
+    }
+
     public function verificar()
     {
         if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-            // return "Método inválido.";
             header("Location: /estagio/login?erros=" . urldecode("Método inválido."));
             exit();
         }
@@ -47,32 +98,27 @@ class AuthController
             exit();
         }
 
-        // if ($this->loginAttempts >= 5) {
-        //     $_SESSION['login_block_time'] = time(); // marca quando bloqueou
-        //     $_SESSION['login_attempts'] = $this->loginAttempts;
+        $env = parse_ini_file(__DIR__ . '/../../config/.env');
 
-        //     header("Location: /estagio/login?erros=" . urldecode("Muitas tentativas. Espere 5 minutos."));
-        //     exit();
-        //     // throw new RuntimeException("Muitas tentativas. Espere 5 minutos.");
-        //     // $this->error = "Muitas tentativas. Espere 5 minutos.";
-        //     // return $this->error;
-        // }
+        foreach ($env as $key => $value) {
+            putenv("$key=$value");
+        }
 
-        // if (isset($_SESSION['login_block_time'])) {
-        //     $tempoBloqueio = $_SESSION['login_block_time'];
-        //     $agora = time();
+        $projectId = getenv("GOOGLE_CLOUD_PROJECT_ID");
+        $apiKey = getenv("GOOGLE_RECAPTCHA_API_KEY");
+        $siteKey = getenv("GOOGLE_DATA_SITE_KEY");
+        $recaptchaToken = $_POST['g-recaptcha-response'] ?? '';
 
-        //     if (($agora - $tempoBloqueio) < 60) {
-        //         $restante = 60 - ($agora - $tempoBloqueio);
-        //         header("Location: /estagio/login?erros=" . urldecode("Bloqueado. Tente novamente em " . ceil($restante / 60) . " minuto(s)."));
-        //         exit();
-        //         // return "Bloqueado. Tente novamente em " . ceil($restante / 60) . " minuto(s).";
-        //     }
+        $recaptchaResult = $this->verifyRecaptcha($recaptchaToken, $siteKey, $projectId, $apiKey);
 
-        //     // desbloqueia após 5 minutos
-        //     unset($_SESSION['login_block_time']);
-        //     $_SESSION['login_attempts'] = 0;
-        // }
+        if (!$recaptchaResult['success']) {
+            $this->error = "Falha na verificação de segurança: " . $recaptchaResult['error'];
+            $this->loginAttempts++;
+            $_SESSION['login_attempts'] = $this->loginAttempts;
+            registrarAtividade(null, "Falha no reCAPTCHA", "LOGIN_FAILED");
+            header("Location: /estagio/login?erros=" . urlencode($this->error));
+            exit();
+        }
 
         $email = filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL);
         $senha = trim($_POST['password'] ?? '');
@@ -100,7 +146,29 @@ class AuthController
             exit();
         }
 
-        $email_hashed = hash('sha256', $email);
+        $email_hashed = hash('sha256', strtolower(trim($email)));
+
+        $tentativas = $_SESSION['login_falhas'][$email_hashed] ?? ['tentativas' => 0, 'bloqueado_ate' => null];
+
+        if (!empty($tentativas['bloqueado_ate'])) {
+            $restante = $tentativas['bloqueado_ate'] - time();
+
+            if ($restante > 0) {
+                $minutos = ceil($restante / 60);
+                header("Location: /estagio/login?erros=" . urlencode("Conta bloqueada. Tente novamente em {$minutos} minuto(s)."));
+                exit();
+            }
+
+            $_SESSION['login_falhas'][$email_hashed] = ['tentativas' => 0, 'bloqueado_ate' => null];
+            $tentativas = $_SESSION['login_falhas'][$email_hashed];
+        }
+
+        if ($tentativas['tentativas'] >= 5) {
+            $_SESSION['login_falhas'][$email_hashed]['bloqueado_ate'] = time() + 300;
+            header("Location: /estagio/login?erros=" . urlencode("Muitas tentativas falhadas. Conta bloqueada por 5 minutos."));
+            exit();
+        }
+        
         $this->conn->begin_transaction();
         $result = $this->usuario->getUsersByEmailHashed($this->conn, $email_hashed);
         if (!$result || $result->num_rows === 0) {

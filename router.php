@@ -38,6 +38,9 @@ switch ($modulo) {
             case 'confirmar-user':
                 require 'View/Auth/ConfirmacaoFormando.php';
                 break;
+            case 'google-callback':
+                require 'Controller/Auth/GoogleCallbackController.php';
+                break;
             default:
                 require 'View/Erros/error.php';
         }

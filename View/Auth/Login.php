@@ -8,8 +8,15 @@ require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
 SecurityHeaders::setLogin();
 
 include_once __DIR__ . '/../../Controller/Auth/AuthController.php';
-?>
 
+$env = parse_ini_file(__DIR__ . '/../../config/.env');
+
+foreach ($env as $key => $value) {
+    putenv("$key=$value");
+}
+
+$site = getenv("GOOGLE_DATA_SITE_KEY");
+?>
 <!DOCTYPE html>
 <html lang="pt-pt">
 
@@ -22,6 +29,8 @@ include_once __DIR__ . '/../../Controller/Auth/AuthController.php';
     <link rel="stylesheet" href="/estagio/Assets/CSS/global.css">
     <!-- FontAwesome para icones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- <script src="https://www.google.com/recaptcha/api.js" async defer></script> -->
+    <script src="https://www.google.com/recaptcha/enterprise.js" async defer></script>
 </head>
 
 <body>
@@ -60,6 +69,12 @@ include_once __DIR__ . '/../../Controller/Auth/AuthController.php';
                     <div class="input-group">
                         <span class="input-group-text bg-white border-end-0"><i class="fas fa-lock text-muted"></i></span>
                         <input type="password" name="password" class="form-control border-start-0 ps-0" id="password" placeholder="**********" required>
+                    </div>
+                </div>
+                <div class="form-group mb-4">
+                    <div class="input-group">
+                        <div class="g-recaptcha" data-sitekey="<?=$site ?>" data-action="LOGIN"></div>
+                        <span class="error_form" id="recaptcha_error_message"></span>
                     </div>
                 </div>
 

@@ -1,12 +1,14 @@
 <?php
 if (!isset($_GET['numero'])) {
     header('Location: ' . ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'supervisor' ? '/estagio/credencial/listar' : '/estagio/formando'));
-    exit();
+exit();
 }
 
 $id = $_GET['numero'];
-
-require_once __DIR__ . '/../../Conexao/conector.php';require_once __DIR__ . '/../../Helpers/Criptografia.php';
+    
+require_once __DIR__ . '/../../Helpers/CSRFProtection.php';
+require_once __DIR__ . '/../../Conexao/conector.php';
+require_once __DIR__ . '/../../Helpers/Criptografia.php';
 $conexao = new Conector();
 $conn = $conexao->getConexao();
 $criptografia = new Criptografia(); 
@@ -35,6 +37,7 @@ $stmt->close();
     <h2 class="mb-4">Editar Pedido de Credencial de Estágio</h2>
 
     <form id="formEditarPedido" action="/estagio/credencial/atualizar" method="POST">
+        <?php echo CSRFProtection::getTokenField(); ?>
         <input type="hidden" name="id_credencial" value="<?php echo htmlspecialchars($pedido['id_credencial']); ?>">
 
         <div class="row mb-3">

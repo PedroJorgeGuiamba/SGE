@@ -42,6 +42,7 @@ class FormularioDeCartaDeEstagio
                 CSRFProtection::validateToken($token);
             } catch (ErrorException $e) {
                 header("LOCATION: /estagio/estagio/criar?erros=" . $e);
+                exit();
             }
 
             date_default_timezone_set('Africa/Maputo');

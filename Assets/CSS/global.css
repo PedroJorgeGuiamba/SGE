@@ -303,6 +303,10 @@ header nav ul li.nav-item ul.dropdown-menu li a.dropdown-item {
         width: 100%;
         margin-top: 0.5rem;
     }
+
+    .g-recaptcha {
+        transform: scale(0.8);
+    }
 }
 
 @media (max-width: 320px) {
@@ -324,6 +328,10 @@ header nav ul li.nav-item ul.dropdown-menu li a.dropdown-item {
 
     .card-img-top {
         height: 180px;
+    }
+
+    .g-recaptcha {
+        transform: scale(0.85);
     }
 }
 
@@ -580,3 +588,8 @@ button {
     opacity: 0.5;
 }
 
+.g-recaptcha {
+  margin-bottom: 1rem;
+  transform: scale(0.9);
+  transform-origin: center;
+}

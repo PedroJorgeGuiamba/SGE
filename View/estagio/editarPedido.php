@@ -6,6 +6,7 @@ if (!$_GET['numero']) {
 
 $id = $_GET['numero'];
 
+require_once __DIR__ . '/../../Helpers/CSRFProtection.php';
 require_once __DIR__ . '/../../Conexao/conector.php';
 require_once __DIR__ . '/../../Helpers/Criptografia.php';
 $conexao = new Conector();
@@ -37,14 +38,12 @@ $pedido = $result->fetch_assoc();
 $stmt->close();
 ?>
 <?php require_once __DIR__ . '/../../Includes/header-estagio-admin.php' ?>
-
     <main class="container mt-4">
         <h2 class="mb-4">Editar Pedido de Estágio</h2>
 
         <form id="formEditarPedido" action="/estagio/estagio/atualizar" method="POST">
+            <?php echo CSRFProtection::getTokenField(); ?>
             <input type="hidden" name="numero" value="<?php echo htmlspecialchars($pedido['numero']); ?>">
-
-            
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label for="nome" class="form-label">Nome</label>

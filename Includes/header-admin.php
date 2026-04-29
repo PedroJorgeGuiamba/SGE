@@ -33,7 +33,7 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal de Admin</title>
-
+    <link rel="icon" href="https://www.itc.ac.mz/wp-content/uploads/2020/03/cropped-logobackgsite_ITC-2-32x32.png" sizes="32x32">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome for Icons -->
@@ -43,6 +43,7 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
 
     <!-- CSS -->
     <link rel="stylesheet" href="/estagio/Assets/CSS/chart.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/uploadJSON.css">
     <link rel="stylesheet" href="/estagio/Assets/CSS/global.css">
     <link rel="stylesheet" href="/estagio/Assets/CSS/notifications.css">
 </head>
@@ -125,6 +126,23 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                         <li><a class="dropdown-item" href="/estagio/formando/criar"><i class="fas fa-user-graduate fa-fw me-2 text-secondary"></i> Formandos</a></li>
                         <li><a class="dropdown-item" href="/estagio/formador/criar"><i class="fas fa-chalkboard-teacher fa-fw me-2 text-secondary"></i> Formadores</a></li>
                         <li><a class="dropdown-item" href="/estagio/supervisor/criar"><i class="fas fa-user-tie fa-fw me-2 text-secondary"></i> Supervisores</a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item dropdown mx-2">
+                    <a class="nav-link dropdown-toggle fw-semibold text-dark" href="#" id="dropdownModulos" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-list-ul fa-fw me-1 text-info"></i> Listar
+                    </a>
+                    <ul class="dropdown-menu shadow-sm border-0" aria-labelledby="dropdownModulos">
+                        <li><a class="dropdown-item" href="/estagio/cursos/listar"><i class="fas fa-graduation-cap fa-fw me-2 text-secondary"></i> Cursos</a></li>
+                        <li><a class="dropdown-item" href="/estagio/qualificacao/listar"><i class="fas fa-certificate fa-fw me-2 text-secondary"></i> Qualificações</a></li>
+                        <li><a class="dropdown-item" href="/estagio/turma/listar"><i class="fas fa-users-class fa-fw me-2 text-secondary"></i> Turmas</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="/estagio/formando/listar"><i class="fas fa-user-graduate fa-fw me-2 text-secondary"></i> Formandos</a></li>
+                        <li><a class="dropdown-item" href="/estagio/formador/listar"><i class="fas fa-chalkboard-teacher fa-fw me-2 text-secondary"></i> Formadores</a></li>
+                        <li><a class="dropdown-item" href="/estagio/supervisor/listar"><i class="fas fa-user-tie fa-fw me-2 text-secondary"></i> Supervisores</a></li>
                     </ul>
                 </li>
 

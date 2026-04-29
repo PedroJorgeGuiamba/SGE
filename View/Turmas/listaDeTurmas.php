@@ -1,51 +1,45 @@
-<?php require_once __DIR__ . '/../../Includes/header-estagio-admin.php' ?>
+<?php require_once __DIR__ . '/../../Includes/header-admin.php' ?>
 
     <main class="container-fluid px-4 mb-5" style="margin-top: 40px;">
-
         <div class="card shadow-sm border-0 rounded-4">
             <div class="card-header bg-white border-bottom-0 mt-3 pt-4 pb-3 d-flex justify-content-between align-items-center">
                 <div>
-                    <h3 class="fw-bold text-primary"><i class="fas fa-list-alt me-2"></i>Lista de Todos os Pedidos de Credencial</h3>
+                    <h3 class="fw-bold text-primary"><i class="fas fa-list-alt me-2"></i>Lista de Todas as Turmas da Instituição</h3>
+                    <p class="text-muted small mb-0">Faça a gestão das turmas da instituição no sistema</p>
                 </div>
                 <div class="w-25">
                     <div class="input-group">
                         <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
-                        <input type="text" id="searchInput" class="form-control border-start-0 bg-light" placeholder="Pesquisar por Empresa, Nome, Email ou Apelido">
+                        <input type="text" id="searchInput" class="form-control border-start-0 bg-light" placeholder="Pesquisar por Nível...">
                     </div>
                 </div>
             </div>
-
+            
             <div class="card-body p-4 pt-0">
                 <div class="mb-3 d-flex gap-2">
-                    <a href="/estagio/credencial/criar" class="btn btn-primary shadow-sm"><i class="fas fa-plus-circle me-1"></i> Novo Pedido</a>
-                    <a href="/estagio/credencial/historico" class="btn btn-success shadow-sm"><i class="fas fa-history me-1"></i> Histórico</a>
-                    <button type="submit" id="printSelected" class="btn btn-secondary shadow-sm"><i class="fas fa-file-archive me-1"></i> Gerar Selecionados (ZIP)</button>
-                    <button id="deleteSelected" class="btn btn-danger shadow-sm"><i class="fas fa-trash-alt me-1"></i> Deletar Selecionados</button>
+                    <a href="/estagio/turma/criar" class="btn btn-primary shadow-sm"><i class="fas fa-plus-circle me-1"></i> Nova Turma</a>
+                    <button id="deleteSelected" class="btn btn-danger shadow-sm disabled" aria-disabled="true"><i class="fas fa-trash-alt me-1"></i> Deletar Selecionados</button>
                 </div>
 
                 <div class="table-responsive rounded-3 border">
                     <table id="pedidosTable" class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th><input type="checkbox" id="selectAll"></th>
-                                <th>Numero</th>
+                                <th><input type="checkbox" id="selectAll" class="form-check-input"></th>
+                                <th>ID</th>
                                 <th>Nome</th>
-                                <th>Apelido</th>
-                                <th>Código Formando</th>
-                                <th>Contacto do Formando</th>
-                                <th>Email</th>
-                                <th>Empresa</th>
-                                <th>Data do Pedido</th>
-                                <th>Id do Pedido de Estágio</th>
-                                <th>Acções</th>
+                                <th>Curso</th>
+                                <th>Qualificação</th>
+                                <th class="text-center">Acções</th>
                             </tr>
                         </thead>
                         <tbody id="pedidosTbody">
                         </tbody>
                     </table>
                 </div>
+                
                 <nav>
-                    <ul class="pagination justify-content-center mt-3" id="pagination"></ul>
+                    <ul class="pagination justify-content-center mt-4" id="pagination"></ul>
                 </nav>
             </div>
         </div>
@@ -72,8 +66,8 @@
                             <td colspan="15" class="text-center">
                                 <div class="empty-state">
                                     <i class="fas fa-inbox"></i>
-                                    <p class="mb-0">Nenhum pedido encontrado</p>
-                                    <small class="text-muted">Tente ajustar os filtros ou criar um novo pedido</small>
+                                    <p class="mb-0">Nenhum turmas encontrado</p>
+                                    <small class="text-muted">Tente ajustar os filtros ou criar um novo turmas</small>
                                 </div>
                             </td>
                         </tr>
@@ -82,28 +76,20 @@
                     return;
                 }
 
-                pageData.forEach(pedido => {
+                pageData.forEach(turmas => {
                     $('#pedidosTbody').append(`
                         <tr>
-                            <td><input type="checkbox" class="select-checkbox" value="${pedido.id_credencial}"></td>
-                            <td>${pedido.id_credencial}</td>
-                            <td>${pedido.nome}</td>
-                            <td>${pedido.apelido}</td>
-                            <td>${pedido.codigo_formando}</td>
-                            <td>${pedido.contactoFormando}</td>
-                            <td>${pedido.email}</td>
-                            <td>${pedido.empresa}</td>
-                            <td>${pedido.data_do_pedido.split('-').reverse().join('/')}</td>
-                            <td>${pedido.id_pedido_carta}</td>
+                            <td><input type="checkbox" class="select-checkbox" value="${turmas.codigo}"></td>
+                            <td>${turmas.codigo}</td>
+                            <td>${turmas.nome}</td>
+                            <td>${turmas.curso}</td>
+                            <td>${turmas.qualificacao_descricao}</td>
                             <td>
                                 <div class="d-flex gap-1">
-                                    <button class="btn btn-sm btn-primary gerar-pdf-completo-btn" data-id="${pedido.id_pedido_carta}" title="Gerar PDF">
-                                        <i class="fas fa-file-pdf"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-warning editar-btn" data-id="${pedido.id_credencial}" title="Editar" >
+                                    <button class="btn btn-sm btn-warning editar-btn" data-id="${turmas.codigo}" title="Editar" >
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-danger remover-btn" data-id="${pedido.id_credencial}" title="Remover">
+                                    <button class="btn btn-sm btn-danger remover-btn" data-id="${turmas.codigo}" title="Remover">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </div>
@@ -197,10 +183,34 @@
             }
 
             function buscarPedidos(pesquisa = '') {
-                $.get('/estagio/api/credenciais', { termo: pesquisa }, function(data) {
-                    pedidosData = data;
-                    currentPage = 1;
-                    renderTable();
+                $.ajax({
+                    url: '/estagio/api/listar-turmas',
+                    method: 'GET',
+                    data: { termo: pesquisa },
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.error) {
+                            $('#pedidosTbody').html(`
+                                <tr><td colspan="15" class="text-center text-danger py-4">
+                                    <i class="fas fa-exclamation-triangle fa-2x mb-2 d-block"></i>
+                                    ${data.error}
+                                </td></tr>
+                            `);
+                            return;
+                        }
+                        pedidosData = Array.isArray(data) ? data : [];
+                        currentPage = 1;
+                        renderTable();
+                    },
+                    error: function(xhr) {
+                        console.error('Erro:', xhr.responseText);
+                        $('#pedidosTbody').html(`
+                            <tr><td colspan="15" class="text-center text-danger py-4">
+                                <i class="fas fa-database fa-2x mb-2 d-block"></i>
+                                Erro ao carregar dados do servidor
+                            </td></tr>
+                        `);
+                    }
                 });
             }
 
@@ -208,14 +218,9 @@
                 buscarPedidos($(this).val().trim());
             });
 
-            $(document).on('click','.gerar-pdf-completo-btn', function(){
-                var id = $(this).data('id');
-                window.location.href = '/estagio/credencial/gerarPDF/' + id;
-            } )
-
             $(document).on('click', '.editar-btn', function() {
                 var id = $(this).data('id');
-                window.location.href = '/estagio/credencial/editar/' + id;
+                window.location.href = '/estagio/turma/editar/' + id;
             });
 
             $(document).on('click', '.remover-btn', function() {
@@ -224,9 +229,9 @@
                 // Confirmação antes de remover
                 if (confirm('Tem certeza que deseja remover o pedido #' + id + '?')) {
                     $.ajax({
-                        url: '/estagio/credencial/remover',
+                        url: '/estagio/estagio/remover',
                         type: 'POST',
-                        data: { id_credencial: id },
+                        data: { id_pedido_carta: id },
                         dataType: 'json',
                         success: function(response) {
                             if (response.success) {
@@ -253,82 +258,6 @@
                 $('#selectAll').prop('checked', allChecked);
             });
 
-            $('#printSelected').on('click', function(e) {
-                e.preventDefault();
-
-                const selectedIds = [];
-                $('.select-checkbox:checked').each(function() {
-                    selectedIds.push($(this).val());
-                });
-
-                console.log('[ZIP] IDs selecionados:', selectedIds);
-
-                if (selectedIds.length === 0) {
-                    alert('Selecione pelo menos um pedido.');
-                    return;
-                }
-
-                // Monta FormData com ids[]
-                const formData = new FormData();
-                selectedIds.forEach(id => formData.append('ids[]', id));
-
-                // Feedback visual
-                const $btn = $(this);
-                $btn.prop('disabled', true).text('A gerar ZIP...');
-
-                // Usa fetch com blob — evita navegação para página branca
-                fetch('/estagio/credencial/gerarPDF', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => {
-                    console.log('[ZIP] Status HTTP:', response.status);
-                    console.log('[ZIP] Content-Type:', response.headers.get('Content-Type'));
-
-                    const contentType = response.headers.get('Content-Type') || '';
-
-                    if (!response.ok) {
-                        return response.text().then(text => {
-                            throw new Error('Servidor devolveu erro ' + response.status + ':\n' + text);
-                        });
-                    }
-
-                    // Se o servidor devolveu HTML (erro PHP), mostra no console e alerta
-                    if (contentType.includes('text/html')) {
-                        return response.text().then(text => {
-                            console.error('[ZIP] Servidor devolveu HTML (erro PHP):\n', text);
-                            throw new Error('O servidor devolveu um erro PHP. Veja o console para detalhes.');
-                        });
-                    }
-
-                    return response.blob();
-                })
-                .then(blob => {
-                    console.log('[ZIP] Blob recebido:', blob.size, 'bytes | tipo:', blob.type);
-
-                    if (blob.size === 0) {
-                        throw new Error('O ficheiro ZIP recebido está vazio (0 bytes).');
-                    }
-
-                    // Dispara download do ZIP
-                    const url = URL.createObjectURL(blob);
-                    const a   = document.createElement('a');
-                    a.href     = url;
-                    a.download = 'Pacotes_Estagio.zip';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                })
-                .catch(err => {
-                    console.error('[ZIP] Erro:', err);
-                    alert('Erro ao gerar ZIP:\n' + err.message + '\n\nVeja o console (F12) para mais detalhes.');
-                })
-                .finally(() => {
-                    $btn.prop('disabled', false).text('Gerar todos selecionados (ZIP)');
-                });
-            });
-            
             $('#deleteSelected').on('click', function() {
                 const selectedIds = [];
                 $('.select-checkbox:checked').each(function() {
@@ -350,9 +279,9 @@
                     $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Processando...');
                     
                     $.ajax({
-                        url: '/estagio/credencial/remover',
+                        url: '/estagio/estagio/remover',
                         type: 'POST',
-                        contentType: 'application/json', 
+                        contentType: 'application/json',
                         data: JSON.stringify({ ids: selectedIds }),
                         dataType: 'json',
                         success: function(response) {

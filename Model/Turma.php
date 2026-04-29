@@ -17,12 +17,12 @@ class Turma
         $this->nome = $nome;
     }
 
-    public function setCodigoCurso(string $codigoCurso)
+    public function setCodigoCurso(int $codigoCurso)
     {
         $this->codigoCurso = $codigoCurso;
     }
 
-    public function setCodigoQualificacao(string $codigoQualificacao)
+    public function setCodigoQualificacao(int $codigoQualificacao)
     {
         $this->codigoQualificacao = $codigoQualificacao;
     }
@@ -43,6 +43,28 @@ class Turma
             $this->codigoCurso,
             $this->codigoQualificacao
         );
+
+        return $stmt->execute();
+    }
+
+    public function actualizar(int $codigo, string $nome, string $codigo_curso, int $codigo_qualificacao,  mysqli $conn): bool
+    {
+        $stmt = $conn->prepare("UPDATE turma SET
+            nome = ?,
+            codigo_curso = ?,
+            codigo_qualificacao = ?
+            WHERE codigo = ?");
+
+        if (!$stmt) {
+            return false;
+        }
+
+        $stmt->bind_param("siii",
+                $nome,
+                $codigo_curso,
+                $codigo_qualificacao,
+                $codigo
+            );
 
         return $stmt->execute();
     }

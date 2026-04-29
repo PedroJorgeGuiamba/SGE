@@ -43,7 +43,7 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Portal do Formando ITC — gerencie os seus pedidos de estágio e credenciais.">
     <title>Portal do Formando | ITC</title>
-
+    <link rel="icon" href="https://www.itc.ac.mz/wp-content/uploads/2020/03/cropped-logobackgsite_ITC-2-32x32.png" sizes="32x32">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -541,18 +541,80 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                 const totalPages = Math.ceil(pedidosData.length / rowsPerPage);
                 $('#pagination').empty();
 
-                for (let i = 1; i <= totalPages; i++) {
+                if (totalPages <= 1) return;
+
+                // Quantas páginas mostrar de cada vez na janela
+                const windowSize = 5;
+                let startPage = Math.max(1, currentPage - Math.floor(windowSize / 2));
+                let endPage   = Math.min(totalPages, startPage + windowSize - 1);
+
+                // Ajusta se estiver perto do fim
+                if (endPage - startPage < windowSize - 1) {
+                    startPage = Math.max(1, endPage - windowSize + 1);
+                }
+
+                // Botão « Primeira
+                $('#pagination').append(`
+                    <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                        <a class="page-link" href="#" data-page="1" title="Primeira">«</a>
+                    </li>
+                `);
+
+                // Botão ‹ Anterior
+                $('#pagination').append(`
+                    <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                        <a class="page-link" href="#" data-page="${currentPage - 1}" title="Anterior">‹</a>
+                    </li>
+                `);
+
+                // Reticências no início
+                if (startPage > 1) {
                     $('#pagination').append(`
-                        <li class="page-item ${i === currentPage ? 'active' : ''}">
-                            <a class="page-link" href="#">${i}</a>
+                        <li class="page-item disabled">
+                            <span class="page-link">…</span>
                         </li>
                     `);
                 }
 
-                $('.page-link').click(function(e) {
+                // Páginas da janela
+                for (let i = startPage; i <= endPage; i++) {
+                    $('#pagination').append(`
+                        <li class="page-item ${i === currentPage ? 'active' : ''}">
+                            <a class="page-link" href="#" data-page="${i}">${i}</a>
+                        </li>
+                    `);
+                }
+
+                // Reticências no fim
+                if (endPage < totalPages) {
+                    $('#pagination').append(`
+                        <li class="page-item disabled">
+                            <span class="page-link">…</span>
+                        </li>
+                    `);
+                }
+
+                // Botão › Próxima
+                $('#pagination').append(`
+                    <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                        <a class="page-link" href="#" data-page="${currentPage + 1}" title="Próxima">›</a>
+                    </li>
+                `);
+
+                // Botão » Última
+                $('#pagination').append(`
+                    <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                        <a class="page-link" href="#" data-page="${totalPages}" title="Última">»</a>
+                    </li>
+                `);
+                // Evento de clique unificado
+                $('#pagination .page-link').on('click', function(e) {
                     e.preventDefault();
-                    currentPage = parseInt($(this).text());
-                    renderTable();
+                    const page = parseInt($(this).data('page'));
+                    if (!isNaN(page) && page >= 1 && page <= totalPages && page !== currentPage) {
+                        currentPage = page;
+                        renderTable();
+                    }
                 });
             }
 

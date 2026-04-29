@@ -5,7 +5,6 @@ class Supervisor{
     private $id_qualificacao;
     private $user;
     private $area;
-    private $conn;
 
     public function setNome(string $nome){$this->nome = $nome;}
     public function setId_Qualificacao(int $id_qualificacao){$this->id_qualificacao = $id_qualificacao;}
@@ -37,5 +36,27 @@ class Supervisor{
         $stmt->bind_param("ii", $user, $id_qualificacao);
         $stmt->execute();
         return $stmt->get_result();
+    }
+
+    public function actualizar(string $nome, string $area, int $id_qualificacao, int $id_supervisor, mysqli $conn): bool
+    {
+        $stmt = $conn->prepare("UPDATE supervisor SET
+            nome_supervisor = ?,
+            area = ?,
+            id_qualificacao = ?
+            WHERE id_supervisor = ?");
+
+        if (!$stmt) {
+            return false;
+        }
+
+        $stmt->bind_param("ssii",
+                $nome,
+                $area,
+                $id_qualificacao,
+                $id_supervisor
+            );
+
+        return $stmt->execute();
     }
 }

@@ -82,17 +82,34 @@ switch ($modulo) {
                 $auth->verificarAutenticacao();
                 require 'View/Formando/portalDeEstudante.php';
                 break;
+            case 'listar':
+                $auth->verificarAutenticacao();
+                require 'View/Formando/listaDeFormandos.php';
+                break;
             case 'criar':
                 $auth->verificarAutenticacao();
                 require 'View/Formando/CadastrarFormando.php';
+                break;
+            case 'upload-json':
+                $auth->verificarAutenticacao();
+                require 'View/Formando/CadastrarFormandoJSON.php';
                 break;
             case 'salvar':
                 $auth->verificarAutenticacao();
                 require 'Controller/Formando/CadastrarFormando.php';
                 break;
+            case 'salvar-uploadJSON':
+                $auth->verificarAutenticacao();
+                require 'Controller/Formando/CadastrarFormandoJSON.php';
+                break;
             case 'editar':
                 $auth->verificarAutenticacao();
-                require 'Controller/Cursos/CadastrarCurso.php';
+                $_GET['id_formando'] = $id;
+                require 'View/Formando/editarFormando.php';
+                break;
+            case 'atualizar':
+                $auth->verificarAutenticacao();
+                require 'Controller/Formando/editarFormando.php';
                 break;
             case 'remover':
                 $auth->verificarAutenticacao();
@@ -109,6 +126,10 @@ switch ($modulo) {
                 $auth->verificarAutenticacao();
                 require 'View/Formador/portalDoFormador.php';
                 break;
+            case 'listar':
+                $auth->verificarAutenticacao();
+                require 'View/Formador/listaDeFormadores.php';
+                break;
             case 'criar':
                 $auth->verificarAutenticacao();
                 require 'View/Formador/CadastrarFormador.php';
@@ -119,7 +140,12 @@ switch ($modulo) {
                 break;
             case 'editar':
                 $auth->verificarAutenticacao();
-                require 'Controller/Cursos/CadastrarCurso.php';
+                $_GET['id_formador'] = $id;
+                require 'View/Formador/editarFormador.php';
+                break;
+            case 'atualizar':
+                $auth->verificarAutenticacao();
+                require 'Controller/Formador/editarFormador.php';
                 break;
             case 'remover':
                 $auth->verificarAutenticacao();
@@ -136,6 +162,10 @@ switch ($modulo) {
                 $auth->verificarAutenticacao();
                 require 'View/Supervisor/portalDoSupervisor.php';
                 break;
+            case 'listar':
+                $auth->verificarAutenticacao();
+                require 'View/Supervisor/listaDeSupervisores.php';
+                break;
             case 'criar':
                 $auth->verificarAutenticacao();
                 require 'View/Supervisor/CadastrarSupervisor.php';
@@ -146,7 +176,12 @@ switch ($modulo) {
                 break;
             case 'editar':
                 $auth->verificarAutenticacao();
-                require 'Controller/Cursos/CadastrarCurso.php';
+                $_GET['id_supervisor'] = $id;
+                require 'View/Supervisor/editarSupervisor.php';
+                break;
+            case 'atualizar':
+                $auth->verificarAutenticacao();
+                require 'Controller/Supervisor/editarSupervisor.php';
                 break;
             case 'remover':
                 $auth->verificarAutenticacao();
@@ -158,12 +193,13 @@ switch ($modulo) {
         break;
 
     // ================= CURSOS =================
+    case 'curso':
     case 'cursos':
         switch ($acao) {
             case '':
             case 'listar':
                 $auth->verificarAutenticacao();
-                require 'Controller/Cursos/getCursos.php';
+                require 'View/Cursos/listaDeCursos.php';
                 break;
             case 'criar':
                 $auth->verificarAutenticacao();
@@ -173,6 +209,15 @@ switch ($modulo) {
                 $auth->verificarAutenticacao();
                 require 'Controller/Cursos/CadastrarCurso.php';
                 break;
+            case 'editar':
+                $auth->verificarAutenticacao();
+                $_GET['id_curso'] = $id;
+                require 'View/Cursos/editarCurso.php';
+                break;
+            case 'atualizar':
+                $auth->verificarAutenticacao();
+                require 'Controller/Cursos/editarCurso.php';
+                break;
             case 'remover':
                 $auth->verificarAutenticacao();
                 require 'Controller/Cursos/getCursos.php';
@@ -182,13 +227,13 @@ switch ($modulo) {
         }
         break;
 
-    // ================= CURSOS =================
+    // ================= TURMAS =================
     case 'turma':
         switch ($acao) {
             case '':
             case 'listar':
                 $auth->verificarAutenticacao();
-                require 'Controller/Turmas/getCursos.php';
+                require 'View/Turmas/listaDeTurmas.php';
                 break;
             case 'criar':
                 $auth->verificarAutenticacao();
@@ -200,11 +245,50 @@ switch ($modulo) {
                 break;
             case 'editar':
                 $auth->verificarAutenticacao();
-                require 'Controller/Turmas/CadastrarCurso.php';
+                $_GET['codigo'] = $id;
+                require 'View/Turmas/editarTurma.php';
+                break;
+            case 'atualizar':
+                $auth->verificarAutenticacao();
+                require 'Controller/Turmas/editarTurma.php';
                 break;
             case 'remover':
                 $auth->verificarAutenticacao();
                 require 'Controller/Turmas/getCursos.php';
+                break;
+            default:
+                require 'View/Erros/error.php';
+        }
+        break;
+    
+    // ================= QUALIFICACAO =================
+    case 'qualificacao':
+        switch ($acao) {
+            case '':
+            case 'listar':
+                $auth->verificarAutenticacao();
+                require 'View/Qualificacao/listaDeQualificacoes.php';
+                break;
+            case 'criar':
+                $auth->verificarAutenticacao();
+                require 'View/Qualificacao/CadastrarQualificacao.php';
+                break;
+            case 'salvar':
+                $auth->verificarAutenticacao();
+                require 'Controller/Qualificacao/CadastrarQualificacao.php';
+                break;
+            case 'editar':
+                $auth->verificarAutenticacao();
+                $_GET['id_qualificacao'] = $id;
+                require 'View/Qualificacao/editarQualificacao.php';
+                break;
+            case 'atualizar':
+                $auth->verificarAutenticacao();
+                require 'Controller/Qualificacao/editarQualificacao.php';
+                break;
+            case 'remover':
+                $auth->verificarAutenticacao();
+                require 'Controller/Qualificacao/getCursos.php';
                 break;
             default:
                 require 'View/Erros/error.php';
@@ -373,6 +457,30 @@ switch ($modulo) {
             case 'cursos':
                 $auth->verificarAutenticacao();
                 require 'Controller/Cursos/getCursos.php';
+                break;
+            case 'listar-cursos':
+                $auth->verificarAutenticacao();
+                require 'Controller/Cursos/search_cursos.php';
+                break;
+            case 'listar-qualificacoes':
+                $auth->verificarAutenticacao();
+                require 'Controller/Qualificacao/search_qualificacao.php';
+                break;
+            case 'listar-turmas':
+                $auth->verificarAutenticacao();
+                require 'Controller/Turmas/search_turmas.php';
+                break;
+            case 'listar-formandos':
+                $auth->verificarAutenticacao();
+                require 'Controller/Formando/search_formandos.php';
+                break;
+            case 'listar-formadores':
+                $auth->verificarAutenticacao();
+                require 'Controller/Formador/search_formadores.php';
+                break;
+            case 'listar-supervisores':
+                $auth->verificarAutenticacao();
+                require 'Controller/Supervisor/search_supervisores.php';
                 break;
             case 'qualificacao':
                 $auth->verificarAutenticacao();

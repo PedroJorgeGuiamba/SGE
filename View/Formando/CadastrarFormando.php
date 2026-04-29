@@ -136,6 +136,7 @@ include_once __DIR__ . '/../../Helpers/CSRFProtection.php';
 
                             <div class="row mt-5">
                                 <div class="col-md-12 text-end">
+                                    <a href="/estagio/formando/upload-json" class="btn btn-success shadow-sm px-5 py-2 fw-bold text-white">Fazer Upload de Ficheiro JSON</a>
                                     <button type="submit" class="btn btn-primary shadow-sm px-5 py-2 fw-bold text-white"><i class="fas fa-user-plus me-1"></i> Cadastrar Formando</button>
                                 </div>
                             </div>

@@ -126,18 +126,80 @@
                 const totalPages = Math.ceil(pedidosData.length / rowsPerPage);
                 $('#pagination').empty();
 
-                for (let i = 1; i <= totalPages; i++) {
+                if (totalPages <= 1) return;
+
+                // Quantas páginas mostrar de cada vez na janela
+                const windowSize = 5;
+                let startPage = Math.max(1, currentPage - Math.floor(windowSize / 2));
+                let endPage   = Math.min(totalPages, startPage + windowSize - 1);
+
+                // Ajusta se estiver perto do fim
+                if (endPage - startPage < windowSize - 1) {
+                    startPage = Math.max(1, endPage - windowSize + 1);
+                }
+
+                // Botão « Primeira
+                $('#pagination').append(`
+                    <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                        <a class="page-link" href="#" data-page="1" title="Primeira">«</a>
+                    </li>
+                `);
+
+                // Botão ‹ Anterior
+                $('#pagination').append(`
+                    <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                        <a class="page-link" href="#" data-page="${currentPage - 1}" title="Anterior">‹</a>
+                    </li>
+                `);
+
+                // Reticências no início
+                if (startPage > 1) {
                     $('#pagination').append(`
-                        <li class="page-item ${i === currentPage ? 'active' : ''}">
-                            <a class="page-link" href="#">${i}</a>
+                        <li class="page-item disabled">
+                            <span class="page-link">…</span>
                         </li>
                     `);
                 }
 
-                $('.page-link').click(function(e) {
+                // Páginas da janela
+                for (let i = startPage; i <= endPage; i++) {
+                    $('#pagination').append(`
+                        <li class="page-item ${i === currentPage ? 'active' : ''}">
+                            <a class="page-link" href="#" data-page="${i}">${i}</a>
+                        </li>
+                    `);
+                }
+
+                // Reticências no fim
+                if (endPage < totalPages) {
+                    $('#pagination').append(`
+                        <li class="page-item disabled">
+                            <span class="page-link">…</span>
+                        </li>
+                    `);
+                }
+
+                // Botão › Próxima
+                $('#pagination').append(`
+                    <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                        <a class="page-link" href="#" data-page="${currentPage + 1}" title="Próxima">›</a>
+                    </li>
+                `);
+
+                // Botão » Última
+                $('#pagination').append(`
+                    <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                        <a class="page-link" href="#" data-page="${totalPages}" title="Última">»</a>
+                    </li>
+                `);
+                // Evento de clique unificado
+                $('#pagination .page-link').on('click', function(e) {
                     e.preventDefault();
-                    currentPage = parseInt($(this).text());
-                    renderTable();
+                    const page = parseInt($(this).data('page'));
+                    if (!isNaN(page) && page >= 1 && page <= totalPages && page !== currentPage) {
+                        currentPage = page;
+                        renderTable();
+                    }
                 });
             }
 

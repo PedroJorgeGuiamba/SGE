@@ -55,4 +55,30 @@ class Curso
 
         return $stmt->execute();
     }
+
+    public function actualizar(int $codigo, string $nome, string $descricao, string $sigla, int $codigo_qualificacao, int $id_curso, mysqli $conn): bool
+    {
+        $stmt = $conn->prepare("UPDATE curso SET
+            codigo = ?,
+            nome = ?,
+            descricao = ?,
+            sigla = ?,
+            codigo_qualificacao = ?
+            WHERE id_curso = ?");
+
+        if (!$stmt) {
+            return false;
+        }
+
+        $stmt->bind_param("isssii",
+                $codigo,
+                $nome,
+                $descricao,
+                $sigla,
+                $codigo_qualificacao,
+                $id_curso
+            );
+
+        return $stmt->execute();
+    }
 }

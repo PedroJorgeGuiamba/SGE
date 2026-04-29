@@ -1,3 +1,6 @@
+<?php
+include_once __DIR__ . '/../../Helpers/CSRFProtection.php';
+?>
 <?php require_once __DIR__ . '/../../Includes/header-admin.php' ?>
 
     <!-- Utilizando margin e padding elevados no topo para compensar o header Duplo -->

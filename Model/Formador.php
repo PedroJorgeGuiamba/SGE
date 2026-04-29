@@ -90,5 +90,47 @@ class Formador extends Pessoa{
         $stmt->close();
         return $result;
     }
+
+    public function actualizar(string $nome, string $apelido, int $codigo, string $dataDeNascimento, string $naturalidade, string $tipoDeDocumento, string $numeroDeDocumento, string $localEmitido, string $dataDeEmissao, string $NUIT, string $telefone, string $email, int $userID, int $id_formador, mysqli $conn): bool
+    {
+        $stmt = $conn->prepare("UPDATE formador SET
+            nome = ?,
+            apelido = ?,
+            codigo = ?,
+            dataDeNascimento = ?,
+            naturalidade = ?,
+            tipoDeDocumento = ?,
+            numeroDeDocumento = ?,
+            localEmitido = ?,
+            dataDeEmissao = ?,
+            NUIT = ?,
+            telefone = ?,
+            email = ?, 
+            usuario_id = ?
+            WHERE id_formador = ?");
+
+        if (!$stmt) {
+            return false;
+        }
+
+        $stmt->bind_param("ssisssssssssii",
+                $nome,
+                $apelido,
+                $codigo,
+                $dataDeNascimento,
+                $naturalidade,
+                $tipoDeDocumento,
+                $numeroDeDocumento,
+                $localEmitido,
+                $dataDeEmissao,
+                $NUIT,
+                $telefone,
+                $email,
+                $userID,
+                $id_formador
+            );
+
+        return $stmt->execute();
+    }
 }
 ?>

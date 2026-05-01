@@ -43,7 +43,7 @@ SecurityHeaders::setLogin();
                 <?php endif; ?>
 
                 <div class="form-group mb-4">
-                    <label for="codigo" class="form-label text-muted small fw-bold">Código OTP</label>
+                    <label for="codigo" class="form-label text-muted small fw-bold">Código De Verificação</label>
                     <div class="input-group">
                         <span class="input-group-text bg-white border-end-0"><i class="fas fa-key text-muted"></i></span>
                         <input type="number" name="codigo" class="form-control border-start-0 ps-0" id="codigo" placeholder="123456" required minlength="6" maxlength="6">

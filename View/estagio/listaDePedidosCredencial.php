@@ -37,6 +37,7 @@
                                 <th>Empresa</th>
                                 <th>Data do Pedido</th>
                                 <th>Id do Pedido de Estágio</th>
+                                <th>Carta de Resposta</th>
                                 <th>Acções</th>
                             </tr>
                         </thead>
@@ -95,6 +96,16 @@
                             <td>${pedido.empresa}</td>
                             <td>${pedido.data_do_pedido.split('-').reverse().join('/')}</td>
                             <td>${pedido.id_pedido_carta}</td>
+                            <td>
+                                ${pedido.carta_path
+                                    ? `<a href="${pedido.carta_path}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-info" title="Visualizar Carta">
+                                        <i class="fas fa-file-alt"></i>
+                                    </a>`
+                                    : `<span class="text-muted" title="Nenhuma carta anexada">
+                                            <i class="fas fa-file-slash" style="font-size: 1.1rem; opacity: 0.4;"></i>
+                                        </span>`
+                                }
+                            </td>
                             <td>
                                 <div class="d-flex gap-1">
                                     <button class="btn btn-sm btn-primary gerar-pdf-completo-btn" data-id="${pedido.id_pedido_carta}" title="Gerar PDF">

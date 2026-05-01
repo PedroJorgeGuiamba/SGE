@@ -224,7 +224,7 @@ if (!empty($_POST['ids']) && is_array($_POST['ids'])) {
     ob_end_clean();
     readfile($zipFile);
     // unlink($zipFile);
-    $safe->safe_unlink($pdfFile, $pdfDir);
+    $safe->safe_unlink($zipFile, $pdfDir);
     exit;
 }
 

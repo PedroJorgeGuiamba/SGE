@@ -16,12 +16,14 @@ class FormularioDeCredencialDeEstagio
     private Notificacao $notificacao;
     private mysqli $conn;
     private Criptografia $criptografia;
+    private PedidoDeCredencial $pedido;
     public function __construct()
     {
         $conexao = new Conector();
         $this->conn = $conexao->getConexao();
         $this->notificacao = new Notificacao();
         $this->criptografia = new Criptografia();
+        $this->pedido = new PedidoDeCredencial();
     }
     public function pedidoCredencial()
     {
@@ -38,8 +40,6 @@ class FormularioDeCredencialDeEstagio
 
             $this->conn->begin_transaction();
 
-            $pedido = new PedidoDeCredencial();
-
             $codigoFormando = isset($_POST['codigoFormando']) && is_numeric($_POST['codigoFormando']) ? (int) $_POST['codigoFormando'] : null;
             $empresa = strtoupper(trim($_POST['empresa'] ?? ''));
             $email = trim(filter_var($_POST['email'], FILTER_SANITIZE_EMAIL) ?? '');
@@ -54,7 +54,33 @@ class FormularioDeCredencialDeEstagio
                 exit();
             }
 
-            $dadosFormando = $pedido->buscarNomeEApelido((int) $codigoFormando, $this->conn);
+
+            // Configuração do diretório de upload
+            $uploadDirCarta = __DIR__ . "/../../uploads/Formando/$codigoFormando/CartaResposta/";
+            if (!file_exists($uploadDirCarta)) {
+                mkdir($uploadDirCarta, 0777, true);
+            }
+
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            // Processar Carta
+            $CartaPath = null;
+            if (isset($_FILES['carta_path']) && $_FILES['carta_path']['error'] == UPLOAD_ERR_OK) {
+                $CartaName = basename($_FILES['carta_path']['name']);
+                $CartaExt = strtolower(pathinfo($CartaName, PATHINFO_EXTENSION));
+                if (!in_array($_FILES['carta_path']['type'], $allowedTypes)) {
+                    throw new Exception("Tipo de arquivo da Carta não permitido.");
+                }
+                $newCartaName = uniqid() . '.' . $CartaExt;
+                $targetFileCarta = $uploadDirCarta . $newCartaName;
+                if (move_uploaded_file($_FILES['carta_path']['tmp_name'], $targetFileCarta)) {
+                    $CartaPath = "/estagio/uploads/Formando/$codigoFormando/CartaResposta/" . $newCartaName;
+                    
+                } else {
+                    throw new Exception("Erro ao fazer upload do documento da Carta.");
+                }
+            }
+
+            $dadosFormando = $this->pedido->buscarNomeEApelido((int) $codigoFormando, $this->conn);
             if ($dadosFormando === null) {
                 $this->conn->rollback();
                 throw new RuntimeException("Formando nao encontrado");
@@ -79,17 +105,18 @@ class FormularioDeCredencialDeEstagio
                 throw new RuntimeException("Nao foi possivel obter o ID do pedido");
             }
 
-            $pedido->setIdPedido($resultadoNumero['ultimo_id']);
-            $pedido->setCodigoFormando((int) $codigoFormando);
-            $pedido->setContactoFormando($this->criptografia->criptografar(trim($_POST['contactoFormando'] ?? '')));
-            $pedido->setEmail($this->criptografia->criptografar($email));
-            $pedido->setEmpresa($empresa);
-            $pedido->setDataPedido(date('Y-m-d'));
+            $this->pedido->setIdPedido($resultadoNumero['ultimo_id']);
+            $this->pedido->setCodigoFormando((int) $codigoFormando);
+            $this->pedido->setContactoFormando($this->criptografia->criptografar(trim($_POST['contactoFormando'] ?? '')));
+            $this->pedido->setEmail($this->criptografia->criptografar($email));
+            $this->pedido->setEmpresa($empresa);
+            $this->pedido->setDataPedido(date('Y-m-d'));
+            $this->pedido->setCartaPath($CartaPath);
 
             $nome = trim($dadosFormando['nome']) ?? '';
             $apelido = trim($dadosFormando['apelido']) ?? '';
 
-            if (!$pedido->salvar($nome, $apelido, $this->conn)) {
+            if (!$this->pedido->salvar($nome, $apelido, $this->conn)) {
                 $this->conn->rollback();
                 throw new RuntimeException("Erro ao Salvar Pedido");
             }

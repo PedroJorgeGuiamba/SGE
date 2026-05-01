@@ -6,6 +6,10 @@ uploads/avaliacaoEstagios/*
 
 !uploads/avaliacaoEstagios/.gitkeep
 
+uploads/Formando/*
+
+!uploads/Formando/.gitkeep
+
 Assets/Estrutura/*
 
 Tasks/*

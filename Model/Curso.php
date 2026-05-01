@@ -1,21 +1,12 @@
 <?php
-require_once __DIR__ . '/../Conexao/conector.php';
 
 class Curso
 {
-    private $conn;
-
     private $codigo;
     private $nome;
     private $descricao;
     private $sigla;
     private $id_qualificacao;
-
-    public function __construct()
-    {
-        $conexao = new Conector();
-        $this->conn = $conexao->getConexao();
-    }
 
     // Getters e setters
     public function setCodigo(int $codigo)
@@ -44,9 +35,9 @@ class Curso
     }
 
     // Salva o curso no banco de dados
-    public function salvar(): bool
+    public function salvar($conn): bool
     {
-        $stmt = $this->conn->prepare("INSERT INTO curso (codigo, nome, descricao, sigla, codigo_qualificacao) VALUES (?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO curso (codigo, nome, descricao, sigla, codigo_qualificacao) VALUES (?, ?, ?, ?, ?)");
 
         if (!$stmt) {
             // Erro na preparação da query
@@ -61,6 +52,32 @@ class Curso
             $this->sigla,
             $this->id_qualificacao
         );
+
+        return $stmt->execute();
+    }
+
+    public function actualizar(int $codigo, string $nome, string $descricao, string $sigla, int $codigo_qualificacao, int $id_curso, mysqli $conn): bool
+    {
+        $stmt = $conn->prepare("UPDATE curso SET
+            codigo = ?,
+            nome = ?,
+            descricao = ?,
+            sigla = ?,
+            codigo_qualificacao = ?
+            WHERE id_curso = ?");
+
+        if (!$stmt) {
+            return false;
+        }
+
+        $stmt->bind_param("isssii",
+                $codigo,
+                $nome,
+                $descricao,
+                $sigla,
+                $codigo_qualificacao,
+                $id_curso
+            );
 
         return $stmt->execute();
     }

@@ -12,11 +12,11 @@ class Pessoa{
     private string $numeroDeDocumento;
     private string $localEmitido;
     private DateTime $dataDeEmissao;
-    private int $NUIT;
-    private int $Telefone;
+    private string $NUIT;
+    private string $Telefone;
     private string $email;
 
-    public function __construct(string $nome, string $apelido, DateTime $dataDeNascimento,string $naturalidade, string $tipoDeDocumento, string $numeroDeDocumento, string $localEmitido, DateTime $dataDeEmissao, int $NUIT, int $Telefone, string $email) {
+    public function __construct(string $nome, string $apelido, DateTime $dataDeNascimento,string $naturalidade, string $tipoDeDocumento, string $numeroDeDocumento, string $localEmitido, DateTime $dataDeEmissao, string $NUIT, string $Telefone, string $email) {
         $this->nome = $nome;
         $this->apelido = $apelido;
         $this->dataDeNascimento = $dataDeNascimento;
@@ -71,12 +71,12 @@ class Pessoa{
         $this->dataDeEmissao = $dataDeEmissao;
     }
 
-    public function setNUIT(int $NUIT): void
+    public function setNUIT(string $NUIT): void
     {
         $this->NUIT = $NUIT;
     }
 
-    public function setTelefone(int $Telefone): void
+    public function setTelefone(string $Telefone): void
     {
         $this->Telefone = $Telefone;
     }
@@ -125,12 +125,12 @@ class Pessoa{
         return $this->dataDeEmissao;
     }
 
-    public function getNUIT(): int
+    public function getNUIT(): string
     {
         return $this->NUIT;
     }
 
-    public function getTelefone(): int
+    public function getTelefone(): string
     {
         return $this->Telefone;
     }

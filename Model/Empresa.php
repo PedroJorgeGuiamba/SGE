@@ -1,5 +1,4 @@
 <?php
-require_once __DIR__ . '/../Conexao/conector.php';
 
 class Empresa{
     public $nome;
@@ -24,5 +23,28 @@ class Empresa{
 
         $stmt->close();
         return $resultado;
+    }
+
+    function getSiglaEmpresa($nomeEmpresa) {
+        $palavrasIgnorar = ['DE', 'DA', 'DO', 'DAS', 'DOS', 'E', 'COM', 'EM', 'PARA', 'UM', 'UMA', 'LTDA', 'LDA', 'SA'];
+        
+        $nomeEmpresa = strtoupper(trim($nomeEmpresa));
+        $palavras = preg_split('/\s+/', $nomeEmpresa);
+        $sigla = '';
+        
+        foreach ($palavras as $palavra) {
+            // Pega primeira letra se não for palavra ignorada
+            if (!in_array($palavra, $palavrasIgnorar) && !empty($palavra)) {
+                $sigla .= $palavra[0];
+            }
+            
+            // Limita a 5 caracteres
+            if (strlen($sigla) >= 5) {
+                $sigla = substr($sigla, 0, 5);
+                break;
+            }
+        }
+        
+        return $sigla ?: substr($nomeEmpresa, 0, 3); // Fallback
     }
 }

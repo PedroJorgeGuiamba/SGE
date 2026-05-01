@@ -1,10 +1,7 @@
 <?php
-require_once __DIR__ . '/../Conexao/conector.php';
 
 class PedidoDeCarta
 {
-    private $conn;
-
     private $codigoFormando;
     private $numero;
     private $qualificacao;
@@ -15,17 +12,6 @@ class PedidoDeCarta
     private $contactoPrincipal;
     private $contactoSecundario;
     private $email;
-
-    public function __construct($conn = null)
-    {
-        if ($conn instanceof mysqli) {
-            $this->conn = $conn;
-            return;
-        }
-
-        $conexao = new Conector();
-        $this->conn = $conexao->getConexao();
-    }
 
     // Getters e setters
     public function setCodigoFormando(int $codigoFormando)
@@ -73,9 +59,9 @@ class PedidoDeCarta
     {
         $this->email = $email;
     }
-    public function buscarNomeEApelido(int $codigo): ?array
+    public function buscarNomeEApelido(int $codigo, mysqli $conn): ?array
     {
-        $stmt = $this->conn->prepare("SELECT nome, apelido FROM formando WHERE codigo = ?");
+        $stmt = $conn->prepare("SELECT nome, apelido FROM formando WHERE codigo = ?");
         if ($stmt === false) {
             // Handle prepare error
             return null;
@@ -89,9 +75,9 @@ class PedidoDeCarta
         return $result->num_rows > 0 ? $result->fetch_assoc() : null;
     }
 
-    public function salvar(string $nome, string $apelido): bool
+    public function salvar(string $nome, string $apelido, mysqli $conn): bool
     {
-        $stmt = $this->conn->prepare("INSERT INTO pedido_carta (numero, codigo_formando, qualificacao, codigo_turma, data_do_pedido, hora_do_pedido, empresa, contactoPrincipal, contactoSecundario, email, nome, apelido) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO pedido_carta (numero, codigo_formando, qualificacao, codigo_turma, data_do_pedido, hora_do_pedido, empresa, contactoPrincipal, contactoSecundario, email, nome, apelido) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         if (!$stmt) {
             // Erro na preparação da query
@@ -99,7 +85,7 @@ class PedidoDeCarta
         }
 
         $stmt->bind_param(
-            "iiiisssiisss",
+            "iiiissssssss",
             $this->numero,
             $this->codigoFormando,
             $this->qualificacao,
@@ -117,9 +103,9 @@ class PedidoDeCarta
         return $stmt->execute();
     }
 
-    public function actualizar(string $nome, string $apelido, int $codigo_formando, int $qualificacao, int $codigo_turma, string $empresa, string $contactoPrincipal, string $contactoSecundario, string $email, int $id_pedido_carta): bool
+    public function actualizar(string $nome, string $apelido, int $codigo_formando, int $qualificacao, int $codigo_turma, string $empresa, string $contactoPrincipal, string $contactoSecundario, string $email, int $id_pedido_carta, mysqli $conn): bool
     {
-        $stmt = $this->conn->prepare("UPDATE pedido_carta SET
+        $stmt = $conn->prepare("UPDATE pedido_carta SET
             nome = ?,
             apelido = ?,
             codigo_formando = ?,

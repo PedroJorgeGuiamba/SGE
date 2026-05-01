@@ -4,8 +4,13 @@ class Criptografia {
     private $iv;
 
     public function __construct() {
+        $env = parse_ini_file(__DIR__ . '/../Config/.env');
+
+        foreach ($env as $key => $value) {
+            putenv("$key=$value");
+        }
         
-        $chave_base64 = "oz5lnVK8qewNQ4r1+XIDeTxyXzHd6/F/7aXOL7Mo8Mc";
+        $chave_base64 = getenv('ENCRYPTION_KEY');
         if (!$chave_base64) {
             throw new Exception('Chave de criptografia não configurada. Defina a variável de ambiente ENCRYPTION_KEY.');
         }

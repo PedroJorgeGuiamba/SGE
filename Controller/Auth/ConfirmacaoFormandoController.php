@@ -15,7 +15,7 @@ header("X-XSS-Protection: 1; mode=block");
 class ConfirmacaoFormandoController
 {
     private $conn;
-    private $criptografia;
+    private Criptografia $criptografia;
     private $error;
     private $maxAttempts = 3;
     private $lockoutTime = 300; // 5 minutos em segundos
@@ -93,7 +93,7 @@ class ConfirmacaoFormandoController
         registrarAtividade($sessaoId, "Confirmação de formando realizada com sucesso - Código: " . $this->criptografia->criptografar($codigo_formando), "CONFIRMACAO_FORMANDO");
 
         // Redirecionar para o portal do estudante
-        header("Location: /estagio/View/Formando/portalDeEstudante.php");
+        header("Location: /estagio/formando");
         exit();
     }
 

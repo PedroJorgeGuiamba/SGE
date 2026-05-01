@@ -1,5 +1,5 @@
 <?php
-include '../../Controller/Supervisor/CadastrarSupervisor.php';
+include_once __DIR__ . '/../../Helpers/CSRFProtection.php';
 ?>
 
 <?php require_once __DIR__ . '/../../Includes/header-admin.php' ?>
@@ -13,7 +13,8 @@ include '../../Controller/Supervisor/CadastrarSupervisor.php';
                         <p class="text-muted small">Associe um utilizador a um cargo de supervisão e sua área de actuação</p>
                     </div>
                     <div class="card-body p-5">
-                        <form action="../../Controller/Supervisor/CadastrarSupervisor.php" method="post">
+                        <form action="/estagio/supervisor/salvar" method="post">
+                            <?= CSRFProtection::getTokenField() ?>
                             <?php if (isset($_GET['erros'])): ?>
                                 <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
                                     <i class="fas fa-exclamation-circle me-1"></i> <?php echo htmlspecialchars($_GET['erros']); ?>
@@ -79,7 +80,7 @@ include '../../Controller/Supervisor/CadastrarSupervisor.php';
 
         function carregarDados() {
             $.ajax({
-                url: '../../Controller/Qualificacao/getQualificacoes.php',
+                url: '/estagio/api/qualificacao',
                 method: 'GET',
                 success: function(resposta) {
                     $('#qualificacao').html(resposta);
@@ -90,7 +91,7 @@ include '../../Controller/Supervisor/CadastrarSupervisor.php';
             });
 
             $.ajax({
-                url: '../../Controller/Usuarios/getUsers.php',
+                url: '/estagio/api/users',
                 method: 'GET',
                 success: function(resposta) {
                     $('#user').html(resposta);

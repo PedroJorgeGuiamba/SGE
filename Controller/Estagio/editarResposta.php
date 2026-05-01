@@ -1,5 +1,8 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once __DIR__ . '/../../Conexao/conector.php';
 require_once __DIR__ . '/../../Model/Estagio.php';
 
@@ -13,9 +16,10 @@ class EditarResposta
         try {
             $conexao = new Conector();
             $conn = $conexao->getConexao();
+            $conn->begin_transaction();
             $estagio = new Estagio();
 
-            $id_resposta = filter_var( $_POST['id_resposta'] ?? null, FILTER_SANITIZE_NUMBER_INT);
+            $id_resposta = filter_var($_POST['id_resposta'] ?? null, FILTER_SANITIZE_NUMBER_INT);
             $numero_carta = filter_var($_POST['numero_carta']  ?? null, FILTER_SANITIZE_NUMBER_INT);
             $status_resposta = !empty(trim($_POST['status_resposta'] ?? '')) ? trim($_POST['status_resposta']) : null;
             $contato_responsavel = !empty(trim($_POST['contato_responsavel'] ?? '')) ? trim($_POST['contato_responsavel']) : null;
@@ -23,7 +27,7 @@ class EditarResposta
             $data_resposta = !empty(trim($_POST['data_resposta'] ?? '')) ? trim($_POST['data_resposta']) : null;
             $data_inicio_estagio = !empty(trim($_POST['data_inicio_estagio'] ?? '')) ? trim($_POST['data_inicio_estagio']) : null;
             $data_fim_estagio = !empty(trim($_POST['data_fim_estagio'] ?? '')) ? trim($_POST['data_fim_estagio']) : null;
-            
+
             $sql = "UPDATE resposta_carta SET
                     status_resposta = ?,
                     data_resposta = ?,
@@ -32,9 +36,10 @@ class EditarResposta
                     data_fim_estagio = ?,
                     status_estagio = ?
                     WHERE id_resposta = ? AND numero_carta = ?";
-            
+
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("ssssssii",
+            $stmt->bind_param(
+                "ssssssii",
                 $status_resposta,
                 $data_resposta,
                 $contato_responsavel,
@@ -52,7 +57,7 @@ class EditarResposta
             $stmt->close();
 
             // if($status_resposta = "Aceito"){
-            if($status_resposta == "Aceito"){
+            if ($status_resposta == "Aceito") {
                 $sql = "SELECT
                             p.*,
                             s.id_supervisor as id_s,
@@ -85,9 +90,9 @@ class EditarResposta
                 $estagio->setId_empresa($empresa);
 
                 if (method_exists($estagio, 'salvarNoEdit')) {
-//                        $estagio->salvar();
+                    //                        $estagio->salvar();
 
-                    if($estagio->salvar($conn)){
+                    if ($estagio->salvar($conn)) {
                         $sqlEstagio = "SELECT id_estagio FROM estagio ORDER BY id_estagio DESC LIMIT 1";
                         $result = $conn->query($sqlEstagio);
                         $lastIdFromQuery = $result && $result->num_rows > 0 ? $result->fetch_assoc()['id_estagio'] : 0;
@@ -100,9 +105,17 @@ class EditarResposta
                 }
             }
 
+            $conn->commit();
             echo json_encode(['success' => true, 'message' => 'Resposta atualizado com sucesso!']);
-            
         } catch (Exception $e) {
+            if ($conn instanceof mysqli) {
+                try {
+                    $conn->rollback();
+                } catch (Throwable $rollbackError) {
+                    // No-op: rollback best effort.
+                }
+            }
+
             error_log('Erro em editarResposta.php: ' . $e->getMessage());
             echo json_encode(['success' => false, 'message' => 'Exceção capturada: ' . $e->getMessage()]);
         }

@@ -1,5 +1,7 @@
 <?php
-
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 class NotificationHelper
 {
     public static function sanitizeUserId($userId)
@@ -17,6 +19,32 @@ class NotificationHelper
 
         $action = $postData['action'];
 
+        $role = strtolower($_SESSION['role']);
+        $painel = "";
+
+        switch ($role) {
+            case 'formando':
+                $painel = "/estagio/formando";
+                break;
+            case 'supervisor':
+                $painel = "/estagio/supervisor";
+                break;
+            case 'formador':
+                $painel = "/estagio/formador";
+                break;
+            case 'admin':
+                $painel = "/estagio/admin";
+                break;
+            case 'seguranca':
+                $painel = "/estagio/seguranca";
+                break;
+            default:
+                registrarAtividade($_SESSION['sessao_id'], "Tentativa de redirecionamento com role inválida: {$role}", "ERROR");
+                break;
+        }
+
+        $redirectUrl = $postData['redirect_url'] ?? $_SERVER['HTTP_REFERER'] ?? $painel;
+
         if ($action === 'mark_read' && !empty($postData['id_notificacao'])) {
             $notifId = (int) $postData['id_notificacao'];
             self::markAsRead($conn, $userId, $notifId);
@@ -25,6 +53,9 @@ class NotificationHelper
         } elseif ($action === 'clear_all') {
             self::clearAll($conn, $userId);
         }
+
+        header("Location: " . $redirectUrl);
+        exit;
     }
 
     public static function getUnreadCount($conn, $userId)

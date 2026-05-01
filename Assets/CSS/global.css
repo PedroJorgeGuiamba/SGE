@@ -460,6 +460,10 @@ header nav ul li.nav-item ul.dropdown-menu li a.dropdown-item {
     .card-img-top {
         height: 180px;
     }
+
+    .g-recaptcha {
+        transform: scale(0.85);
+    }
 }
 
 /* ====== ANIMAÇÕES SUAVES E ACESSIBILIDADE ====== */

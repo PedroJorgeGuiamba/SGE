@@ -1,17 +1,26 @@
 <?php
 require_once __DIR__ . '/../Conexao/conector.php';
 
-function registrarAtividade($sessaoId, $descricao, $tipo = 'LOGIN', $duracao = null) {
-    // Verificar se pode aceitar NULL ou modificar estrutura da tabela
+function registrarAtividade($sessaoId, $descricao, $tipo = 'LOGIN') {
     $conexao = new Conector();
     $conn = $conexao->getConexao();
+    $conn->begin_transaction();
+
     if ($sessaoId === null) {
-        // Usar query alternativa sem id_sessao
-        $stmt = $conn->prepare("INSERT INTO actividade (descricao, tipo, duracao) VALUES (?, ?, ?)");
-        $stmt->bind_param("ssi", $descricao, $tipo, $duracao);
+        $stmt = $conn->prepare("INSERT INTO actividade (descricao, tipo) VALUES (?, ?)");
+        $stmt->bind_param("ss", $descricao, $tipo);
     } else {
-        // Query normal com id_sessao
-        $stmt = $conn->prepare("INSERT INTO actividade (id_sessao, descricao, tipo, duracao) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("issi", $sessaoId, $descricao, $tipo, $duracao);
+        $stmt = $conn->prepare("INSERT INTO actividade (id_sessao, descricao, tipo) VALUES (?, ?, ?)");
+        $stmt->bind_param("iss", $sessaoId, $descricao, $tipo);
     }
+
+    if (!$stmt->execute()) {
+        error_log("Erro ao registrar atividade: " . $stmt->error);
+        $stmt->close();
+        $conn->rollback();
+    }
+    
+    $stmt->close();
+    $conn->commit();
+    $conn->close();
 }

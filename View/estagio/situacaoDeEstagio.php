@@ -2,8 +2,8 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include '../../Controller/Admin/Home.php';
-include '../../Conexao/conector.php';
+include_once __DIR__ . '/../../Controller/Admin/Home.php';
+include_once __DIR__ . '/../../Conexao/conector.php';
 require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
 require_once __DIR__ . '/../../Helpers/NotificationHelper.php';
 
@@ -137,7 +137,7 @@ if ($avaliacao_result_query) {
 
 <section class="dashboard-header text-center bg-white border-bottom shadow-sm py-5 mb-4" style="margin-top: 130px;">
     <div class="container">
-        <h1 class="display-5 fw-bold text-primary"><i class="fas fa-chart-pie me-3"></i>Situação de Estágios</h1>
+        <h1 class="display-5 fw-bold"><i class="fas fa-chart-pie me-3"></i>Situação de Estágios</h1>
         <p class="lead text-muted">Acompanhe as métricas globais e o status das candidaturas a estágio</p>
     </div>
 </section>
@@ -146,7 +146,7 @@ if ($avaliacao_result_query) {
 <main class="container-fluid px-4 bg-light pb-5 pt-3">
     <!-- Charts Section -->
     <section class="row g-4 align-items-stretch">
-        
+
         <!-- Bar Chart: Pedidos per Month -->
         <div class="col-lg-6">
             <div class="card h-100 shadow-sm border-0 rounded-4">

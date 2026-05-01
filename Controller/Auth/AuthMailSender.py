@@ -8,7 +8,7 @@ def enviar_email(email_destino, otp):
     corpo_email = f"O seu código é {otp}"
 
     msg = MIMEMultipart()
-    msg['From'] = "devzitc@gmail.com"
+    msg['From'] = os.getenv('EMAIL_SMTP')
     msg['To'] = email_destino
     msg['Subject'] = "Código de Verificação"
 

@@ -1,5 +1,8 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 include '../../Controller/Seguranca/Home.php';
 require_once __DIR__ . '/../../middleware/auth.php';
 require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
@@ -18,22 +21,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 }
 $unreadCount = NotificationHelper::getUnreadCount($conn, $userId);
 $notifications = NotificationHelper::getNotifications($conn, $userId);
+
+$themeValue = isset($_SESSION['theme']) ? trim($_SESSION['theme']) : 'light';
+$themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : 'light';
 ?>
 
 <!DOCTYPE html>
-<html lang="pt-pt" data-bs-theme="<?php echo $_SESSION['theme'] ?? 'light'; ?>">
+<html lang="pt-pt" data-bs-theme="<?php echo htmlspecialchars($themeValue, ENT_QUOTES, 'UTF-8') ?? 'light'; ?>">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal do Segurança</title>
-
+    <link rel="icon" href="https://www.itc.ac.mz/wp-content/uploads/2020/03/cropped-logobackgsite_ITC-2-32x32.png" sizes="32x32">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- JQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+        crossorigin="anonymous"></script>
 
     <!-- CSS -->
     <link rel="stylesheet" href="../../Assets/CSS/global.css">
@@ -84,7 +93,7 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
                             </li>
                             <?php include __DIR__ . '/../../Includes/notification-widget.php'; ?>
                             <li class="nav-item ms-lg-3">
-                                <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger shadow-sm px-4 fw-semibold rounded-pill"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+                                <a href="/estagio/logout" class="btn btn-danger shadow-sm px-4 fw-semibold rounded-pill"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
                             </li>
                         </ul>
                     </div>
@@ -114,7 +123,7 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
                     </div>
                     <div class="card-body p-5">
                         <form action="../../Controller/Seguranca/RegistroDeEntrada.php" method="post" id="formularioEstagio">
-                            
+
                             <h5 class="text-secondary fw-semibold mb-3 border-bottom pb-2">Identificação Principal</h5>
                             <div class="row g-3 mb-4">
                                 <div class="col-md-4">
@@ -146,7 +155,7 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
                                     <span class="error_form text-danger small" id="turma_error_message"></span>
                                 </div>
                             </div>
-                            
+
                             <h5 class="text-secondary fw-semibold mb-3 border-bottom pb-2 mt-4">Detalhes do Pedido</h5>
                             <div class="row g-3 mb-4">
                                 <div class="col-md-4">

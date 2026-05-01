@@ -1,5 +1,8 @@
 ﻿<?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 include '../../Controller/Formador/Home.php';
 require_once __DIR__ . '/../../middleware/auth.php';
 require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
@@ -13,7 +16,7 @@ $conn = $conector->getConexao();
 $userId = NotificationHelper::sanitizeUserId($_SESSION['usuario_id'] ?? 0);
 NotificationHelper::handleAction($conn, $userId, $_POST ?? []);
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    header("Location: " . $_SERVER['PHP_SELF']);
+    // header("Location: " . $_SERVER['PHP_SELF']);
     exit;
 }
 $unreadCount = NotificationHelper::getUnreadCount($conn, $userId);
@@ -21,7 +24,7 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
 ?>
 
 <!DOCTYPE html>
-<html lang="pt-pt" data-bs-theme="<?php echo $_SESSION['theme'] ?? 'light'; ?>">
+<html lang="pt-pt" data-bs-theme="<?php echo htmlspecialchars($_SESSION['theme'], ENT_QUOTES, 'UTF-8') ?? 'light'; ?>">
 
 <head>
     <meta charset="UTF-8">

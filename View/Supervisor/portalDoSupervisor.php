@@ -1,7 +1,10 @@
 <?php
-session_start();
-include '../../Controller/Supervisor/Home.php';
-include '../../Conexao/conector.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+include_once __DIR__ . '/../../Controller/Supervisor/Home.php';
+include_once __DIR__ . '/../../Conexao/conector.php';
 require_once __DIR__ . '/../../middleware/auth.php';
 require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
 require_once __DIR__ . '/../../Helpers/NotificationHelper.php';
@@ -111,24 +114,27 @@ if ($pedidos_year_query_per_qualification) {
 
 $pedidos_year_per_qual_json = json_encode($pedidos_year_per_qualification);
 $years_list_json = json_encode(array_values($years_list));
+
+$themeValue = isset($_SESSION['theme']) ? trim($_SESSION['theme']) : 'light';
+$themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : 'light';
 ?>
 
 <!DOCTYPE html>
-<html lang="pt-pt" data-bs-theme="<?php echo $_SESSION['theme'] ?? 'light'; ?>">
+<html lang="pt-pt" data-bs-theme="<?php echo htmlspecialchars($themeValue, ENT_QUOTES, 'UTF-8') ?? 'light'; ?>">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal do Supervisor</title>
-
+    <link rel="icon" href="https://www.itc.ac.mz/wp-content/uploads/2020/03/cropped-logobackgsite_ITC-2-32x32.png" sizes="32x32">
     <!-- BootStrap Links -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- CSS -->
-    <link rel="stylesheet" href="../../Assets/CSS/global.css">
-    <link rel="stylesheet" href="../../Assets/CSS/notifications.css">
-    <link rel="stylesheet" href="../../Assets/CSS/chart.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/global.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/notifications.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/chart.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
@@ -176,7 +182,7 @@ $years_list_json = json_encode(array_values($years_list));
                             </li>
                             <?php include __DIR__ . '/../../Includes/notification-widget.php'; ?>
                             <li class="nav-item ms-lg-3">
-                                <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger shadow-sm"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+                                <a href="/estagio/logout" class="btn btn-danger shadow-sm"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
                             </li>
                         </ul>
                     </div>
@@ -188,7 +194,7 @@ $years_list_json = json_encode(array_values($years_list));
         <nav class="bg-white shadow-sm border-bottom">
             <ul class="nav justify-content-center py-2">
                 <li class="nav-item mx-2">
-                    <a class="nav-link active fw-semibold text-dark" aria-current="page" href="#">
+                    <a class="nav-link active fw-semibold text-dark" aria-current="page" href="/estagio/supervisor">
                         <i class="fas fa-home me-1 text-primary"></i> Home
                     </a>
                 </li>
@@ -197,9 +203,9 @@ $years_list_json = json_encode(array_values($years_list));
                         <i class="fas fa-plus-circle fa-fw me-1 text-success"></i> Fazer Pedidos
                     </a>
                     <ul class="dropdown-menu shadow border-0 mt-2" aria-labelledby="pedidosDropdown">
-                        <li><a class="dropdown-item" href="../estagio/formularioDeCartaDeEstagio.php"><i class="fas fa-envelope-open-text fa-fw me-2 text-secondary"></i> Pedido de Estágio</a></li>
-                        <li><a class="dropdown-item" href="../estagio/formularioDeCredencialDeEstagio.php"><i class="fas fa-id-badge fa-fw me-2 text-secondary"></i> Credencial de Estágio</a></li>
-                        <li><a class="dropdown-item" href="../estagio/formularioDeVisita.php"><i class="fas fa-map-marked-alt fa-fw me-2 text-secondary"></i> Visita de Estágio</a></li>
+                        <li><a class="dropdown-item" href="/estagio/estagio/criar"><i class="fas fa-envelope-open-text fa-fw me-2 text-secondary"></i> Pedido de Estágio</a></li>
+                        <li><a class="dropdown-item" href="/estagio/credencial/criar"><i class="fas fa-id-badge fa-fw me-2 text-secondary"></i> Credencial de Estágio</a></li>
+                        <li><a class="dropdown-item" href="/estagio/visita/criar"><i class="fas fa-map-marked-alt fa-fw me-2 text-secondary"></i> Visita de Estágio</a></li>
                     </ul>
                 </li>
                 <li class="nav-item mx-1 dropdown">
@@ -207,13 +213,13 @@ $years_list_json = json_encode(array_values($years_list));
                         <i class="fas fa-list-ul fa-fw me-1 text-info"></i> Listas
                     </a>
                     <ul class="dropdown-menu shadow border-0 mt-2" aria-labelledby="listasDropdown">
-                        <li><a class="dropdown-item" href="../estagio/listaDePedidos.php"><i class="fas fa-file-alt fa-fw me-2 text-secondary"></i> Pedidos de Estágio</a></li>
-                        <li><a class="dropdown-item" href="../estagio/listaDePedidosCredencial.php"><i class="fas fa-id-card-clip fa-fw me-2 text-secondary"></i> Pedidos de Credencial</a></li>
-                        <li><a class="dropdown-item" href="../estagio/listaDePedidosVisita.php"><i class="fas fa-route fa-fw me-2 text-secondary"></i> Pedidos de Visita</a></li>
+                        <li><a class="dropdown-item" href="/estagio/estagio/listar"><i class="fas fa-file-alt fa-fw me-2 text-secondary"></i> Pedidos de Estágio</a></li>
+                        <li><a class="dropdown-item" href="/estagio/credencial/listar"><i class="fas fa-id-card-clip fa-fw me-2 text-secondary"></i> Pedidos de Credencial</a></li>
+                        <li><a class="dropdown-item" href="/estagio/visita/listar"><i class="fas fa-route fa-fw me-2 text-secondary"></i> Pedidos de Visita</a></li>
                     </ul>
                 </li>
                 <li class="nav-item mx-1">
-                    <a class="nav-link fw-semibold text-dark" href="../estagio/relatorio.php">
+                    <a class="nav-link fw-semibold text-dark" href="/estagio/relatorio">
                         <i class="fas fa-file-pdf fa-fw me-1 text-danger"></i> Gerar Relatórios
                     </a>
                 </li>
@@ -223,7 +229,7 @@ $years_list_json = json_encode(array_values($years_list));
 
     <section class="dashboard-header text-center bg-white border-bottom shadow-sm py-5 mb-4" style="margin-top: 190px;">
         <div class="container">
-            <h1 class="display-5 fw-bold text-primary"><i class="fas fa-chart-line me-3"></i>Resumo dos Dados de Estágios</h1>
+            <h1 class="display-5 fw-bold"><i class="fas fa-chart-line me-3"></i>Resumo dos Dados de Estágios</h1>
             <p class="lead text-muted">Visão Geral dos Dados de Estágio sob a sua supervisão</p>
         </div>
     </section>
@@ -235,7 +241,7 @@ $years_list_json = json_encode(array_values($years_list));
                 <div class="card h-100 shadow-sm border-0 rounded-4">
                     <div class="card-body p-4 d-flex flex-column">
                         <h5 class="card-title fw-bold text-secondary mb-4">
-                            <i class="fas fa-calendar-alt text-primary me-2"></i>Cartas de Estágio geradas por Ano 
+                            <i class="fas fa-calendar-alt text-primary me-2"></i>Cartas de Estágio geradas por Ano
                         </h5>
                         <div class="chart-container flex-grow-1 position-relative">
                             <canvas id="pedidosAnoPieChart"></canvas>

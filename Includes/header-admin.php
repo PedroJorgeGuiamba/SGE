@@ -22,16 +22,18 @@ NotificationHelper::handleAction($conn, $userId, $_POST ?? []);
 
 $unreadCount = NotificationHelper::getUnreadCount($conn, $userId);
 $notifications = NotificationHelper::getNotifications($conn, $userId);
-?>
 
+$themeValue = isset($_SESSION['theme']) ? trim($_SESSION['theme']) : 'light';
+$themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : 'light';
+?>
 <!DOCTYPE html>
-<html lang="pt-pt" data-bs-theme="<?php echo $_SESSION['theme'] ?? 'light'; ?>">
+<html lang="pt-pt" data-bs-theme="<?php echo htmlspecialchars($themeValue, ENT_QUOTES, 'UTF-8'); ?>">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal de Admin</title>
-
+    <link rel="icon" href="https://www.itc.ac.mz/wp-content/uploads/2020/03/cropped-logobackgsite_ITC-2-32x32.png" sizes="32x32">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome for Icons -->
@@ -40,9 +42,10 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="../../Assets/CSS/global.css">
-    <link rel="stylesheet" href="../../Assets/CSS/chart.css">
-    <link rel="stylesheet" href="../../Assets/CSS/notifications.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/chart.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/uploadJSON.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/global.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/notifications.css">
 </head>
 
 <body>
@@ -89,7 +92,7 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
                             </li>
                             <?php include __DIR__ . '/notification-widget.php'; ?>
                             <li class="nav-item ms-lg-3">
-                                <a href="../../Controller/Auth/LogoutController.php" class="btn btn-danger shadow-sm px-4 fw-semibold rounded-pill"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+                                <a href="/estagio/logout" class="btn btn-danger shadow-sm px-4 fw-semibold rounded-pill"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
                             </li>
                         </ul>
                     </div>
@@ -99,7 +102,7 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
         <nav class="bg-white shadow-sm border-bottom">
             <ul class="nav justify-content-center py-2">
                 <li class="nav-item mx-2">
-                    <a class="nav-link active fw-semibold text-dark" aria-current="page" href="../../View/Admin/portalDoAdmin.php">
+                    <a class="nav-link active fw-semibold text-dark" aria-current="page" href="/estagio/admin">
                         <i class="fas fa-home me-1 text-primary"></i> Home
                     </a>
                 </li>
@@ -114,13 +117,32 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
                         <i class="fas fa-plus-circle me-1 text-primary"></i> Cadastrar
                     </a>
                     <ul class="dropdown-menu shadow-sm border-0" aria-labelledby="dropdownModulos">
-                        <li><a class="dropdown-item" href="../../View/Cursos/CadastrarCurso.php"><i class="fas fa-graduation-cap fa-fw me-2 text-secondary"></i> Cursos</a></li>
-                        <li><a class="dropdown-item" href="../../View/Qualificacao/CadastrarQualificacao.php"><i class="fas fa-certificate fa-fw me-2 text-secondary"></i> Qualificações</a></li>
-                        <li><a class="dropdown-item" href="../../View/Turmas/CadastrarTurma.php"><i class="fas fa-users-class fa-fw me-2 text-secondary"></i> Turmas</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="../../View/Formando/CadastrarFormando.php"><i class="fas fa-user-graduate fa-fw me-2 text-secondary"></i> Formandos</a></li>
-                        <li><a class="dropdown-item" href="../../View/Formador/CadastrarFormador.php"><i class="fas fa-chalkboard-teacher fa-fw me-2 text-secondary"></i> Formadores</a></li>
-                        <li><a class="dropdown-item" href="../../View/Supervisor/CadastrarSupervisor.php"><i class="fas fa-user-tie fa-fw me-2 text-secondary"></i> Supervisores</a></li>
+                        <li><a class="dropdown-item" href="/estagio/cursos/criar"><i class="fas fa-graduation-cap fa-fw me-2 text-secondary"></i> Cursos</a></li>
+                        <li><a class="dropdown-item" href="/estagio/qualificacao/criar"><i class="fas fa-certificate fa-fw me-2 text-secondary"></i> Qualificações</a></li>
+                        <li><a class="dropdown-item" href="/estagio/turma/criar"><i class="fas fa-users-class fa-fw me-2 text-secondary"></i> Turmas</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="/estagio/formando/criar"><i class="fas fa-user-graduate fa-fw me-2 text-secondary"></i> Formandos</a></li>
+                        <li><a class="dropdown-item" href="/estagio/formador/criar"><i class="fas fa-chalkboard-teacher fa-fw me-2 text-secondary"></i> Formadores</a></li>
+                        <li><a class="dropdown-item" href="/estagio/supervisor/criar"><i class="fas fa-user-tie fa-fw me-2 text-secondary"></i> Supervisores</a></li>
+                    </ul>
+                </li>
+
+                <li class="nav-item dropdown mx-2">
+                    <a class="nav-link dropdown-toggle fw-semibold text-dark" href="#" id="dropdownModulos" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-list-ul fa-fw me-1 text-info"></i> Listar
+                    </a>
+                    <ul class="dropdown-menu shadow-sm border-0" aria-labelledby="dropdownModulos">
+                        <li><a class="dropdown-item" href="/estagio/cursos/listar"><i class="fas fa-graduation-cap fa-fw me-2 text-secondary"></i> Cursos</a></li>
+                        <li><a class="dropdown-item" href="/estagio/qualificacao/listar"><i class="fas fa-certificate fa-fw me-2 text-secondary"></i> Qualificações</a></li>
+                        <li><a class="dropdown-item" href="/estagio/turma/listar"><i class="fas fa-users-class fa-fw me-2 text-secondary"></i> Turmas</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="/estagio/formando/listar"><i class="fas fa-user-graduate fa-fw me-2 text-secondary"></i> Formandos</a></li>
+                        <li><a class="dropdown-item" href="/estagio/formador/listar"><i class="fas fa-chalkboard-teacher fa-fw me-2 text-secondary"></i> Formadores</a></li>
+                        <li><a class="dropdown-item" href="/estagio/supervisor/listar"><i class="fas fa-user-tie fa-fw me-2 text-secondary"></i> Supervisores</a></li>
                     </ul>
                 </li>
 
@@ -135,7 +157,7 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
                     </a>
                 </li>
                 <li class="nav-item mx-2">
-                    <a class="nav-link fw-semibold text-dark" href="../estagio/situacaoDeEstagio.php">
+                    <a class="nav-link fw-semibold text-dark" href="/estagio/estagio">
                         <i class="fas fa-briefcase me-1 text-primary"></i> Situação de Estágio
                     </a>
                 </li>

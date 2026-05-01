@@ -18,6 +18,7 @@ from reportlab.platypus import (
 )
 from reportlab.pdfgen import canvas as pdfcanvas
 import urllib.request
+import requests
 
 PRETO      = colors.black
 CINZA_LINHA = colors.HexColor('#AAAAAA')
@@ -113,7 +114,10 @@ def gerar_pdf(dados, output_path):
     try:
         url = "https://www.itc.ac.mz/wp-content/uploads/2020/07/cropped-LOGO_ITC-09.png"
         req = urllib.request.Request(url, headers={'User-Agent':'Mozilla/5.0'})
-        raw = urllib.request.urlopen(req, timeout=5).read()
+        # raw = urllib.request.urlopen(req, timeout=5).read()
+        response = requests.get(url, timeout=5, verify=True)
+        response.raise_for_status()
+        raw = response.content
         logo_img = Image(io.BytesIO(raw), width=2.0*cm, height=1.8*cm)
     except Exception:
         pass

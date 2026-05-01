@@ -1,5 +1,5 @@
 <?php
-require_once '../../Conexao/conector.php';
+require_once __DIR__ . '/../../Conexao/conector.php';
 require_once __DIR__ . '/../../Helpers/Criptografia.php';
 
 $con = new Conector();
@@ -7,7 +7,7 @@ $mysqli = $con->getConexao();
 
 $descriptografar = new Criptografia();
 
-$query = "SELECT id, Email FROM usuarios";
+$query = "SELECT id, Email FROM usuarios WHERE role='formador'";
 $resultado = mysqli_query($mysqli, $query);
 
 $email_descriptografado = $descriptografar->descriptografar($row['Email']);

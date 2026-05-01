@@ -1,9 +1,7 @@
 <?php
-require_once __DIR__ . '/../Conexao/conector.php';
 require_once __DIR__ . '/../Model/Pessoa.php';
 use Models\Pessoa;
 class Formando extends Pessoa{
-    private $conn;
     private int $codigo;
     private int $userId;
     public function __construct(
@@ -16,14 +14,12 @@ class Formando extends Pessoa{
         string $numeroDeDocumento,
         string $localEmitido,
         DateTime $dataDeEmissao,
-        int $NUIT,
-        int $Telefone,
+        string $NUIT,
+        string $Telefone,
         string $email,
         int $userId
     ) {
         parent::__construct($nome, $apelido,  $dataDeNascimento,$naturalidade, $tipoDeDocumento, $numeroDeDocumento, $localEmitido, $dataDeEmissao, $NUIT, $Telefone, $email);
-        $conexao = new Conector();
-        $this->conn = $conexao->getConexao();
         $this->codigo = $codigo;
         $this->userId = $userId;
     }
@@ -47,14 +43,14 @@ class Formando extends Pessoa{
         return $this->userId;
     }
 
-    public function salvar(): bool
+    public function salvar($conn): bool
     {
-        $stmt = $this->conn->prepare(
+        $stmt = $conn->prepare(
             "INSERT INTO formando (codigo, nome, apelido, dataDeNascimento, naturalidade, tipoDeDocumento, numeroDeDocumento, localEmitido, dataDeEmissao, NUIT, telefone, email, usuario_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
 
         if (!$stmt) {
-            error_log("Erro na preparação da query: " . $this->conn->error);
+            error_log("Erro na preparação da query: " . $conn->error);
             return false;
         }
 
@@ -75,7 +71,7 @@ class Formando extends Pessoa{
         $email = $this->getEmail();
 
         $stmt->bind_param(
-            "issssssssiisi",
+            "isssssssssssi",
             $this->codigo,
             $nome,
             $apelido,
@@ -98,6 +94,51 @@ class Formando extends Pessoa{
 
         $stmt->close();
         return $result;
+    }
+    public function LastInsertId($conn){
+        return $conn->insert_id;
+    }
+
+    public function actualizar(string $nome, string $apelido, int $codigo, string $dataDeNascimento, string $naturalidade, string $tipoDeDocumento, string $numeroDeDocumento, string $localEmitido, string $dataDeEmissao, string $NUIT, string $telefone, string $email, int $userID, int $id_formando, mysqli $conn): bool
+    {
+        $stmt = $conn->prepare("UPDATE formando SET
+            nome = ?,
+            apelido = ?,
+            codigo = ?,
+            dataDeNascimento = ?,
+            naturalidade = ?,
+            tipoDeDocumento = ?,
+            numeroDeDocumento = ?,
+            localEmitido = ?,
+            dataDeEmissao = ?,
+            NUIT = ?,
+            telefone = ?,
+            email = ?, 
+            usuario_id = ?
+            WHERE id_formando = ?");
+
+        if (!$stmt) {
+            return false;
+        }
+
+        $stmt->bind_param("ssisssssssssii",
+                $nome,
+                $apelido,
+                $codigo,
+                $dataDeNascimento,
+                $naturalidade,
+                $tipoDeDocumento,
+                $numeroDeDocumento,
+                $localEmitido,
+                $dataDeEmissao,
+                $NUIT,
+                $telefone,
+                $email,
+                $userID,
+                $id_formando
+            );
+
+        return $stmt->execute();
     }
 }
 

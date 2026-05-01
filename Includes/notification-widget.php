@@ -1,5 +1,7 @@
 <?php
 $unreadLabel = $unreadCount > 99 ? '99+' : $unreadCount;
+
+$currentUrl = $_SERVER['REQUEST_URI'] ?? '/estagio/formando';
 ?>
 <li class="nav-item dropdown">
     <a href="#" class="nav-link notification-icon dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Notificações" style="padding: 0; margin: 0 15px;">
@@ -34,10 +36,12 @@ $unreadLabel = $unreadCount > 99 ? '99+' : $unreadCount;
         <li class="px-3 py-2 text-center">
             <form method="POST" style="display:inline;" class="d-inline-block me-2">
                 <input type="hidden" name="action" value="mark_all_read">
+                <input type="hidden" name="redirect_url" value="<?php echo htmlspecialchars($currentUrl); ?>">
                 <button type="submit" class="btn btn-sm btn-outline-primary">Marcar todas como lidas</button>
             </form>
             <form method="POST" style="display:inline;" class="d-inline-block">
                 <input type="hidden" name="action" value="clear_all">
+                <input type="hidden" name="redirect_url" value="<?php echo htmlspecialchars($currentUrl); ?>">
                 <button type="submit" class="btn btn-sm btn-outline-danger">Limpar todas</button>
             </form>
         </li>

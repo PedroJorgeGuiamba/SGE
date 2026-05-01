@@ -23,20 +23,6 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
 // ============================================================
 // CONTROLO DE QUALIFICAÇÕES POR ROLE
 // ============================================================
-// Se for supervisor, carrega apenas as qualificações que lhe estão
-// associadas na tabela `supervisor_qualificacao`.
-// Se for admin, carrega todas as qualificações disponíveis.
-
-// Estrutura esperada para a tabela de vínculo:
-//   CREATE TABLE supervisor_qualificacao (
-//     id          INT AUTO_INCREMENT PRIMARY KEY,
-//     usuario_id  INT NOT NULL,   -- FK -> usuarios(id)
-//     id_qualificacao INT NOT NULL, -- FK -> qualificacao(id_qualificacao)
-//     UNIQUE (usuario_id, id_qualificacao),
-//     FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-//     FOREIGN KEY (id_qualificacao) REFERENCES qualificacao(id_qualificacao)
-//   );
-// ============================================================
 
 $qualificacoes_ids      = [];
 $qualificacoes_sql_in   = '';

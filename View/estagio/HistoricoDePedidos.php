@@ -1,6 +1,6 @@
 <?php require_once __DIR__ . '/../../Includes/header-estagio-admin.php' ?>
 
-    <main class="container-fluid px-4 mb-5" style="margin-top: 40px;">
+    <main class="container-fluid px-4 mb-5" style="margin-top: 20px;">
         <div class="card shadow-sm border-0 rounded-4">
             <div class="card-header bg-white border-bottom-0 mt-3 pt-4 pb-3 d-flex justify-content-between align-items-center">
                 <div>

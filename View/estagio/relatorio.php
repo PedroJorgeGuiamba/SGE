@@ -415,7 +415,7 @@ if ($is_supervisor) {
         }
     </style> -->
 
-<main class="container-fluid px-4 mb-5" style="margin-top: 40px;">
+<main class="container-fluid px-4 mb-5" style="margin-top: 20px;">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h3 class="fw-bold text-primary mb-0">

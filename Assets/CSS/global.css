@@ -279,8 +279,28 @@ header nav ul li.nav-item ul.dropdown-menu li a.dropdown-item {
     }
 
     .destaques,
-    .dicas-noticias {
+    .dicas-noticias,
+    .about-section {
         padding: 2rem 0;
+    }
+
+    .auth-card {
+        padding: 2rem;
+        margin: 1rem;
+        width: calc(100% - 2rem);
+    }
+
+    .auth-card .logo-container img {
+        max-width: 150px;
+    }
+
+    .empty-state {
+        padding: 2rem 1rem;
+    }
+    
+    .container-footer {
+        padding: 30px 15px;
+        margin-top: 30px;
     }
 }
 
@@ -299,13 +319,26 @@ header nav ul li.nav-item ul.dropdown-menu li a.dropdown-item {
     }
 
     .btn-primary,
-    .btn-outline-primary {
+    .btn-outline-primary,
+    .btn-success {
         width: 100%;
         margin-top: 0.5rem;
     }
 
     .g-recaptcha {
         transform: scale(0.8);
+    }
+
+    .auth-card {
+        padding: 1.5rem;
+    }
+
+    .auth-title {
+        font-size: 1.25rem;
+    }
+    
+    .icon-box {
+        padding: 1.5rem;
     }
 }
 

@@ -5,11 +5,6 @@
     padding-top: 140px; /* header fixo: navbar principal + navbar secundária */
 }
 
-@media (max-width: 767.98px) {
-    .portal-section {
-        padding-top: 120px;
-    }
-}
 
 .section-header {
     display: flex;
@@ -228,4 +223,99 @@
     font-size: 3rem;
     margin-bottom: 1rem;
     color: #cbd5e1;
+}
+
+/* ====== RESPONSIVIDADE ====== */
+@media (max-width: 1200px) {
+    .portal-section {
+        padding: 2rem 1rem 3rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .portal-section {
+        padding-top: 130px;
+    }
+}
+
+@media (max-width: 768px) {
+    .portal-section {
+        padding-top: 110px;
+        padding-bottom: 2rem;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .section-header .icon-badge {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .section-header h2 {
+        font-size: 1.25rem;
+    }
+    
+    .table-card-header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 1.25rem;
+        gap: 15px;
+    }
+    
+    .quick-actions {
+        width: 100%;
+        justify-content: stretch;
+        margin-bottom: 0.5rem;
+    }
+    
+    .quick-action-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 12px;
+    }
+    
+    .table-card {
+        border-radius: 12px;
+    }
+    
+    /* Tabela rolável para mobile */
+    #pedidosTable {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        width: 100%;
+    }
+    
+    #pedidosTable thead tr th,
+    #pedidosTable tbody td {
+        padding: 10px 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    .portal-section {
+        padding-top: 100px;
+    }
+    
+    .section-header h2 {
+        font-size: 1.15rem;
+    }
+    
+    .btn-action {
+        width: 28px;
+        height: 28px;
+        font-size: 0.75rem;
+    }
+    
+    .empty-state {
+        padding: 2rem 1rem;
+    }
+    
+    .empty-state i {
+        font-size: 2.5rem;
+    }
 }

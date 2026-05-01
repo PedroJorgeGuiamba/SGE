@@ -108,19 +108,60 @@
     transform: translateY(-2px);
 }
 
-@media (max-width: 767.98px) {
-    .preview-body {
+/* ====== RESPONSIVIDADE ====== */
+@media (max-width: 992px) {
+    .preview-wrapper {
+        max-width: 95%;
+    }
+}
+
+@media (max-width: 768px) {
+    .preview-body,
+    .preview-header,
+    .preview-footer {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .preview-card {
+        border-radius: 16px;
+    }
+
+    .preview-body,
+    .preview-header,
+    .preview-footer {
         padding: 1.25rem;
     }
-    .preview-header {
-        padding: 1.25rem;
+    
+    .preview-header h4 {
+        font-size: 1.05rem;
     }
+    
+    .field-card {
+        padding: 12px 14px;
+    }
+    
+    .field-card .field-value {
+        font-size: 0.9rem;
+    }
+
     .preview-footer {
         flex-direction: column;
-        gap: 10px;
-        padding: 1.25rem;
+        gap: 12px;
+        border-radius: 0 0 16px 16px;
     }
+    
     .preview-footer .btn {
         width: 100%;
+        padding: 12px;
+    }
+}
+
+@media (max-width: 400px) {
+    .preview-body,
+    .preview-header,
+    .preview-footer {
+        padding: 1rem;
     }
 }

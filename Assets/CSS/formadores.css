@@ -196,7 +196,31 @@
 }
 
 /* ====== RESPONSIVIDADE ====== */
+@media (max-width: 1200px) {
+    .formadores-list {
+        padding: 2.5rem 0;
+    }
+}
+
+@media (max-width: 992px) {
+    .formadores-stats {
+        margin: 2rem 0;
+    }
+    
+    .card-img-wrapper {
+        height: 220px;
+    }
+}
+
 @media (max-width: 768px) {
+    .formadores-stats {
+        margin: 1.5rem 0;
+    }
+
+    .formadores-list {
+        padding: 2rem 0;
+    }
+
     .stat-number {
         font-size: 2rem;
     }
@@ -214,7 +238,7 @@
     }
 
     .formador-card .card-title {
-        font-size: 1rem;
+        font-size: 1.1rem;
     }
 
     .formador-card .card-text {
@@ -229,6 +253,11 @@
 
     .stat-box {
         margin-bottom: 1rem;
+        padding: 1.25rem;
+    }
+
+    .stat-number {
+        font-size: 1.75rem;
     }
 
     .card-img-wrapper {
@@ -236,15 +265,30 @@
     }
 
     .formador-card .card-body {
-        padding: 1rem;
+        padding: 1.25rem;
     }
 
     .formador-card .card-title {
-        font-size: 0.95rem;
+        font-size: 1rem;
     }
 
     .formador-stats small {
         font-size: 0.8rem;
+    }
+    
+    .formador-card .badge {
+        font-size: 0.7rem;
+        padding: 0.4em 0.6em;
+    }
+}
+
+@media (max-width: 400px) {
+    .card-img-wrapper {
+        height: 160px;
+    }
+    
+    .stat-box {
+        padding: 1rem;
     }
 }
 

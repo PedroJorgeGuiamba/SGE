@@ -2,12 +2,13 @@
 
 class PedidoDeCredencial
 {
-    private $id_pedido_carta;
-    private $codigoFormando;
-    private $contactoFormando;
-    private $email;
-    private $empresa;
-    private $dataPedido;
+    private int $id_pedido_carta;
+    private int $codigoFormando;
+    private string $contactoFormando;
+    private string $email;
+    private string $empresa;
+    private string $dataPedido;
+    private string $cartaPath;
 
     // Getters e setters
     public function setIdPedido($id)
@@ -37,6 +38,10 @@ class PedidoDeCredencial
     {
         $this->dataPedido = $dataPedido;
     }
+    public function setCartaPath(string $cartaPath)
+    {
+        $this->cartaPath = $cartaPath;
+    }
 
     public function buscarNomeEApelido(int $codigo, mysqli $conn): ?array
     {
@@ -54,14 +59,14 @@ class PedidoDeCredencial
 
     public function salvar(string $nome, string $apelido, mysqli $conn): bool
     {
-        $stmt = $conn->prepare("INSERT INTO credencial_estagio (id_pedido_carta, codigo_formando, nome, apelido, contactoFormando, email, empresa, data_do_pedido) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO credencial_estagio (id_pedido_carta, codigo_formando, nome, apelido, contactoFormando, email, empresa, data_do_pedido, carta_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         if (!$stmt) {
             return false;
         }
 
         $stmt->bind_param(
-            "iissssss",
+            "iisssssss",
             $this->id_pedido_carta,
             $this->codigoFormando,
             $nome,
@@ -70,6 +75,7 @@ class PedidoDeCredencial
             $this->email,
             $this->empresa,
             $this->dataPedido,
+            $this->cartaPath
         );
 
         return $stmt->execute();

@@ -33,7 +33,7 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
                     <p class="text-muted small">Preencha com o seu registo, destino e contacto para a geração da credencial</p>
                 </div>
                 <div class="card-body p-5">
-                    <form action="/estagio/credencial/salvar" method="post" id="formularioEstagio">
+                    <form action="/estagio/credencial/salvar" method="post" id="formularioEstagio" enctype="multipart/form-data">
                         <?php echo CSRFProtection::getTokenField(); ?>
                         <?php if (isset($_GET['erros'])): ?>
                             <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
@@ -77,6 +77,17 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
                                     <input type="email" name="email" class="form-control border-start-0 ps-0" id="email" placeholder="estudante@dominio.com" required>
                                 </div>
                                 <span class="error_form text-danger small" id="email_error_message"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="row g-3 mb-4 justify-content-center">
+                            <div class="col-md-6">
+                                <label for="carta_path" class="form-label text-muted fw-bold small">Carta de Resposta(PDF/Word/Imagem)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-file text-muted"></i></span>
+                                    <input type="file" name="carta_path" id="carta_path" accept="image/jpeg,image/png,image/gif,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                                </div>
+                                <span class="error_form text-danger small" id="carta_path_error_message"></span>
                             </div>
                         </div>
 

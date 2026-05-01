@@ -78,7 +78,8 @@ while ($row = $result->fetch_assoc()) {
         'email' => $criptografia->descriptografar($row['email']),
         'empresa' => $row['empresa'],
         'data_do_pedido' => $row['data_do_pedido'],
-        'id_pedido_carta' => $row['id_pedido_carta']
+        'id_pedido_carta' => $row['id_pedido_carta'],
+        'carta_path'      => $row['carta_path'] ?? null
     ];
 }
 

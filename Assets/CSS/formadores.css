@@ -1,9 +1,12 @@
+Formadores.css
 /* ====== PORTAL DE FORMADORES - ESTILOS ESPECÍFICOS ====== */
 
 /* Secção Hero de Formadores */
 .formadores-hero {
     background: linear-gradient(135deg, rgba(58, 76, 145, 0.05) 0%, rgba(60, 155, 255, 0.05) 100%);
     border-bottom: 1px solid rgba(58, 76, 145, 0.1);
+    padding-top: 3.5rem !important;
+    padding-bottom: 3.5rem !important;
 }
 
 /* Estatísticas dos Formadores */
@@ -43,6 +46,10 @@
 .formadores-list {
     padding: 3rem 0;
     background: white;
+}
+
+.formadores-list .row {
+    align-items: stretch;
 }
 
 /* Card de Formador */
@@ -197,6 +204,28 @@
 
 /* ====== RESPONSIVIDADE ====== */
 @media (max-width: 768px) {
+    .formadores-hero {
+        padding-top: 2.75rem !important;
+        padding-bottom: 2.75rem !important;
+    }
+
+    .section-title {
+        margin-bottom: 2rem;
+    }
+
+    .section-title h2 {
+        font-size: 1.6rem;
+    }
+
+    .section-title .lead {
+        font-size: 1rem;
+        padding: 0 0.5rem;
+    }
+
+    .formadores-stats {
+        margin: 2rem 0;
+    }
+
     .stat-number {
         font-size: 2rem;
     }
@@ -213,6 +242,10 @@
         height: 200px;
     }
 
+    .formadores-list {
+        padding: 2rem 0;
+    }
+
     .formador-card .card-title {
         font-size: 1rem;
     }
@@ -223,16 +256,36 @@
 }
 
 @media (max-width: 576px) {
+    .formadores-hero {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+    }
+
+    .section-title h2 {
+        font-size: 1.35rem;
+    }
+
+    .section-title .lead {
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
     .formadores-stats .row {
-        flex-direction: column;
+        gap: 0.75rem !important;
     }
 
     .stat-box {
-        margin-bottom: 1rem;
+        margin-bottom: 0;
+        padding: 1.25rem 1rem;
     }
 
     .card-img-wrapper {
         height: 180px;
+    }
+
+    .formadores-list .row {
+        --bs-gutter-x: 0.75rem;
+        --bs-gutter-y: 0.75rem;
     }
 
     .formador-card .card-body {
@@ -243,8 +296,43 @@
         font-size: 0.95rem;
     }
 
+    .formador-card .card-text {
+        font-size: 0.88rem;
+        line-height: 1.5;
+    }
+
     .formador-stats small {
         font-size: 0.8rem;
+    }
+
+    .card-overlay {
+        opacity: 1;
+        background: linear-gradient(180deg, rgba(58, 76, 145, 0) 35%, rgba(58, 76, 145, 0.82) 100%);
+        align-items: flex-end;
+        justify-content: center;
+        padding-bottom: 1rem;
+    }
+
+    .card-overlay .btn {
+        min-width: 140px;
+    }
+}
+
+@media (max-width: 380px) {
+    .stat-number {
+        font-size: 1.7rem;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+    }
+
+    .card-img-wrapper {
+        height: 165px;
+    }
+
+    .formador-card .badge {
+        font-size: 0.7rem;
     }
 }
 

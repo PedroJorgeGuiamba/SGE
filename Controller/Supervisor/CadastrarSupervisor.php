@@ -5,6 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once __DIR__ . '/../../Model/Supervisor.php';
 require_once __DIR__ . '/../../Model/Notificacao.php';
+require_once __DIR__ . '/../../Model/Usuario.php';
 require_once __DIR__ . '/../../Conexao/conector.php';
 require_once __DIR__ . '/../../Helpers/Actividade.php';
 require_once __DIR__ . '/../../Helpers/Criptografia.php';
@@ -14,6 +15,7 @@ class CadastrarSupervisor
 {
     private mysqli $conn;
     private Supervisor $supervisor;
+    private Usuario $usuario;
     private Notificacao $notificacao;
 
     public function __construct()
@@ -22,6 +24,7 @@ class CadastrarSupervisor
         $this->conn = $conexao->getConexao();
         $this->supervisor = new Supervisor();
         $this->notificacao = new Notificacao();
+        $this->usuario = new Usuario();
     }
     public function cadastrarSupervisor()
     {
@@ -52,6 +55,12 @@ class CadastrarSupervisor
             if($result && $result->num_rows > 0){
                 $this->conn->rollback();
                 header("Location: /estagio/supervisor/criar?erros=" . "Supervisor já registrado na qualificação selecionada.");
+                exit();
+            }
+
+            if(!$this->usuario->updateRoleById( $this->conn, "supervisor", $user)) {
+                $this->conn->rollback();
+                header("Location: /estagio/supervisor/criar?erros=" . "Erro ao Actualizar Role do Supervisor.");
                 exit();
             }
 

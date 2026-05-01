@@ -28,31 +28,38 @@ class Usuario{
         $this->role = $role;
     }
 
-    public function salvar($conn){
+    public function salvar(mysqli $conn){
         $sql = "INSERT INTO usuarios (Email, password, role, email_hash) VALUES (?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ssss", $this->email, $this->senha, $this->role, $this->email_hash);
 
         return $stmt->execute();
     }
-    public function getUsers($conn){
+    public function getUsers(mysqli $conn){
         $sql = "SELECT id, Email, password, role FROM usuarios";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         return $stmt->get_result();
     }
-    public function getUsersByEmail($conn, $email){
+    public function getUsersByEmail(mysqli $conn, string $email){
         $sql = "SELECT id FROM usuarios WHERE Email = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $email);
         $stmt->execute();
         return $stmt->get_result();
     }
-    public function getUsersByEmailHashed($conn, $email){
+    public function getUsersByEmailHashed(mysqli $conn, string $email){
         $sql = "SELECT id, password, Email, role FROM usuarios WHERE email_hash = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $email);
         $stmt->execute();
         return $stmt->get_result();
+    }
+
+    public function updateRoleById(mysqli $conn, string $role, int $usuario_id){
+        $sql = "UPDATE usuarios SET role = ? WHERE usuario_id - ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("si", $role, $usuario_id);
+        return $stmt->execute();
     }
 }

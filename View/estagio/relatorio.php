@@ -26,7 +26,7 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
 // Se for supervisor, carrega apenas as qualificações que lhe estão
 // associadas na tabela `supervisor_qualificacao`.
 // Se for admin, carrega todas as qualificações disponíveis.
-//
+
 // Estrutura esperada para a tabela de vínculo:
 //   CREATE TABLE supervisor_qualificacao (
 //     id          INT AUTO_INCREMENT PRIMARY KEY,

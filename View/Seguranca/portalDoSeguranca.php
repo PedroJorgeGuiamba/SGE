@@ -45,8 +45,8 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
         crossorigin="anonymous"></script>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="../../Assets/CSS/global.css">
-    <link rel="stylesheet" href="../../Assets/CSS/notifications.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/global.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/notifications.css">
 </head>
 
 <body>
@@ -228,10 +228,7 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
 
     <!-- Bootsrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-    </script>
+    <script src="/estagio/Assets/JS/tooltip.js"></script>
 </body>
 
 </html>

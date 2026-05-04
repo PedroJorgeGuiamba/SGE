@@ -114,7 +114,7 @@ $conn->close();
     </main>
 
     <?php require_once __DIR__ . '/../../Includes/footer.php'?>
-    <script>
+    <!-- <script>
         $(document).ready(function () {
             $('#formEditarResposta').submit(function (e) {
                 e.preventDefault();
@@ -139,7 +139,7 @@ $conn->close();
                 });
             });
         });
-    </script>
+    </script> -->
     <script src="/estagioAssets/JS/tema.js"></script>
 </body>
 </html>

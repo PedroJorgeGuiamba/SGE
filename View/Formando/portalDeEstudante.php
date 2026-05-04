@@ -477,7 +477,7 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
 
     <!-- <?php require_once __DIR__ . '/../../Includes/footer.php' ?> -->
 
-    <script>
+    <!-- <script>
         $(document).ready(function() {
             let currentPage = 1;
             const rowsPerPage = 4;
@@ -707,7 +707,8 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                 $('#selectAll').prop('checked', allChecked);
             });
         });
-    </script>
+    </script> -->
+    <script src="/estagio/Assets/JS/portalDeEstudante.js"></script>
 </body>
 
 </html>

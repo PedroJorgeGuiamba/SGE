@@ -288,3 +288,63 @@ async function enviarDados(dados) {
         setLoading(false);
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Elementos do DOM
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const btnUpload = document.getElementById('btnUpload');
+    const btnClear = document.getElementById('btnClear');
+    
+    // 1. Upload area - clique para abrir seletor de arquivo
+    if (uploadArea) {
+        uploadArea.addEventListener('click', function() {
+            fileInput.click();
+        });
+    }
+    
+    // 2. Botão Upload
+    if (btnUpload) {
+        btnUpload.addEventListener('click', function() {
+            uploadJSON();
+        });
+    }
+    
+    // 3. Botão Limpar
+    if (btnClear) {
+        btnClear.addEventListener('click', function() {
+            limparArquivo();
+        });
+    }
+    
+    // 4. File input - mudança de arquivo
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            processarArquivo(e.target.files[0]);
+        });
+    }
+    
+    // 5. Upload area - drag and drop (já existe no seu código)
+    if (uploadArea) {
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('drag-over');
+        });
+        
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+        });
+        
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type === 'application/json') {
+                processarArquivo(file);
+            } else {
+                mostrarAlerta('Por favor, envie um arquivo JSON válido', 'error');
+            }
+        });
+    }
+});

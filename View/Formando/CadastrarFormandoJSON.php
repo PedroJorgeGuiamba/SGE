@@ -38,8 +38,8 @@ include_once __DIR__ . '/../../Helpers/CSRFProtection.php';
                         
                         <!-- Botões de ação -->
                         <div class="batch-actions" id="batchActions" style="display: none;">
-                            <button id="btnUpload" class="btn-secondary" onclick="uploadJSON()">📤 Enviar Todos os Registros</button>
-                            <button id="btnClear" class="btn-danger" onclick="limparArquivo()">🗑️ Limpar</button>
+                            <button id="btnUpload" class="btn-secondary">📤 Enviar Todos os Registros</button>
+                            <button id="btnClear" class="btn-danger">🗑️ Limpar</button>
                         </div>
                         
                         <!-- Barra de progresso -->

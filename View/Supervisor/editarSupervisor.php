@@ -39,52 +39,52 @@ $supervisor = $result->fetch_assoc();
 $stmt->close();
 ?>
 <?php require_once __DIR__ . '/../../Includes/header-admin.php' ?>
-    <main class="container mt-4">
-        <h2 class="mb-4" style="margin-top: 100px;">Editar Supervisor</h2>
+<main class="container mt-4">
+    <h2 class="mb-4">Editar Supervisor</h2>
 
-        <form id="formEditarSupervisor" action="/estagio/supervisor/atualizar" method="POST">
-            <?php echo CSRFProtection::getTokenField(); ?>
-            <input type="hidden" name="id_supervisor" value="<?php echo htmlspecialchars($supervisor['id_supervisor']); ?>">
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label for="nome" class="form-label">Nome</label>
-                    <input type="text" class="form-control" id="nome" name="nome" value="<?php echo htmlspecialchars($supervisor['nome_supervisor']); ?>" required>
-                    <span class="error_form text-danger small" id="nome_error_message"></span>
-                </div>
-                <div class="col-md-6">
-                    <label for="area" class="form-label">Área</label>
-                    <input type="text" class="form-control" id="area" name="area" value="<?php echo htmlspecialchars($supervisor['area']); ?>" required>
-                    <span class="error_form text-danger small" id="area_error_message"></span>
-                </div>
+    <form id="formEditarSupervisor" action="/estagio/supervisor/atualizar" method="POST">
+        <?php echo CSRFProtection::getTokenField(); ?>
+        <input type="hidden" name="id_supervisor" value="<?php echo htmlspecialchars($supervisor['id_supervisor']); ?>">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="nome" class="form-label">Nome</label>
+                <input type="text" class="form-control" id="nome" name="nome" value="<?php echo htmlspecialchars($supervisor['nome_supervisor']); ?>" required>
+                <span class="error_form text-danger small" id="nome_error_message"></span>
             </div>
-            
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label for="id_qualificacao" class="form-label">Qualificação</label>
-                        <select name="id_qualificacao" id="id_qualificacao" class="form-select">
-                            <option value="">-- Selecione uma Qualificação --</option>
-                            <?php foreach ($qualificacoes as $qual): ?>
-                                <option 
-                                    value="<?= htmlspecialchars($qual['id_qualificacao']) ?>"
-                                    <?= (int)$qual['id_qualificacao'] === (int)$supervisor['qID'] ? 'selected' : '' ?>
-                                >
-                                    <?= htmlspecialchars($qual['descricao']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    <span class="error_form text-danger small" id="qualificacao_error_message"></span>
-                </div>
+            <div class="col-md-6">
+                <label for="area" class="form-label">Área</label>
+                <input type="text" class="form-control" id="area" name="area" value="<?php echo htmlspecialchars($supervisor['area']); ?>" required>
+                <span class="error_form text-danger small" id="area_error_message"></span>
             </div>
+        </div>
 
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <a href="<?php echo $_SESSION['role'] === 'admin' || $_SESSION['role'] === 'supervisor' ? '/estagio/supervisor/listar' : '/estagio/formando'; ?>" class="btn btn-secondary me-md-2">Cancelar</a>
-                <button type="submit" class="btn btn-primary">Atualizar Pedido</button>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="id_qualificacao" class="form-label">Qualificação</label>
+                <select name="id_qualificacao" id="id_qualificacao" class="form-select">
+                    <option value="">-- Selecione uma Qualificação --</option>
+                    <?php foreach ($qualificacoes as $qual): ?>
+                        <option
+                            value="<?= htmlspecialchars($qual['id_qualificacao']) ?>"
+                            <?= (int)$qual['id_qualificacao'] === (int)$supervisor['qID'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($qual['descricao']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <span class="error_form text-danger small" id="qualificacao_error_message"></span>
             </div>
-        </form>
-    </main>
+        </div>
 
-    <!-- Bootstrap JS -->
-    <?php require_once __DIR__ . '/../../Includes/footer.php' ?>
-    <script src="/estagio/Assets/JS/editarSupervisor.js"></script>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <a href="<?php echo $_SESSION['role'] === 'admin' || $_SESSION['role'] === 'supervisor' ? '/estagio/supervisor/listar' : '/estagio/formando'; ?>" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-primary">Atualizar Pedido</button>
+        </div>
+    </form>
+</main>
+
+<!-- Bootstrap JS -->
+<?php require_once __DIR__ . '/../../Includes/footer.php' ?>
+<script src="/estagio/Assets/JS/editarSupervisor.js"></script>
 </body>
+
 </html>

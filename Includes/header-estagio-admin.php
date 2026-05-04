@@ -45,29 +45,15 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
         crossorigin="anonymous"></script>
     <link rel="stylesheet" href="/estagio/Assets/CSS/chart.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/header.css">
     <link rel="stylesheet" href="/estagio/Assets/CSS/global.css">
     <link rel="stylesheet" href="/estagio/Assets/CSS/notifications.css">
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- <style>
-        button {
-            padding-bottom: 110px;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            background: #f8f9fa;
-            border-radius: 12px;
-            color: #6c757d;
-        }
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-    </style> -->
+    <script src="/estagio/Assets/JS/SessionManager.js" 
+        data-session-config='{"timeoutMinutes":30,"heartbeatInterval":60}'>
+    </script>
 </head>
 
 <body>
@@ -75,7 +61,7 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
         <!-- Nav principal -->
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
             <div class="container-fluid">
-                <img src="https://www.itc.ac.mz/wp-content/uploads/2020/07/cropped-LOGO_ITC-09.png" style="height: 40px; margin-right: 15px;">
+                <img src="https://www.itc.ac.mz/wp-content/uploads/2020/07/cropped-LOGO_ITC-09.png">
                 <div class="nav-modal">
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText"
                         aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,29 +72,29 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                             <!-- Instagram -->
                             <li class="nav-item">
                                 <a class="nav-link fs-5" aria-current="page" href="https://www.instagram.com/itc.ac" target="_blank" title="Instagram">
-                                    <i class="fa-brands fa-instagram" style="color: #E1306C;"></i>
+                                    <i class="fa-brands fa-instagram"></i>
                                 </a>
                             </li>
                             <!-- Facebook -->
                             <li class="nav-item">
                                 <a class="nav-link fs-5" aria-current="page" href="https://pt-br.facebook.com/itc.transcom" target="_blank" title="Facebook">
-                                    <i class="fa-brands fa-facebook" style="color: #1877F2;"></i>
+                                    <i class="fa-brands fa-facebook"></i>
                                 </a>
                             </li>
                             <!-- Google -->
                             <li class="nav-item">
                                 <a class="nav-link fs-5" href="https://plus.google.com/share?url=https://simplesharebuttons.com" target="_blank" title="Google Plus">
-                                    <i class="fa-brands fa-google-plus-g" style="color: #db4a39;"></i>
+                                    <i class="fa-brands fa-google-plus-g"></i>
                                 </a>
                             </li>
                             <!-- LinkedIn -->
                             <li class="nav-item">
                                 <a class="nav-link fs-5" href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://simplesharebuttons.com" target="_blank" title="LinkedIn">
-                                    <i class="fa-brands fa-linkedin" style="color: #0A66C2;"></i>
+                                    <i class="fa-brands fa-linkedin"></i>
                                 </a>
                             </li>
                             <li class="nav-item ms-3">
-                                <button id="themeToggle" class="btn btn-outline-secondary position-fixed bottom-0 end-0 m-3 rounded-circle shadow" style="z-index: 1050; width: 50px; height: 50px;">
+                                <button id="themeToggle" class="btn btn-outline-secondary position-fixed bottom-0 end-0 m-3 rounded-circle shadow">
                                     <i class="fas fa-moon"></i>
                                 </button>
                             </li>

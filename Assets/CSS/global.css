@@ -79,6 +79,14 @@ footer {
     color: var(--secondary-color);
 }
 
+footer .container-footer p span a {
+    text-decoration: none;
+}
+
+footer div[class*="container-footer"] p span a {
+    text-decoration: none !important;
+}
+
 /* ====== HEADER RESPONSIVO - SEM SCROLL ====== */
 
 /* Primeira Nav (navbar principal) */
@@ -126,6 +134,12 @@ footer {
     white-space: normal; /* Permite que texto do link quebre */
     word-break: keep-all;
     font-size: 1rem;
+}
+nav.navbar div.container-fluid div.nav-modal div.collapse ul.navbar-nav li.nav-item button.themeToggle{
+    z-index: 1050;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
 }
 
 /* Menu responsivo - mobile */
@@ -1200,4 +1214,10 @@ img, video, iframe {
     .stat-card {
         width: 100%;
     }
+}
+#card2{
+    animation-delay: 0.1s;
+}
+#card3{
+    animation-delay: 0.2s;
 }

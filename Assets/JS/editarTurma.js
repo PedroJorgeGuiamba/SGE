@@ -23,31 +23,38 @@ $(document).ready(function () {
     });
 });
 
-$("#formEditarSupervisor").validate({
+$("#formularioEditarTurma").validate({
     rules: {
-        nome: {
+        codigoTurma: {
             required: true,
+            digits: true,
             minlength: 2
         },
-        area: {
+        nomeTurma: {
             required: true,
             minlength: 2
         },
         qualificacao: {
             required: true
+        },
+        curso: {
+            required: true
         }
     },
     messages: {
-        nome: {
-            required: "Campo obrigatório.",
+        codigoTurma: {
+            required: "Informe o nome da turma.",
+            minlength: "O nome deve ter pelo menos 2 digitos."
+        },
+        nomeTurma: {
+            required: "Informe a área.",
             minlength: "O nome deve ter pelo menos 2 caracteres."
         },
-        area: {
-            required: "Informe o nome",
-            minlength: "A área deve ter pelo menos 2 caracteres."
-        },
         qualificacao: {
-            required: "Informe o apelido"
+            required: "Informe o qualificação da turma."
+        },
+        curso: {
+            required: "Informe Utilizador."
         }
     },
     errorClass: "is-invalid",

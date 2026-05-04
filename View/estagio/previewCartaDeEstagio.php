@@ -104,8 +104,9 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
     <!-- BootStrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <!-- CSS -->
-    <link rel="stylesheet" href="/estagio/Assets/CSS/global.css">
     <link rel="stylesheet" href="/estagio/Assets/CSS/preview.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/header.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/global.css">
     <link rel="stylesheet" href="/estagio/Assets/CSS/notifications.css">
     <!-- jQuery -->
     <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
@@ -122,7 +123,7 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
         <!-- Nav principal -->
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
             <div class="container-fluid">
-                <img src="https://www.itc.ac.mz/wp-content/uploads/2020/07/cropped-LOGO_ITC-09.png" style="height: 40px; margin-right: 15px;">
+                <img src="https://www.itc.ac.mz/wp-content/uploads/2020/07/cropped-LOGO_ITC-09.png">
                 <div class="nav-modal">
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText"
                         aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
@@ -133,29 +134,29 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                             <!-- Instagram -->
                             <li class="nav-item">
                                 <a class="nav-link fs-5" aria-current="page" href="https://www.instagram.com/itc.ac" target="_blank" title="Instagram">
-                                    <i class="fa-brands fa-instagram" style="color: #E1306C;"></i>
+                                    <i class="fa-brands fa-instagram"></i>
                                 </a>
                             </li>
                             <!-- Facebook -->
                             <li class="nav-item">
                                 <a class="nav-link fs-5" aria-current="page" href="https://pt-br.facebook.com/itc.transcom" target="_blank" title="Facebook">
-                                    <i class="fa-brands fa-facebook" style="color: #1877F2;"></i>
+                                    <i class="fa-brands fa-facebook"></i>
                                 </a>
                             </li>
                             <!-- Google -->
                             <li class="nav-item">
                                 <a class="nav-link fs-5" href="https://plus.google.com/share?url=https://simplesharebuttons.com" target="_blank" title="Google Plus">
-                                    <i class="fa-brands fa-google-plus-g" style="color: #db4a39;"></i>
+                                    <i class="fa-brands fa-google-plus-g"></i>
                                 </a>
                             </li>
                             <!-- LinkedIn -->
                             <li class="nav-item">
                                 <a class="nav-link fs-5" href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://simplesharebuttons.com" target="_blank" title="LinkedIn">
-                                    <i class="fa-brands fa-linkedin" style="color: #0A66C2;"></i>
+                                    <i class="fa-brands fa-linkedin"></i>
                                 </a>
                             </li>
                             <li class="nav-item ms-3">
-                                <button id="themeToggle" class="btn btn-outline-secondary position-fixed bottom-0 end-0 m-3 rounded-circle shadow" style="z-index: 1050; width: 50px; height: 50px;">
+                                <button id="themeToggle" class="btn btn-outline-secondary position-fixed bottom-0 end-0 m-3 rounded-circle shadow">
                                     <i class="fas fa-moon"></i> <!-- ícone muda com JS -->
                                 </button>
                             </li>
@@ -214,7 +215,7 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
         </nav>
     </header>
 
-    <main class="container mb-5" style="margin-top: 40px;">
+    <main class="container mb-5">
         <div class="row justify-content-center">
             <div class="col-lg-10">
                 <div class="preview-wrapper">

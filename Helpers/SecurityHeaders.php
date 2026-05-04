@@ -25,7 +25,7 @@ class SecurityHeaders {
 
     private static function getCSP() {
         return  "default-src 'self'; " .
-                "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://code.jquery.com https://cdn.datatables.net; " .
+                "script-src 'self' https://cdn.jsdelivr.net https://code.jquery.com https://cdn.datatables.net; " .
                 "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://getbootstrap.com https://cdnjs.cloudflare.com https://cdn.datatables.net  https://cdn.boxicons.com; " .
                 "img-src 'self' data: https:; " .
                 "font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.boxicons.com; " .

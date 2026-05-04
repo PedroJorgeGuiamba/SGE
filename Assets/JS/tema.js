@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
         updateIcon();
 
         // Envia para o PHP salvar a preferência (via AJAX)
-        fetch('../../Controller/Geral/TrocarTema.php', {
+        fetch('/estagio/api/tema', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: 'theme=' + newTheme

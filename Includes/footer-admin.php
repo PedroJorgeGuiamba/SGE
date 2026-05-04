@@ -4,7 +4,7 @@
         <!-- Rodapé -->
         <footer>
             <div class="container-footer">
-                <p> &copy; <?php echo date("Y"); ?> - TRANSCOM . DIREITOS RESERVADOS . DESIGN & DEVELOPMENT <span><a href="https://www.linkedin.com/in/pedro-jorge-guiamba-930a142b2?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" style="text-decoration: none">PEDRO JORGE GUIAMBA</a></span></p>
+                <p> &copy; <?php echo date("Y"); ?> - TRANSCOM . DIREITOS RESERVADOS . DESIGN & DEVELOPMENT <span><a href="https://www.linkedin.com/in/pedro-jorge-guiamba-930a142b2?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app">PEDRO JORGE GUIAMBA</a></span></p>
             </div>
         </footer>
 

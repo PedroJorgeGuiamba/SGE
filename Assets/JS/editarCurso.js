@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $("#formEditarSupervisor").submit(function (e) {
+    $("#formEditarCurso").submit(function (e) {
         e.preventDefault();
         console.log("Dados enviados:", $(this).serialize());
         $.ajax({
@@ -25,7 +25,7 @@ $(document).ready(function () {
         });
     });
 
-    $("#formEditarSupervisor").validate({
+    $("#formEditarCurso").validate({
         rules: {
         nome: {
             required: true,

@@ -1,6 +1,5 @@
 button { background: #667eea; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
 button:hover { background: #5a67d8; }
-.btn-secondary { background: #48bb78; margin-left: 10px; }
 .btn-danger { background: #e53e3e; }
 .btn-danger:hover { background: #c53030; }
 .alert { padding: 12px; border-radius: 4px; margin-bottom: 20px; display: none; }
@@ -59,4 +58,119 @@ button:hover { background: #5a67d8; }
     justify-content: center;
     color: white;
     font-size: 12px;
+}
+
+/* ====== CSS FALTANTE PARA UPLOADJSON.CSS ====== */
+
+/* Título "Upload de Arquivo JSON" - substitui style="margin-bottom: 15px;" */
+#json-aba > h3 {
+    margin-bottom: 15px !important;
+}
+
+/* Small text do upload area - substitui style="color: #666;" */
+.upload-area small {
+    color: #666 !important;
+}
+
+/* File input hidden - substitui style="display: none;" */
+#fileInput {
+    display: none !important;
+}
+
+/* JSON Preview container - substitui style="display: none;" */
+#jsonPreview {
+    display: none !important;
+}
+
+/* Preview Content - substitui estilos inline */
+#previewContent {
+    background: #f4f4f4 !important;
+    padding: 10px !important;
+    border-radius: 4px !important;
+    overflow-x: auto !important;
+    max-height: 300px !important;
+    font-family: monospace;
+    font-size: 12px;
+    margin: 0;
+}
+
+/* Batch Actions container - substitui style="display: none;" */
+#batchActions {
+    display: none !important;
+}
+
+/* Botão "Enviar Todos os Registros" - classe correta */
+.btn-cancel {
+    background: #667eea;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.btn-cancel:hover {
+    background: #5a67d8;
+}
+
+/* Botão Danger - garantir consistência */
+.btn-danger {
+    background: #e53e3e;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.btn-danger:hover {
+    background: #c53030;
+}
+
+/* Progress Bar container - substitui style="display: none;" */
+#progressBar {
+    display: none !important;
+}
+
+/* Progress Fill - substitui style="width: 0%" */
+#progressFill {
+    width: 0% !important;
+}
+
+/* Batch Results container - substitui style="display: none; margin-top: 20px;" */
+#batchResults {
+    display: none !important;
+    margin-top: 20px !important;
+}
+
+/* Alert container (já existe, mas garantir) */
+#alert {
+    display: none;
+}
+
+/* Loading container */
+#loading {
+    display: none;
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Spinner */
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e9ecef;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

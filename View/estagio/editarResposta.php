@@ -140,6 +140,6 @@ $conn->close();
             });
         });
     </script> -->
-    <script src="/estagioAssets/JS/tema.js"></script>
+    <script src="/estagio/Assets/JS/tema.js"></script>
 </body>
 </html>

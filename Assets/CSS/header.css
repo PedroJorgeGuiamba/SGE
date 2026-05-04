@@ -1,0 +1,134 @@
+#themeToggle {
+    transition: all 0.3s ease !important;
+}
+
+#themeToggle:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* === Ícones Sociais - Forçar cores corretas === */
+.nav-link i.fa-instagram,
+i.fa-brands.fa-instagram {
+    color: #E1306C !important;
+}
+
+.nav-link i.fa-facebook,
+i.fa-brands.fa-facebook {
+    color: #1877F2 !important;
+}
+
+.nav-link i.fa-google-plus-g,
+i.fa-brands.fa-google-plus-g {
+    color: #db4a39 !important;
+}
+
+.nav-link i.fa-linkedin,
+i.fa-brands.fa-linkedin,
+.nav-link i.fa-linkedin-in,
+i.fa-brands.fa-linkedin-in {
+    color: #0A66C2 !important;
+}
+
+/* Efeito hover nos ícones sociais */
+.nav-link:hover i.fa-instagram,
+.nav-link:hover i.fa-facebook,
+.nav-link:hover i.fa-google-plus-g,
+.nav-link:hover i.fa-linkedin,
+.nav-link:hover i.fa-linkedin-in {
+    opacity: 0.8 !important;
+    transform: translateY(-2px) !important;
+    transition: all 0.2s ease !important;
+}
+
+/* === Botão Logout === */
+.btn-danger.shadow-sm.px-4.fw-semibold.rounded-pill {
+    transition: all 0.3s ease !important;
+}
+
+.btn-danger.shadow-sm.px-4.fw-semibold.rounded-pill:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* === Dropdown Menus === */
+.dropdown-menu.shadow.border-0.mt-2 {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1) !important;
+    border: none !important;
+    border-radius: 0.5rem !important;
+}
+
+.dropdown-menu .dropdown-item {
+    transition: all 0.2s ease !important;
+}
+
+.dropdown-menu .dropdown-item:hover {
+    background-color: #f8f9fa !important;
+    padding-left: 1.5rem !important;
+}
+
+/* === Links de Navegação === */
+.nav-link.fw-semibold.text-dark {
+    transition: all 0.2s ease !important;
+    position: relative !important;
+}
+
+.nav-link.fw-semibold.text-dark:hover {
+    color: #0d6efd !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Link ativo */
+.nav-link.fw-semibold.text-dark.active {
+    color: #0d6efd !important;
+}
+
+.nav-link.fw-semibold.text-dark.active::after {
+    content: '' !important;
+    position: absolute !important;
+    bottom: -2px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 30px !important;
+    height: 2px !important;
+    background-color: #0d6efd !important;
+    border-radius: 2px !important;
+}
+
+/* === Navegação Secundária === */
+.bg-white.shadow-sm.border-bottom {
+    background-color: white !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    border-bottom: 1px solid #dee2e6 !important;
+}
+
+/* === Ajuste do container da navbar === */
+.navbar .container-fluid {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+}
+
+/* === Responsivo para botão de tema === */
+@media (max-width: 768px) {
+    #themeToggle {
+        width: 40px !important;
+        height: 40px !important;
+        margin: 0.75rem !important;
+    }
+    
+    .btn-danger.shadow-sm.px-4.fw-semibold.rounded-pill {
+        padding: 0.25rem 1rem !important;
+        font-size: 0.875rem !important;
+    }
+    
+    .nav-link.fw-semibold.text-dark {
+        padding: 0.4rem 0.75rem !important;
+        font-size: 0.875rem !important;
+    }
+    
+    img[src*="cropped-LOGO_ITC-09.png"] {
+        height: 35px !important;
+    }
+}

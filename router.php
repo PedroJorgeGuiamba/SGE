@@ -520,6 +520,12 @@ switch ($modulo) {
             case 'credencial':
                 require 'View/estagio/Credencial.php';
                 break;
+            case 'tema':
+                require 'Controller/Geral/TrocarTema.php';
+                break;
+            case 'heartbeat-beacon':
+                require 'Helpers/heartbeat-beacon.php';
+                break;
             default:
                 header('Content-Type: application/json');
                 echo json_encode(['error' => 'Endpoint não encontrado']);

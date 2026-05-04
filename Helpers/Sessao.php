@@ -17,7 +17,7 @@ function configurarCookieSessao()
     }
 }
 
-function iniciarSessao($utilizador_id)
+function iniciarSessao(int $utilizador_id)
 {
     configurarCookieSessao();
 
@@ -50,7 +50,7 @@ function iniciarSessao($utilizador_id)
         $ip = '127.0.0.1';
     }
 
-    $stmt = $conn->prepare("INSERT INTO sessao (data, hora_inicio, token, se_valido, utilizador_id, ip_address, user_agent) VALUES (?, ?, ?, 1, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO sessao (data, hora_inicio, token, se_valido, utilizador_id, ip_address, user_agent, ultima_atividade) VALUES (?, ?, ?, 1, ?, ?, ?, NOW())");
     $stmt->bind_param("sssiss", $data, $hora_inicio, $token, $utilizador_id, $ip, $userAgent);
     $stmt->execute();
 

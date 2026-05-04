@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -112,143 +112,9 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
         crossorigin="anonymous"></script>
-    <!-- Fallback local para jQuery -->
-    <script>
-        window.jQuery || document.write('<script src="../../Scripts/jquery-3.6.0.min.js"><\/script>');
-    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
     <link href='https://cdn.boxicons.com/fonts/brands/boxicons-brands.min.css' rel='stylesheet'>
-
-    <!-- <style>
-        /* ====== PREVIEW CARD OVERRIDE ====== */
-        .preview-wrapper {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .preview-card {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
-            overflow: hidden;
-            animation: fadeInUp 0.6s ease;
-        }
-
-        .preview-card:hover {
-            transform: none;
-        }
-
-        .preview-header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            padding: 1.5rem 2rem;
-            color: var(--text-light);
-        }
-
-        .preview-header h4 {
-            margin: 0;
-            font-weight: 700;
-            font-size: 1.15rem;
-            color: var(--text-light);
-        }
-
-        .preview-header small {
-            font-size: 0.8rem;
-            opacity: 0.85;
-            color: rgba(255, 255, 255, 0.85);
-        }
-
-        .preview-body {
-            padding: 2rem;
-        }
-
-        .section-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--primary-color);
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            padding-bottom: 10px;
-            border-bottom: 2px solid rgba(58, 76, 145, 0.12);
-            margin-bottom: 14px;
-        }
-
-        .section-label i {
-            font-size: 13px;
-            color: var(--secondary-color);
-        }
-
-        .field-card {
-            background: #f8f9fa;
-            border-radius: var(--border-radius);
-            padding: 14px 18px;
-            border: 1px solid #e9ecef;
-            transition: var(--transition);
-        }
-
-        .field-card:hover {
-            border-color: var(--secondary-color);
-            box-shadow: 0 2px 8px rgba(60, 155, 255, 0.08);
-        }
-
-        .field-card .field-label {
-            font-size: 0.7rem;
-            color: #6c757d;
-            text-transform: uppercase;
-            font-weight: 600;
-            letter-spacing: 0.04em;
-            margin: 0 0 4px;
-        }
-
-        .field-card .field-value {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #212529;
-            margin: 0;
-            word-break: break-word;
-        }
-
-        .preview-footer {
-            padding: 1.25rem 2rem;
-            border-top: 1px solid #e9ecef;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #fafbfc;
-            border-radius: 0 0 20px 20px;
-        }
-
-        .preview-footer .btn {
-            border-radius: 10px;
-            padding: 10px 28px;
-            font-weight: 600;
-            transition: var(--transition);
-        }
-
-        .preview-footer .btn:hover {
-            transform: translateY(-2px);
-        }
-
-        @media (max-width: 767.98px) {
-            .preview-body {
-                padding: 1.25rem;
-            }
-            .preview-header {
-                padding: 1.25rem;
-            }
-            .preview-footer {
-                flex-direction: column;
-                gap: 10px;
-                padding: 1.25rem;
-            }
-            .preview-footer .btn {
-                width: 100%;
-            }
-        }
-    </style> -->
 </head>
 
 <body>

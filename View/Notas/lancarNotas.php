@@ -191,7 +191,7 @@ $tentativas = $conn->query("SELECT id_tentativa, descricao FROM tipo_tentativa O
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- Script para mostrar 4 campos de cada vez -->
-  <script>
+  <!-- <script>
     document.addEventListener("DOMContentLoaded", () => {
       const form = document.querySelector("form");
       const inputs = form.querySelectorAll(".col-md-6, .col-md-4, .col-md-8, .col-md-12");
@@ -241,8 +241,8 @@ $tentativas = $conn->query("SELECT id_tentativa, descricao FROM tipo_tentativa O
 
       showStep();
     });
-  </script>
-
+  </script> -->
+  <script src="/estagio/Assets/JS/lancarNotas.js"></script>
 </body>
 
 </html>

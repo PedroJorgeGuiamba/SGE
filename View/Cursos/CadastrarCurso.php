@@ -83,24 +83,7 @@ include_once __DIR__ . '/../../Helpers/CSRFProtection.php';
     </main>
 
     <?php require_once __DIR__ . '/../../Includes/footer.php'?>
-    <script>
-        $(document).ready(function () {
-            carregarDados();
-        });
-
-        function carregarDados() {
-            $.ajax({
-                url: '/estagio/api/qualificacao',
-                method: 'GET',
-                success: function (resposta) {
-                    $('#qualificacao').html(resposta);
-                },
-                error: function () {
-                    $('#qualificacao').html('<option>Erro ao carregar</option>');
-                }
-            });
-        }
-    </script>
+    <script src="/estagio/Assets/JS/CadastrarCurso.js"></script>
 </body>
 
 </html>

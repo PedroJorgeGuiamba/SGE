@@ -8,113 +8,58 @@ if (!isset($_GET['numero']) || !is_numeric($_GET['numero']) || intval($_GET['num
 $numero = intval($_GET['numero']);
 ?>
 <?php require_once __DIR__ . '/../../Includes/header-estagio-admin.php' ?>
-    <main>
-        <div class="formulario">
+<main>
+    <div class="formulario">
 
-            <?php if (isset($_SESSION['flash_success'])): ?>
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <?php echo htmlspecialchars($_SESSION['flash_success']); unset($_SESSION['flash_success']); ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <?php if (isset($_SESSION['flash_success'])): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <?php echo htmlspecialchars($_SESSION['flash_success']);
+                unset($_SESSION['flash_success']); ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['flash_error'])): ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <?php echo htmlspecialchars($_SESSION['flash_error']);
+                unset($_SESSION['flash_error']); ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <?php endif; ?>
+
+        <form action="../../Controller/Estagio/avaliarEstagio.php?numero=<?php echo htmlspecialchars($numero, ENT_QUOTES, 'UTF-8'); ?>" method="post" id="formularioAvaliacao" enctype="multipart/form-data">
+            <div class="row">
+                <div class="form-group col-md-4">
+                    <label for="resultado" class="form-label">Resultado</label>
+                    <select class="form-select" name="resultado" id="resultado" required>
+                        <option value="">Selecione o resultado</option>
+                        <option value="A">Aprovado</option>
+                        <option value="NA">Não Aprovado</option>
+                    </select>
+                    <span class="error_form" id="resultado_error_message"></span>
                 </div>
-            <?php endif; ?>
 
-            <?php if (isset($_SESSION['flash_error'])): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <?php echo htmlspecialchars($_SESSION['flash_error']); unset($_SESSION['flash_error']); ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <div class="form-group col-md-4">
+                    <label for="imagem_doc_path" class="form-label">Relatório de Estágio (pdf, word):</label>
+                    <input type="file" name="imagem_doc_path" class="form-control" id="imagem_doc_path" accept="image/jpeg,image/png,image/gif,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                    <span class="error_form" id="imagem_error_message"></span>
                 </div>
-            <?php endif; ?>
+            </div>
 
-            <form action="../../Controller/Estagio/avaliarEstagio.php?numero=<?php echo htmlspecialchars($numero, ENT_QUOTES, 'UTF-8'); ?>" method="post" id="formularioAvaliacao" enctype="multipart/form-data">
-                <div class="row">
-                    <div class="form-group col-md-4">
-                        <label for="resultado" class="form-label">Resultado</label>
-                        <select class="form-select" name="resultado" id="resultado" required>
-                            <option value="">Selecione o resultado</option>
-                            <option value="A">Aprovado</option>
-                            <option value="NA">Não Aprovado</option>
-                        </select>
-                        <span class="error_form" id="resultado_error_message"></span>
+            <div class="row">
+                <div class="form-group">
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-success form-control">Registrar</button>
                     </div>
-                    
-                    <div class="form-group col-md-4">
-                        <label for="imagem_doc_path" class="form-label">Relatório de Estágio (pdf, word):</label>
-                        <input type="file" name="imagem_doc_path" class="form-control" id="imagem_doc_path" accept="image/jpeg,image/png,image/gif,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
-                        <span class="error_form" id="imagem_error_message"></span>
-                    </div>
                 </div>
+            </div>
+        </form>
+    </div>
+</main>
 
-                <div class="row">
-                    <div class="form-group">
-                        <div class="col-md-3">
-                            <button type="submit" class="btn btn-success form-control">Registrar</button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </main>
-
-    <?php require_once __DIR__ . '/../../Includes/footer.php'?>
-    <script>
-        // Verificar se jQuery está carregado
-        if (typeof jQuery === 'undefined') {
-            console.error('jQuery não foi carregado!');
-        } else {
-            console.log('jQuery carregado com sucesso, versão:', jQuery.fn.jquery);
-        }
-
-        // Validação do formulário
-        $("#formularioAvaliacao").validate({
-            rules: {
-                resultado: {
-                    required: true
-                }
-            },
-            messages: {
-                resultado: {
-                    required: "Informe o resultado."
-                }
-            },
-            errorClass: "is-invalid",
-            validClass: "is-valid",
-            highlight: function (element) {
-                $(element).addClass("is-invalid").removeClass("is-valid");
-            },
-            unhighlight: function (element) {
-                $(element).removeClass("is-invalid").addClass("is-valid");
-            },
-            errorPlacement: function (error, element) {
-                error.insertAfter(element);
-            },
-            submitHandler: function(form) {
-                // Usar FormData para suportar upload de arquivos
-                var formData = new FormData(form);
-                
-                $.ajax({
-                    url: form.action,
-                    method: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    dataType: 'json',
-                    success: function (response) {
-                        if (response.success) {
-                            alert(response.message);
-                            window.location.href = response.redirect;
-                        } else {
-                            alert(response.message);
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.log('Erro AJAX:', xhr.status, status, error, xhr.responseText);
-                        alert('Erro ao processar a requisição: ' + (xhr.responseText || 'Verifique o console para mais detalhes.'));
-                    }
-                });
-                return false; // Previne o submit padrão
-            }
-        });
-    </script>
+<?php require_once __DIR__ . '/../../Includes/footer.php' ?>
+<script src="/estagio/Assets/JS/avaliarEstagio.js"></script>
 
 </body>
+
 </html>

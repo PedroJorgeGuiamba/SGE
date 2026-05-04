@@ -13,8 +13,5 @@
 </script>
 <script src="/estagio/Assets/JS/tema.js"></script>
 <script src="/estagio/Assets/JS/info-message-close.js"></script>
-<script>
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-</script>
+<script src="/estagio/Assets/JS/tooltip.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>

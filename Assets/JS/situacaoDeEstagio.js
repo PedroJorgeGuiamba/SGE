@@ -1,157 +1,142 @@
+// situacaoDeEstagio.js - JavaScript puro sem inline
+
 document.addEventListener('DOMContentLoaded', function() {
     
-    /**
-     * Cria um gráfico a partir de um canvas que tem o atributo data-chart
-     * @param {HTMLCanvasElement} canvas - O elemento canvas
-     */
-    function createChartFromDataAttribute(canvas) {
-        if (!canvas || !canvas.dataset.chart) return null;
-        
-        try {
-            const chartConfig = JSON.parse(canvas.dataset.chart);
-            const ctx = canvas.getContext('2d');
-            const chartType = chartConfig.type || determineChartType(chartConfig);
-            
-            // Configurações comuns para todos os gráficos
-            const options = {
+    // Verificar se os dados foram carregados
+    if (!window.situacaoEstagioData) {
+        console.error('Dados não carregados. Verifique se situacaoDeEstagio.data.php foi incluído.');
+        return;
+    }
+    
+    const data = window.situacaoEstagioData;
+    
+    // 1. Gráfico de Barras - Pedidos Mensais
+    const ctxPedidos = document.getElementById('pedidosBarChart')?.getContext('2d');
+    if (ctxPedidos) {
+        new Chart(ctxPedidos, {
+            type: 'bar',
+            data: {
+                labels: data.months,
+                datasets: [{
+                    label: 'Número de Pedidos',
+                    data: data.pedidos_monthly,
+                    backgroundColor: 'rgba(13, 202, 240, 0.6)',
+                    borderColor: 'rgba(13, 202, 240, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
                 responsive: true,
-                maintainAspectRatio: false,
-                ...getChartOptions(chartType, chartConfig)
-            };
-            
-            return new Chart(ctx, {
-                type: chartType,
-                data: {
-                    labels: chartConfig.labels,
-                    datasets: chartConfig.datasets
-                },
-                options: options
-            });
-        } catch (error) {
-            console.error('Erro ao criar gráfico:', error, canvas.id);
-            return null;
-        }
+                scales: { y: { beginAtZero: true } }
+            }
+        });
     }
     
-    function determineChartType(chartConfig) {
-        if (chartConfig.type) return chartConfig.type;
+    // 2. Gráfico de Barras Empilhadas - Pedidos por Qualificação
+    const ctxPedidosQualificacao = document.getElementById('pedidosPieChart')?.getContext('2d');
+    if (ctxPedidosQualificacao && data.qualifications) {
+        const colors = ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(255, 206, 86, 0.6)', 'rgba(75, 192, 192, 0.6)', 'rgba(153, 102, 255, 0.6)', 'rgba(255, 159, 64, 0.6)', 'rgba(201, 203, 207, 0.6)'];
+        const borderColors = colors.map(c => c.replace('0.6', '1'));
         
-        if (chartConfig.stacked === true) return 'bar';
-
-        const dataset = chartConfig.datasets?.[0];
-        if (dataset && (dataset.backgroundColor?.length > 1 || chartConfig.labels?.length <= 6)) {
-            return 'pie';
-        }
+        const datasets = data.qualifications.map((qual, index) => ({
+            label: qual,
+            data: data.pedidos_per_qual[qual],
+            backgroundColor: colors[index % colors.length],
+            borderColor: borderColors[index % colors.length],
+            borderWidth: 2
+        }));
         
-        return 'bar';
+        new Chart(ctxPedidosQualificacao, {
+            type: 'bar',
+            data: { labels: data.months, datasets: datasets },
+            options: {
+                responsive: true,
+                scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } },
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
     }
     
-    function getChartOptions(type, chartConfig) {
-        const baseOptions = {
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: { font: { size: 11 } }
+    // 3. Gráfico de Barras - Empresas por Qualificação
+    const ctxCredEmpresa = document.getElementById('credenciaisEmpresaChart')?.getContext('2d');
+    if (ctxCredEmpresa && data.credenciais_por_empresa) {
+        const qualColors = ['#4e79a7', '#f28e2b', '#e15759', '#76b7b2', '#59a14f', '#edc948', '#b07aa1', '#ff9da7', '#9c755f', '#bab0ac'];
+        
+        const datasets = Object.entries(data.credenciais_por_empresa).map(([qual, empresaMap], i) => ({
+            label: qual,
+            data: data.empresas_labels.map(emp => empresaMap[emp] || 0),
+            backgroundColor: qualColors[i % qualColors.length],
+            borderRadius: 4
+        }));
+        
+        new Chart(ctxCredEmpresa, {
+            type: 'bar',
+            data: { labels: data.empresas_labels, datasets: datasets },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y} credencial(ais)` } }
                 },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            let label = context.dataset.label || '';
-                            let value = context.raw !== undefined ? context.raw : context.parsed?.y;
-                            
-                            if (type === 'pie') {
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = ((value / total) * 100).toFixed(1);
-                                return `${context.label}: ${value} (${percentage}%)`;
-                            }
-                            
-                            if (label) {
-                                return `${label}: ${value}`;
-                            }
-                            return `${value}`;
-                        }
-                    }
+                scales: {
+                    x: { ticks: { maxRotation: 35, minRotation: 20, font: { size: 11 } } },
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
                 }
             }
-        };
-        
-        if (type === 'bar') {
-            return {
-                ...baseOptions,
-                scales: {
-                    x: {
-                        stacked: chartConfig.stacked === true,
-                        ticks: {
-                            maxRotation: 35,
-                            minRotation: 20,
-                            font: { size: 10 }
-                        }
-                    },
-                    y: {
-                        stacked: chartConfig.stacked === true,
-                        beginAtZero: true,
-                        ticks: { stepSize: 1 }
-                    }
-                }
-            };
-        }
-        
-        if (type === 'pie') {
-            return {
-                ...baseOptions,
-                plugins: {
-                    ...baseOptions.plugins,
-                    legend: {
-                        position: 'bottom',
-                        labels: { font: { size: 10 } }
-                    }
-                }
-            };
-        }
-        
-        return baseOptions;
-    }
-
-    const pedidosBarChart = document.getElementById('pedidosBarChart');
-    if (pedidosBarChart) {
-        createChartFromDataAttribute(pedidosBarChart);
+        });
     }
     
-    const pedidosPieChart = document.getElementById('pedidosPieChart');
-    if (pedidosPieChart) {
-        createChartFromDataAttribute(pedidosPieChart);
+    // 4. Gráfico de Pizza - Status Resposta
+    const ctxResposta = document.getElementById('statusRespostaPie')?.getContext('2d');
+    if (ctxResposta && data.status_resposta_labels) {
+        new Chart(ctxResposta, {
+            type: 'pie',
+            data: {
+                labels: data.status_resposta_labels,
+                datasets: [{
+                    data: data.status_resposta_data,
+                    backgroundColor: ['#0dcaf0', '#198754', '#ffc107'],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
     }
     
-    const credenciaisEmpresaChart = document.getElementById('credenciaisEmpresaChart');
-    if (credenciaisEmpresaChart) {
-        createChartFromDataAttribute(credenciaisEmpresaChart);
+    // 5. Gráfico de Pizza - Status Estágio
+    const ctxEstagio = document.getElementById('statusEstagioPie')?.getContext('2d');
+    if (ctxEstagio && data.status_estagio_labels) {
+        new Chart(ctxEstagio, {
+            type: 'pie',
+            data: {
+                labels: data.status_estagio_labels,
+                datasets: [{
+                    data: data.status_estagio_data,
+                    backgroundColor: ['#198754', '#dc3545'],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
     }
     
-    const statusRespostaPie = document.getElementById('statusRespostaPie');
-    if (statusRespostaPie) {
-        createChartFromDataAttribute(statusRespostaPie);
+    // 6. Gráfico de Pizza - Estágios por Qualificação
+    const ctxEstagioQualificacao = document.getElementById('statusEstagioQualificacaoPie')?.getContext('2d');
+    if (ctxEstagioQualificacao && data.status_estagio_qualificacao_labels) {
+        new Chart(ctxEstagioQualificacao, {
+            type: 'pie',
+            data: {
+                labels: data.status_estagio_qualificacao_labels,
+                datasets: [{
+                    data: data.status_estagio_qualificacao_data,
+                    backgroundColor: ['#198754', '#dc3545'],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
     }
-
-    const statusEstagioPie = document.getElementById('statusEstagioPie');
-    if (statusEstagioPie) {
-        createChartFromDataAttribute(statusEstagioPie);
-    }
-    
-    const statusEstagioQualificacaoPie = document.getElementById('statusEstagioQualificacaoPie');
-    if (statusEstagioQualificacaoPie) {
-        createChartFromDataAttribute(statusEstagioQualificacaoPie);
-    }
-    
-    let resizeTimer;
-    window.addEventListener('resize', function() {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(function() {
-            // Forçar re-renderização dos gráficos
-            Chart.helpers.each(Chart.instances, function(instance) {
-                if (instance && instance.resize) {
-                    instance.resize();
-                }
-            });
-        }, 250);
-    });
 });

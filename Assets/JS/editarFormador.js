@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $('#formEditarQualificacao').submit(function (e) {
+    $('#formEditarFormador').submit(function (e) {
         e.preventDefault();
         console.log('Dados enviados:', $(this).serialize()); // Log dos dados enviados
         $.ajax({
@@ -23,33 +23,107 @@ $(document).ready(function () {
     });
 });
 
-$("#formEditarQualificacao").validate({
+$.validator.addMethod('telefone_mz', function(value, element) {
+    if (this.optional(element)) return true;
+    return /^(\+258)?[ -]?[8][2-7][0-9]{7}$/.test(value);
+}, 'Número inválido. Ex: +258 84xxxxxxx ou 84xxxxxxx');
+
+// Validação do formulário
+$("#formEditarFormador").validate({
     rules: {
-        formador: {
+        codigo: {
             required: true,
-            digits: true
+            digits: true,
+            minlength: 5
         },
-        descricao: {
+        nome: {
             required: true,
             minlength: 2
         },
-        nivel: {
+        apelido: {
             required: true,
-            minlength: 1
+            minlength: 2
+        },
+        dataDeNascimento: {
+            required: true,
+            date: true
+        },
+        naturalidade: {
+            required: true,
+            minlength: 2
+        },
+        tipoDeDocumento: {
+            required: true,
+            minlength: 2
+        },
+        numeroDeDocumento: {
+            required: true,
+            minlength: 5
+        },
+        localEmitido: {
+            required: true,
+            minlength: 2
+        },
+        NUIT: {
+            required: true,
+            digits: true,
+            minlength: 9
+        },
+        telefone: {
+            required: true,
+            telefone_mz: true
+        },
+        email: {
+            required: true,
+            email: true
         }
     },
     messages: {
-        formador: {
+        codigo: {
             required: "Campo obrigatório.",
-            digits: "Apenas números são permitidos."
+            digits: "Apenas números são permitidos.",
+            minlength: "O código deve ter pelo menos 5 digitos."
         },
-        descricao: {
-            required: "Informe o nome",
-            minlength: "A descrição deve ter pelo menos 2 caracteres."
+        nome: {
+            required: "Informe o nome do formando.",
+            minlength: "O nome deve ter pelo menos 2 caracteres."
         },
-        nivel: {
-            required: "Informe o apelido",
-            minlength: "O nível deve ter pelo menos 1 caracteres."
+        apelido: {
+            required: "Informe o apelido do formando.",
+            minlength: "O apelido deve ter pelo menos 2 caracteres."
+        },
+        dataDeNascimento: {
+            required: "Informe a data de nascimento.",
+            date: "Formato inválido."
+        },
+        naturalidade: {
+            required: "Informe a Naturalidade.",
+            minlength: "A naturalidade deve ter pelo menos 2 caracteres."
+        },
+        tipoDeDocumento: {
+            required: "Informe o O Tipo do Documento.",
+            minlength: "O Tipo de Documento deve ter pelo menos 2 caracteres."
+        },
+        numeroDeDocumento: {
+            required: "Informe o Número do Documento.",
+            minlength: "O Número do Documento deve ter pelo menos 5 caracteres."
+        },
+        localEmitido: {
+            required: "Informe o Local De Emissão do Documento.",
+            minlength: "O Local De Emissão do Documento deve ter pelo menos 2 caracteres."
+        },
+        NUIT: {
+            required: "Informe o nome da empresa.",
+            digits: "Apenas números são permitidos.",
+            minlength: "O NUIT deve ter 9 digitos exactos."
+        },
+        telefone: {
+            required: "Campo obrigatório.",
+            telefone_mz: "Número inválido. Ex: +258 84xxxxxxx"
+        },
+        email: {
+            required: "Informe o e-mail.",
+            email: "Endereço de e-mail inválido."
         }
     },
     errorClass: "is-invalid",

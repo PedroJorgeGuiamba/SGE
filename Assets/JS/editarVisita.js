@@ -47,7 +47,7 @@ $("#formEditarPedido").validate({
             required: true,
             minlength: 2
         },
-        contactoPrincipal: {
+        contactoFormando: {
             required: true,
             telefone_mz: true
         },
@@ -85,7 +85,7 @@ $("#formEditarPedido").validate({
             required: "Informe o nome da empresa.",
             minlength: "O nome da empresa deve ter pelo menos 2 caracteres."
         },
-        contactoPrincipal: {
+        contactoFormando: {
             required: "Campo obrigatório.",
             telefone_mz: "Número inválido. Ex: +258 84xxxxxxx"
         },

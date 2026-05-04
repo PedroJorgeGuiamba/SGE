@@ -11,13 +11,12 @@
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="Assets/CSS/global.css">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
     <link href='https://cdn.boxicons.com/fonts/brands/boxicons-brands.min.css' rel='stylesheet'>
-
+    <!-- CSS -->
+    <link rel="stylesheet" href="/estagio/Assets/CSS/global.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/header.css">
 
 </head>
 
@@ -36,29 +35,26 @@
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                             <!-- Instagram -->
                             <li class="nav-item">
-                                <a class="nav-link" aria-current="page" href="https://www.instagram.com/itc.ac"
-                                    class="me-3 text-white fs-4">
-                                    <i class="fa-brands fa-square-instagram" style="color: #3a4c91"></i>
+                                <a class="nav-link fs-5" aria-current="page" href="https://www.instagram.com/itc.ac" aria-label="Instagram">
+                                    <i class="fa-brands fa-instagram"></i>
                                 </a>
                             </li>
                             <!-- Facebook -->
                             <li class="nav-item">
-                                <a class="nav-link" aria-current="page" href="https://pt-br.facebook.com/itc.transcom">
-                                    <i class="fa-brands fa-facebook" style="color: #3a4c91"></i>
+                                <a class="nav-link fs-5" aria-current="page" href="https://pt-br.facebook.com/itc.transcom" aria-label="Facebook">
+                                    <i class="fa-brands fa-facebook"></i>
                                 </a>
                             </li>
                             <!-- Google -->
                             <li class="nav-item">
-                                <a class="nav-link"
-                                    href="https://plus.google.com/share?url=https://simplesharebuttons.com">
-                                    <i class="fab fa-google" style="color: #3a4c91;"></i>
+                                <a class="nav-link fs-5" href="https://plus.google.com/share?url=https://simplesharebuttons.com" aria-label="Google">
+                                    <i class="fa-brands fa-google"></i>
                                 </a>
                             </li>
                             <!-- LinkedIn -->
                             <li class="nav-item">
-                                <a class="nav-link"
-                                    href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://simplesharebuttons.com">
-                                    <i class="fa-brands fa-linkedin-in" style="color: #3a4c91;"></i>
+                                <a class="nav-link fs-5" href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://simplesharebuttons.com" aria-label="LinkedIn">
+                                    <i class="fa-brands fa-linkedin-in"></i>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -67,6 +63,7 @@
                         </ul>
                     </div>
                 </div>
+            </div>
         </nav>
 
         <!-- Nav Secundária -->
@@ -228,7 +225,7 @@
                     </div>
 
                     <!-- Card 2 -->
-                    <div class="col fade-in text-center" style="animation-delay: 0.1s;">
+                    <div class="col fade-in text-center" id="card2">
                         <div class="card h-100">
                             <img src="https://www.itc.ac.mz/wp-content/uploads/2024/10/WhatsApp-Image-2024-10-29-at-14.36.59-7-768x1024.jpeg"
                                 class="card-img-top" alt="Feira">
@@ -246,7 +243,7 @@
                     </div>
 
                     <!-- Card 3 -->
-                    <div class="col fade-in" style="animation-delay: 0.2s;">
+                    <div class="col fade-in" id="card3">
                         <div class="card h-100">
                             <img src="https://www.itc.ac.mz/wp-content/uploads/2023/10/WhatsApp-Image-2023-10-26-at-15.03.08-2.jpeg"
                                 class="card-img-top" alt="Cerimônia">

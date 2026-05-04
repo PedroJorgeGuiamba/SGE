@@ -40,13 +40,17 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
     <!-- Custom CSS -->
+    <link rel="stylesheet" href="/estagio/Assets/CSS/formadores.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/header.css">
     <link rel="stylesheet" href="/estagio/Assets/CSS/global.css">
     <link rel="stylesheet" href="/estagio/Assets/CSS/notifications.css">
-    <link rel="stylesheet" href="/estagio/Assets/CSS/formadores.css">
 
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
+    <script src="/estagio/Assets/JS/SessionManager.js" 
+        data-session-config='{"timeoutMinutes":30,"heartbeatInterval":60}'>
+    </script>
 </head>
 
 <body>
@@ -67,31 +71,31 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                             <!-- Instagram -->
                             <li class="nav-item">
                                 <a class="nav-link fs-5" aria-current="page" href="https://www.instagram.com/itc.ac" aria-label="Instagram">
-                                    <i class="fa-brands fa-square-instagram" style="color: #3a4c91"></i>
+                                    <i class="fa-brands fa-square-instagram"></i>
                                 </a>
                             </li>
                             <!-- Facebook -->
                             <li class="nav-item">
                                 <a class="nav-link fs-5" href="https://pt-br.facebook.com/itc.transcom" aria-label="Facebook">
-                                    <i class="fa-brands fa-facebook" style="color: #3a4c91"></i>
+                                    <i class="fa-brands fa-facebook"></i>
                                 </a>
                             </li>
                             <!-- Google -->
                             <li class="nav-item">
                                 <a class="nav-link fs-5" href="https://plus.google.com/share?url=https://simplesharebuttons.com" aria-label="Google">
-                                    <i class="fab fa-google" style="color: #3a4c91;"></i>
+                                    <i class="fab fa-google"></i>
                                 </a>
                             </li>
                             <!-- LinkedIn -->
                             <li class="nav-item">
                                 <a class="nav-link fs-5" href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://simplesharebuttons.com" aria-label="LinkedIn">
-                                    <i class="fa-brands fa-linkedin-in" style="color: #3a4c91;"></i>
+                                    <i class="fa-brands fa-linkedin-in"></i>
                                 </a>
                             </li>
                             <!-- Botão Tema -->
                             <li class="nav-item">
                                 <button id="themeToggle" class="btn btn-outline-secondary position-fixed bottom-0 end-0 m-3 shadow-sm"
-                                    style="z-index: 1050; border-radius: 50%; width: 45px; height: 45px;" aria-label="Alternar tema">
+                                    aria-label="Alternar tema">
                                     <i class="fas fa-moon"></i>
                                 </button>
                             </li>

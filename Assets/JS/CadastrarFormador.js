@@ -1,7 +1,3 @@
-$(document).ready(function() {
-    carregarDados();
-});
-
 $.validator.addMethod('telefone_mz', function(value, element) {
     if (this.optional(element)) return true;
     return /^(\+258)?[ -]?[8][2-7][0-9]{7}$/.test(value);
@@ -117,28 +113,3 @@ $("#formularioFormador").validate({
         error.insertAfter(element);
     }
 });
-
-
-function carregarDados() {
-    $.ajax({
-        url: '/estagio/api/qualificacao',
-        method: 'GET',
-        success: function(resposta) {
-            $('#qualificacao').html(resposta);
-        },
-        error: function() {
-            $('#qualificacao').html('<option>Erro ao carregar</option>');
-        }
-    });
-
-    $.ajax({
-        url: '/estagio/api/users',
-        method: 'GET',
-        success: function(resposta) {
-            $('#user').html(resposta);
-        },
-        error: function() {
-            $('#user').html('<option>Erro ao carregar</option>');
-        }
-    });
-}

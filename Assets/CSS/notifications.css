@@ -206,6 +206,35 @@
     background: #555;
 }
 
+.notification-icon {
+    padding: 0 !important;
+    margin: 0 15px !important;
+}
+
+.notification-icon span {
+    position: relative !important;
+    display: inline-block !important;
+}
+
+.notification-icon i.fa-bell,
+.notification-icon .fas.fa-bell {
+    color: #3a4c91 !important;
+}
+
+.notification-form {
+    display: inline !important;
+    margin-top: 5px !important;
+}
+
+.d-inline-block.me-2,
+.d-inline-block {
+    display: inline-block !important;
+}
+
+.px-3.py-2.text-center form {
+    display: inline-block !important;
+}
+
 /* Responsividade */
 @media (max-width: 576px) {
     .dropdown-menu.notifications {

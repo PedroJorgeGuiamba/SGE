@@ -1,7 +1,3 @@
-$(document).ready(function() {
-    carregarDados();
-});
-
 $.validator.addMethod('telefone_mz', function(value, element) {
     if (this.optional(element)) return true;
     return /^(\+258)?[ -]?[8][2-7][0-9]{7}$/.test(value);
@@ -58,7 +54,7 @@ $("#formularioFormando").validate({
         }
     },
     messages: {
-        codigoFormando: {
+        codigoformando: {
             required: "Campo obrigatório.",
             digits: "Apenas números são permitidos.",
             minlength: "O código deve ter pelo menos 5 digitos."

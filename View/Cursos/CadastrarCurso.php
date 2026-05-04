@@ -4,7 +4,7 @@ include_once __DIR__ . '/../../Helpers/CSRFProtection.php';
 <?php require_once __DIR__ . '/../../Includes/header-admin.php' ?>
 
     <!-- Utilizando margin e padding elevados no topo para compensar o header Duplo -->
-    <main class="container mb-5" style="margin-top: 40px;">
+    <main class="container mb-5">
         <div class="row justify-content-center">
             <div class="col-lg-10">
                 <div class="card shadow-sm border-0 rounded-4">
@@ -13,7 +13,7 @@ include_once __DIR__ . '/../../Helpers/CSRFProtection.php';
                         <p class="text-muted small">Preencha os campos abaixo para adicionar um novo curso ao sistema</p>
                     </div>
                     <div class="card-body p-5">
-                        <form action="/estagio/cursos/salvar" method="post">
+                        <form action="/estagio/cursos/salvar" method="post" id="formularioCurso">
                             <?php echo CSRFProtection::getTokenField(); ?>
                             <?php if (isset($_GET['erros'])): ?>
                                 <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">

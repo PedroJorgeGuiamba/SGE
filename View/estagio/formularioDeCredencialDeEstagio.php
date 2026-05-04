@@ -24,7 +24,7 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
 ?>
 
 <?php require_once __DIR__ . '/../../Includes/header-form-estagio.php' ?>
-<main class="container mb-5" style="margin-top: 20px;">
+<main class="container mb-5">
     <div class="row justify-content-center">
         <div class="col-lg-10">
             <div class="card shadow-sm border-0 rounded-4">
@@ -79,7 +79,7 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
                                 <span class="error_form text-danger small" id="email_error_message"></span>
                             </div>
                         </div>
-                        
+
                         <div class="row g-3 mb-4 justify-content-center">
                             <div class="col-md-6">
                                 <label for="carta_path" class="form-label text-muted fw-bold small">Carta de Resposta(PDF/Word/Imagem)</label>

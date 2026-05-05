@@ -37,11 +37,11 @@ class SecurityHeaders {
     
     private static function getLoginCSP() {
         return "default-src 'self'; " .
-                "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://code.jquery.com https://www.google.com https://www.gstatic.com; " .
-                "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com https://www.google.com; " .
+                "script-src 'self' https://cdn.jsdelivr.net https://code.jquery.com https://www.google.com https://www.gstatic.com; " .
+                "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com https://www.google.com https://fonts.googleapis.com; " .
                 "img-src 'self' data: https:; " .
-                "font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " .
-                "connect-src 'self' http://localhost; " .
+                "font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.gstatic.com; " .
+                "connect-src 'self' http://localhost https://www.google.com; " .
                 "frame-src https://www.google.com https://www.gstatic.com" .
                 "frame-ancestors 'none'";
     }

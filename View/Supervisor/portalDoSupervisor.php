@@ -23,97 +23,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 $unreadCount = NotificationHelper::getUnreadCount($conn, $userId);
 $notifications = NotificationHelper::getNotifications($conn, $userId);
 
-$filtroQualificacao = "";
-
-if (isset($_SESSION['role']) && $_SESSION['role'] === 'supervisor' && isset($_SESSION['usuario_id'])) {
-    $userId = (int) $_SESSION['usuario_id'];
-
-    $stmtSup = $conn->prepare("
-        SELECT id_qualificacao 
-        FROM supervisor 
-        WHERE usuario_id = ?
-    ");
-    $stmtSup->bind_param("i", $userId);
-    $stmtSup->execute();
-    $resSup = $stmtSup->get_result();
-
-    $qualificacaoIds = [];
-    while ($row = $resSup->fetch_assoc()) {
-        if ($row['id_qualificacao']) {
-            $qualificacaoIds[] = (int) $row['id_qualificacao'];
-        }
-    }
-    $stmtSup->close();
-
-    if (!empty($qualificacaoIds)) {
-        $placeholders        = implode(',', $qualificacaoIds);
-        $filtroQualificacao  = "AND p.qualificacao IN ($placeholders)";
-    }
-}
-
-$months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-
-$pedidos_monthly_query_per_qualification = mysqli_query($conn, "
-    SELECT MONTH(p.data_do_pedido) as month,
-                q.descricao as qualificacao_desc,
-                COUNT(*) as count
-                FROM pedido_carta p
-                JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
-                WHERE YEAR(p.data_do_pedido) = YEAR(CURDATE()) $filtroQualificacao GROUP BY MONTH(p.data_do_pedido), q.descricao");
-$pedidos_monthly_per_qualification = [];
-if ($pedidos_monthly_query_per_qualification) {
-    while ($row = mysqli_fetch_assoc($pedidos_monthly_query_per_qualification)) {
-        $qual = $row['qualificacao_desc'];
-        if (!isset($pedidos_monthly_per_qualification[$qual])) {
-            $pedidos_monthly_per_qualification[$qual] = array_fill(0, 12, 0);
-        }
-        $pedidos_monthly_per_qualification[$qual][$row['month'] - 1] = $row['count'];
-    }
-}
-$qualifications = array_keys($pedidos_monthly_per_qualification);
-$pedidos_per_qual_json = json_encode($pedidos_monthly_per_qualification);
-
-$pedidos_year_query_per_qualification = mysqli_query($conn, "
-    SELECT YEAR(p.data_do_pedido) as year,
-           q.descricao as qualificacao_desc,
-           COUNT(*) as count
-    FROM pedido_carta p
-    JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
-    WHERE YEAR(p.data_do_pedido) BETWEEN YEAR(CURDATE()) - 4 AND YEAR(CURDATE())
-    $filtroQualificacao
-    GROUP BY YEAR(p.data_do_pedido), q.descricao
-    ORDER BY year ASC
-");
-
-$pedidos_year_per_qualification = [];
-$years_list = [];
-
-if ($pedidos_year_query_per_qualification) {
-    while ($row = mysqli_fetch_assoc($pedidos_year_query_per_qualification)) {
-        $qual = $row['qualificacao_desc'];
-        $year = $row['year'];
-
-        if (!in_array($year, $years_list)) {
-            $years_list[] = $year;
-        }
-        if (!isset($pedidos_year_per_qualification[$qual])) {
-            $pedidos_year_per_qualification[$qual] = [];
-        }
-        $pedidos_year_per_qualification[$qual][$year] = $row['count'];
-    }
-
-    foreach ($pedidos_year_per_qualification as $qual => &$yearData) {
-        $filled = [];
-        foreach ($years_list as $y) {
-            $filled[] = $yearData[$y] ?? 0;
-        }
-        $yearData = $filled;
-    }
-    unset($yearData);
-}
-
-$pedidos_year_per_qual_json = json_encode($pedidos_year_per_qualification);
-$years_list_json = json_encode(array_values($years_list));
 
 $themeValue = isset($_SESSION['theme']) ? trim($_SESSION['theme']) : 'light';
 $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : 'light';
@@ -130,14 +39,14 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
     <!-- BootStrap Links -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <!-- CSS -->
     <link rel="stylesheet" href="/estagio/Assets/CSS/notifications.css">
     <link rel="stylesheet" href="/estagio/Assets/CSS/chart.css">
     <link rel="stylesheet" href="/estagio/Assets/CSS/header.css">
     <link rel="stylesheet" href="/estagio/Assets/CSS/global.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="/estagio/Assets/JS/SessionManager.js" 
+    <script src="/estagio/Assets/JS/SessionManager.js"
         data-session-config='{"timeoutMinutes":30,"heartbeatInterval":60}'>
     </script>
 </head>
@@ -186,7 +95,7 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                             </li>
                             <?php include __DIR__ . '/../../Includes/notification-widget.php'; ?>
                             <li class="nav-item ms-lg-3">
-                                <a href="/estagio/logout" class="btn btn-danger shadow-sm"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+                                <a href="/estagio/logout" class="btn btn-danger shadow-sm px-4 fw-semibold rounded-pill"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
                             </li>
                         </ul>
                     </div>
@@ -220,6 +129,7 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                         <li><a class="dropdown-item" href="/estagio/estagio/listar"><i class="fas fa-file-alt fa-fw me-2 text-secondary"></i> Pedidos de Estágio</a></li>
                         <li><a class="dropdown-item" href="/estagio/credencial/listar"><i class="fas fa-id-card-clip fa-fw me-2 text-secondary"></i> Pedidos de Credencial</a></li>
                         <li><a class="dropdown-item" href="/estagio/visita/listar"><i class="fas fa-route fa-fw me-2 text-secondary"></i> Pedidos de Visita</a></li>
+                        <li><a class="dropdown-item" href="/estagio/avaliacao-estagio/listar"><i class="fas fa-route fa-fw me-2 text-secondary"></i> Avaliações De Estágio</a></li>
                     </ul>
                 </li>
                 <li class="nav-item mx-1">
@@ -269,94 +179,8 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
     </main>
 
     <?php require_once __DIR__ . '/../../Includes/footer.php' ?>
-    <script>
-        const ctxPedidosQualificacao = document.getElementById('pedidosPieChart').getContext('2d');
-        const qualifications = <?php echo json_encode($qualifications); ?>;
-        const pedidos_data = <?php echo $pedidos_per_qual_json; ?>;
-        const colors = [
-            'rgba(255, 99, 132, 0.6)',
-            'rgba(54, 162, 235, 0.6)',
-            'rgba(255, 206, 86, 0.6)',
-            'rgba(75, 192, 192, 0.6)',
-            'rgba(153, 102, 255, 0.6)',
-            'rgba(255, 159, 64, 0.6)',
-            'rgba(201, 203, 207, 0.6)'
-        ];
-        const borderColors = colors.map(color => color.replace('0.6', '1'));
-        let datasets = qualifications.map((qual, index) => {
-            return {
-                label: qual,
-                data: pedidos_data[qual],
-                backgroundColor: colors[index % colors.length],
-                borderColor: borderColors[index % colors.length],
-                borderWidth: 2
-            };
-        });
-        new Chart(ctxPedidosQualificacao, {
-            type: 'bar',
-            data: {
-                labels: <?php echo json_encode($months); ?>,
-                datasets: datasets
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    x: {
-                        stacked: true
-                    },
-                    y: {
-                        stacked: true,
-                        beginAtZero: true
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }
-        });
-
-
-        const ctxPedidosAno = document.getElementById('pedidosAnoPieChart').getContext('2d');
-        const years_list = <?php echo $years_list_json; ?>;
-        const pedidos_year_data = <?php echo $pedidos_year_per_qual_json; ?>;
-
-        let datasetsAno = qualifications.map((qual, index) => {
-            return {
-                label: qual,
-                data: pedidos_year_data[qual] ?? [],
-                backgroundColor: colors[index % colors.length],
-                borderColor: borderColors[index % colors.length],
-                borderWidth: 2
-            };
-        });
-
-        new Chart(ctxPedidosAno, {
-            type: 'bar',
-            data: {
-                labels: years_list,
-                datasets: datasetsAno
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    x: {
-                        stacked: true
-                    },
-                    y: {
-                        stacked: true,
-                        beginAtZero: true
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }
-        });
-    </script>
+    <script src="/estagio/Assets/JS/supervisor.data.php"></script>
+    <script src="/estagio/Assets/JS/supervisor.js"></script>
 </body>
 
 </html>

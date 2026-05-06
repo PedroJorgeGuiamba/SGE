@@ -31,11 +31,12 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ITC</title><link rel="icon" href="https://www.itc.ac.mz/wp-content/uploads/2020/03/cropped-logobackgsite_ITC-2-32x32.png" sizes="32x32">
+    <title>ITC</title>
+    <link rel="icon" href="https://www.itc.ac.mz/wp-content/uploads/2020/03/cropped-logobackgsite_ITC-2-32x32.png" sizes="32x32">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <!-- Chart.js -->
     <link rel="stylesheet" href="/estagio/Assets/CSS/chart.css">
     <link rel="stylesheet" href="/estagio/Assets/CSS/header.css">
@@ -43,7 +44,7 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
     <link rel="stylesheet" href="/estagio/Assets/CSS/notifications.css">
     <!-- Custom CSS -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="/estagio/Assets/JS/SessionManager.js" 
+    <script src="/estagio/Assets/JS/SessionManager.js"
         data-session-config='{"timeoutMinutes":30,"heartbeatInterval":60}'>
     </script>
 </head>
@@ -132,6 +133,7 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                         <li><a class="dropdown-item" href="/estagio/estagio/listar"><i class="fas fa-file-alt fa-fw me-2 text-secondary"></i> Pedidos de Estágio</a></li>
                         <li><a class="dropdown-item" href="/estagio/credencial/listar"><i class="fas fa-id-card-clip fa-fw me-2 text-secondary"></i> Pedidos de Credencial</a></li>
                         <li><a class="dropdown-item" href="/estagio/visitas/listar"><i class="fas fa-route fa-fw me-2 text-secondary"></i> Pedidos de Visita</a></li>
+                        <li><a class="dropdown-item" href="/estagio/avaliacao-estagio/listar"><i class="fas fa-route fa-fw me-2 text-secondary"></i> Avaliações De Estágio</a></li>
                     </ul>
                 </li>
                 <li class="nav-item mx-1">

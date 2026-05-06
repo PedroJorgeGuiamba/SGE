@@ -1,6 +1,6 @@
 $.validator.addMethod('telefone_mz', function(value, element) {
     if (this.optional(element)) return true;
-    return /^(\+258)?[ -]?[8][2-7][0-9]{7}$/.test(value);
+    return /^(\+258)?[ -]?[8][2-8][0-9]{7}$/.test(value);
 }, 'Número inválido. Ex: +258 84xxxxxxx ou 84xxxxxxx');
 
 // Validação do formulário

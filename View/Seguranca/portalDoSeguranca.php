@@ -37,7 +37,7 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <!-- JQuery -->
     <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
@@ -47,7 +47,7 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
     <!-- CSS -->
     <link rel="stylesheet" href="/estagio/Assets/CSS/global.css">
     <link rel="stylesheet" href="/estagio/Assets/CSS/notifications.css">
-    <script src="/estagio/Assets/JS/SessionManager.js" 
+    <script src="/estagio/Assets/JS/SessionManager.js"
         data-session-config='{"timeoutMinutes":30,"heartbeatInterval":60}'>
     </script>
 </head>

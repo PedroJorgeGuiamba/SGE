@@ -29,7 +29,7 @@ $site = getenv("GOOGLE_DATA_SITE_KEY");
     <!-- Fazer link do CSS Global -->
     <link rel="stylesheet" href="/estagio/Assets/CSS/global.css">
     <!-- FontAwesome para icones -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <!-- <script src="https://www.google.com/recaptcha/api.js" async defer></script> -->
     <script src="https://www.google.com/recaptcha/enterprise.js" async defer></script>
 </head>
@@ -74,7 +74,7 @@ $site = getenv("GOOGLE_DATA_SITE_KEY");
                 </div>
                 <div class="form-group mb-4">
                     <div class="input-group">
-                        <div class="g-recaptcha" data-sitekey="<?=$site ?>" data-action="LOGIN"></div>
+                        <div class="g-recaptcha" data-sitekey="<?= $site ?>" data-action="LOGIN"></div>
                         <span class="error_form" id="recaptcha_error_message"></span>
                     </div>
                 </div>

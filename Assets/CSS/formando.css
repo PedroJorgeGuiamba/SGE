@@ -1,10 +1,6 @@
 .portal-section {
     background: linear-gradient(135deg, #f0f4ff 0%, #f8f9fa 100%);
-    min-height: calc(100vh - 140px);
-    padding: 2rem 0 3rem;
-    padding-top: 140px; /* header fixo: navbar principal + navbar secundária */
 }
-
 
 .section-header {
     display: flex;
@@ -227,22 +223,22 @@
 
 /* ====== RESPONSIVIDADE ====== */
 @media (max-width: 1200px) {
-    .portal-section {
+    /* .portal-section {
         padding: 2rem 1rem 3rem;
-    }
+    } */
 }
 
 @media (max-width: 992px) {
-    .portal-section {
-        padding-top: 130px;
-    }
+    /* .portal-section {
+        padding-top: 130px; 
+    } */
 }
 
 @media (max-width: 768px) {
-    .portal-section {
-        padding-top: 110px;
-        padding-bottom: 2rem;
-    }
+    /* .portal-section {
+        padding-top: 110px; */
+        /* padding-bottom: 2rem;
+    } */
     
     .section-header {
         flex-direction: column;
@@ -297,9 +293,9 @@
 }
 
 @media (max-width: 576px) {
-    .portal-section {
+    /* .portal-section {
         padding-top: 100px;
-    }
+    } */
     
     .section-header h2 {
         font-size: 1.15rem;

@@ -6,11 +6,15 @@ include_once __DIR__ . '/../../Controller/Formando/Home.php';
 require_once __DIR__ . '/../../middleware/auth.php';
 require_once __DIR__ . '/../../Helpers/SecurityHeaders.php';
 require_once __DIR__ . '/../../Helpers/NotificationHelper.php';
+require_once __DIR__ . '/../../Conexao/conector.php';
 
 SecurityHeaders::setFull();
 
-$conexao = new Conector();
-$conn = $conexao->getConexao();
+if (!isset($conn) || $conn === null) {
+    $conector = new Conector();
+    $conn = $conector->getConexao();
+}
+
 $userId = NotificationHelper::sanitizeUserId($_SESSION['usuario_id'] ?? 0);
 
 // Verificar se o formando já confirmou seu código
@@ -22,11 +26,6 @@ if (strtolower($_SESSION['role'] ?? '') === 'formando') {
 }
 
 NotificationHelper::handleAction($conn, $userId, $_POST ?? []);
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    // header("Location: " . $_SERVER['PHP_SELF']);
-    // exit;
-}
 
 $unreadCount = NotificationHelper::getUnreadCount($conn, $userId);
 $notifications = NotificationHelper::getNotifications($conn, $userId);
@@ -58,9 +57,10 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/estagio/Assets/CSS/formando.css">
-    <link rel="stylesheet" href="/estagio/Assets/CSS/global.css">
     <link rel="stylesheet" href="/estagio/Assets/CSS/notifications.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/header.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/global.css">
+    <link rel="stylesheet" href="/estagio/Assets/CSS/formando.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
         crossorigin="anonymous"></script>
@@ -71,59 +71,48 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
 
 <body>
     <header>
-        <!-- Nav principal -->
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">
-                    <img src="https://www.itc.ac.mz/wp-content/uploads/2020/07/cropped-LOGO_ITC-09.png"
-                        alt="ITC Logo" style="height: 45px;">
-                </a>
+                <img src="https://www.itc.ac.mz/wp-content/uploads/2020/07/cropped-LOGO_ITC-09.png">
                 <div class="nav-modal">
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#navbarFormando" aria-controls="navbarFormando"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText"
+                        aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
-                    <div class="collapse navbar-collapse" id="navbarFormando">
+                    <div class="collapse navbar-collapse" id="navbarText">
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                             <!-- Instagram -->
                             <li class="nav-item">
-                                <a class="nav-link fs-5" href="https://www.instagram.com/itc.ac" aria-label="Instagram">
-                                    <i class="fa-brands fa-square-instagram" style="color: #3a4c91"></i>
+                                <a class="nav-link fs-5" aria-current="page" href="https://www.instagram.com/itc.ac" aria-label="Instagram">
+                                    <i class="fa-brands fa-instagram"></i>
                                 </a>
                             </li>
                             <!-- Facebook -->
                             <li class="nav-item">
-                                <a class="nav-link fs-5" href="https://pt-br.facebook.com/itc.transcom" aria-label="Facebook">
-                                    <i class="fa-brands fa-facebook" style="color: #3a4c91"></i>
+                                <a class="nav-link fs-5" aria-current="page" href="https://pt-br.facebook.com/itc.transcom" aria-label="Facebook">
+                                    <i class="fa-brands fa-facebook"></i>
                                 </a>
                             </li>
                             <!-- Google -->
                             <li class="nav-item">
                                 <a class="nav-link fs-5" href="https://plus.google.com/share?url=https://simplesharebuttons.com" aria-label="Google">
-                                    <i class="fab fa-google" style="color: #3a4c91;"></i>
+                                    <i class="fa-brands fa-google"></i>
                                 </a>
                             </li>
                             <!-- LinkedIn -->
                             <li class="nav-item">
                                 <a class="nav-link fs-5" href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https://simplesharebuttons.com" aria-label="LinkedIn">
-                                    <i class="fa-brands fa-linkedin-in" style="color: #3a4c91;"></i>
+                                    <i class="fa-brands fa-linkedin-in"></i>
                                 </a>
                             </li>
-                            <!-- Botão Tema -->
                             <li class="nav-item">
-                                <button id="themeToggle" class="btn btn-outline-secondary position-fixed bottom-0 end-0 m-3 shadow-sm"
-                                    style="z-index: 1050; border-radius: 50%; width: 45px; height: 45px;" aria-label="Alternar tema">
+                                <button id="themeToggle" class="btn btn-outline-secondary position-fixed bottom-0 end-0 m-3 shadow-sm">
                                     <i class="fas fa-moon"></i>
                                 </button>
                             </li>
-                            <!-- Notificações -->
-                            <?php include_once __DIR__ . '/../../Includes/notification-widget.php'; ?>
-                            <!-- Logout -->
-                            <li class="nav-item ms-lg-2">
-                                <a href="/estagio/logout" class="btn btn-danger shadow-sm px-4 fw-semibold rounded-pill">
-                                    <i class="fas fa-sign-out-alt me-1"></i> Logout
-                                </a>
+                            <?php include __DIR__ . '/../../Includes/notification-widget.php'; ?>
+                            <li class="nav-item ms-lg-3">
+                                <a href="/estagio/logout" class="btn btn-danger shadow-sm px-4 fw-semibold rounded-pill"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
                             </li>
                         </ul>
                     </div>
@@ -154,14 +143,17 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                         <i class="fas fa-calendar-check me-1 text-primary"></i> Visita de Estágio
                     </a>
                 </li>
+                <li class="nav-item mx-2">
+                    <a class="nav-link fw-semibold text-dark" href="/estagio/avaliacao-estagio/criar">
+                        <i class="fas fa-file-pdf me-1 text-primary"></i> Avaliação de Estágio
+                    </a>
+                </li>
             </ul>
         </nav>
     </header>
 
     <main class="portal-section">
         <div class="container">
-
-            <!-- Cabeçalho da secção -->
             <div class="section-header">
                 <div class="icon-badge">
                     <i class="fas fa-clipboard-list"></i>
@@ -172,7 +164,6 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                 </div>
             </div>
 
-            <!-- Acções rápidas -->
             <div class="quick-actions">
                 <a href="/estagio/estagio/criar" class="quick-action-btn primary">
                     <i class="fas fa-plus-circle"></i> Novo Pedido de Estágio
@@ -185,7 +176,6 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                 </a>
             </div>
 
-            <!-- Tabela de pedidos -->
             <div class="table-card">
                 <div class="table-card-header">
                     <div>
@@ -221,11 +211,9 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                                 <th>Contacto 1</th>
                                 <th>Contacto 2</th>
                                 <th>Email</th>
-                                <!-- <th>Acções</th> -->
                             </tr>
                         </thead>
                         <tbody id="pedidosTbody">
-                            <!-- Preenchido via JS -->
                         </tbody>
                     </table>
                 </div>
@@ -241,17 +229,9 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
     </main>
 
     <script src="/estagio/Assets/JS/portalDeEstudante.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
 </body>
 
 </html>
-
-<!-- <td>
-<div class="d-flex gap-1">
-    <button class="btn-action edit editar-btn" data-id="${pedido.id_pedido_carta}" title="Editar">
-        <i class="fas fa-edit"></i>
-    </button>
-    <button class="btn-action remove remover-btn" data-id="${pedido.id_pedido_carta}" title="Remover">
-        <i class="fas fa-trash-alt"></i>
-    </button>
-</div>
-</td> -->

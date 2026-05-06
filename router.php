@@ -345,6 +345,34 @@ switch ($modulo) {
         }
         break;
 
+    case 'avaliacao-estagio':
+        switch($acao){
+            case 'listar':
+                $auth->verificarAutenticacao();
+                require 'View/estagio/listaDeAvaliacoes.php';
+                break;
+            case 'criar':
+                $auth->verificarAutenticacao();
+                require 'View/estagio/avaliarEstagio.php';
+                break;
+            case 'salvar':
+                $auth->verificarAutenticacao();
+                require 'Controller/Estagio/avaliarEstagio.php';
+                break;
+            case 'editar':
+                $_GET['id_avaliacao']= $id;
+                $auth->verificarAutenticacao();
+                require 'View/Estagio/editarAvaliacao.php';
+                break;
+            case 'atualizar':
+                $auth->verificarAutenticacao();
+                require 'Controller/Estagio/editarAvaliacao.php';
+                break;
+            default:
+                require 'View/Erros/error.php';
+        }
+        break;
+
     // ================= CREDENCIAL =================
     case 'credencial':
     case 'credenciais':
@@ -525,6 +553,10 @@ switch ($modulo) {
                 break;
             case 'heartbeat-beacon':
                 require 'Helpers/heartbeat-beacon.php';
+                break;
+            case 'avalicoes':
+                $auth->verificarAutenticacao();
+                require 'Controller/Estagio/search_avalicoes.php';
                 break;
             default:
                 header('Content-Type: application/json');

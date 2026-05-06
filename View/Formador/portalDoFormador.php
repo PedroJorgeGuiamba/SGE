@@ -46,9 +46,9 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
     <link rel="stylesheet" href="/estagio/Assets/CSS/notifications.css">
 
     <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
-    <script src="/estagio/Assets/JS/SessionManager.js" 
+    <script src="/estagio/Assets/JS/SessionManager.js"
         data-session-config='{"timeoutMinutes":30,"heartbeatInterval":60}'>
     </script>
 </head>

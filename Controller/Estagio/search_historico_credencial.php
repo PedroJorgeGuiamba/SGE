@@ -9,7 +9,9 @@ $conn    = $conexao->getConexao();
 $criptografia = new Criptografia();
 $termo = trim($_GET['termo'] ?? '');
 
+
 // --- Filtro por qualificação do supervisor ---
+$filtroAdicional = "";
 $filtroQualificacao = "";
 
 if (isset($_SESSION['role']) && $_SESSION['role'] === 'supervisor' && isset($_SESSION['usuario_id'])) {
@@ -38,6 +40,13 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'supervisor' && isset($_SE
     }
 }
 
+if (isset($_SESSION['role']) && $_SESSION['role'] === 'formando' && isset($_SESSION['usuario_id'])) {
+    $userId = (int) $_SESSION['usuario_id'];
+    $codigoFormando = (int) $_SESSION['codigo_formando'];
+
+    $filtroAdicional = "AND c.codigo_formando = $codigoFormando";
+}
+
 // --- Queries ---
 if ($termo === '') {
     if ($_SESSION['role'] && $_SESSION['role'] !== 'supervisor') {
@@ -46,7 +55,7 @@ if ($termo === '') {
         FROM credencial_estagio c
         JOIN pedido_carta p ON c.id_pedido_carta = p.id_pedido_carta
         LEFT JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
-        WHERE c.data_de_levantamento IS NOT NULL
+        WHERE c.data_de_levantamento IS NOT NULL $filtroAdicional
         ORDER BY c.id_credencial DESC
         ";
     } else {
@@ -67,7 +76,7 @@ if ($termo === '') {
             FROM credencial_estagio c
             JOIN pedido_carta p ON c.id_pedido_carta = p.id_pedido_carta
             LEFT JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
-            WHERE 1=1 AND c.data_de_levantamento IS NOT NULL $filtroQualificacao
+            WHERE 1=1 AND c.data_de_levantamento IS NOT NULL $filtroQualificacao $filtroAdicional
                 AND (c.empresa LIKE ? OR c.nome LIKE ? OR c.apelido LIKE ? OR c.email LIKE ?)
             ORDER BY c.id_credencial DESC
         ";

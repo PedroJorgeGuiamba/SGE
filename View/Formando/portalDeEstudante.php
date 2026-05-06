@@ -176,56 +176,205 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                 </a>
             </div>
 
-            <div class="table-card">
-                <div class="table-card-header">
-                    <div>
-                        <span class="fw-semibold text-dark">
-                            <i class="fas fa-list-alt me-2 text-primary"></i>Todos os Pedidos
-                        </span>
-                    </div>
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="input-group input-group-sm" style="width: 220px;">
-                            <span class="input-group-text bg-white border-end-0">
-                                <i class="fas fa-search text-muted" style="font-size: 0.75rem;"></i>
+            <div class="section-tabs">
+                <button class="tab-btn active" data-tab="pedidos">Pedidos de Estágio</button>
+                <button class="tab-btn" data-tab="credenciais">Credenciais</button>
+                <button class="tab-btn" data-tab="visitas">Visitas</button>
+                <button class="tab-btn" data-tab="avaliacoes">Avaliações</button>
+            </div>
+
+            <div id="pedidos-section" class="tab-section active">
+                <div class="table-card">
+                    <!-- Tabela de pedidos -->
+                    <div class="table-card-header">
+                        <div>
+                            <span class="fw-semibold text-dark">
+                                <i class="fas fa-list-alt me-2 text-primary"></i>Todos os Pedidos
                             </span>
-                            <input type="text" id="searchInput" class="form-control border-start-0 ps-0"
-                                placeholder="Pesquisar..." style="font-size: 0.85rem;">
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="input-group input-group-sm" style="width: 220px;">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="fas fa-search text-muted" style="font-size: 0.75rem;"></i>
+                                </span>
+                                <input type="text" id="searchInput" class="form-control border-start-0 ps-0"
+                                    placeholder="Pesquisar..." style="font-size: 0.85rem;">
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="table-responsive">
-                    <table id="pedidosTable" class="table mb-0">
-                        <thead>
-                            <tr>
-                                <th><input type="checkbox" id="selectAll" class="form-check-input"></th>
-                                <th>Nº</th>
-                                <th>Nome</th>
-                                <th>Apelido</th>
-                                <th>Cód. Formando</th>
-                                <th>Qualificação</th>
-                                <th>Turma</th>
-                                <th>Data</th>
-                                <th>Hora</th>
-                                <th>Empresa</th>
-                                <th>Contacto 1</th>
-                                <th>Contacto 2</th>
-                                <th>Email</th>
-                            </tr>
-                        </thead>
-                        <tbody id="pedidosTbody">
-                        </tbody>
-                    </table>
-                </div>
+                    <div class="table-responsive">
+                        <table id="pedidosTable" class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="selectAll" class="form-check-input"></th>
+                                    <th>Nº</th>
+                                    <th>Nome</th>
+                                    <th>Apelido</th>
+                                    <th>Cód. Formando</th>
+                                    <th>Qualificação</th>
+                                    <th>Turma</th>
+                                    <th>Data</th>
+                                    <th>Hora</th>
+                                    <th>Empresa</th>
+                                    <th>Contacto 1</th>
+                                    <th>Contacto 2</th>
+                                    <th>Email</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pedidosTbody">
+                            </tbody>
+                        </table>
+                    </div>
 
-                <div class="px-3 py-3 border-top bg-white">
-                    <nav>
-                        <ul class="pagination justify-content-center mb-0" id="pagination"></ul>
-                    </nav>
+                    <div class="px-3 py-3 border-top bg-white">
+                        <nav>
+                            <ul class="pagination justify-content-center mb-0" id="pagination"></ul>
+                        </nav>
+                    </div>
                 </div>
             </div>
 
+            <!-- Seção de Credenciais -->
+            <div id="credenciais-section" class="tab-section" style="display:none;">
+                <div class="table-card">
+                    <div class="table-card-header">
+                        <div>
+                            <span class="fw-semibold text-dark">
+                                <i class="fas fa-id-card me-2 text-primary"></i>Histórico de Credenciais
+                            </span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="input-group input-group-sm" style="width: 220px;">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="fas fa-search text-muted"></i>
+                                </span>
+                                <input type="text" id="credenciaisSearch" data-section="credenciais" 
+                                    class="form-control section-search border-start-0 ps-0"
+                                    placeholder="Pesquisar credenciais...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table id="pedidosTable" class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" class="form-check-input selectAll" data-section="credenciais"></th>
+                                    <th>Numero</th>
+                                    <th>Nome</th>
+                                    <th>Apelido</th>
+                                    <th>Código Formando</th>
+                                    <th>Contacto do Formando</th>
+                                    <th>Email</th>
+                                    <th>Empresa</th>
+                                    <th>Data do Pedido</th>
+                                    <th>Id do Pedido de Estágio</th>
+                                    <th>Carta Resposta</th>
+                                </tr>
+                            </thead>
+                            <tbody id="credenciaisTbody"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="px-3 py-3 border-top bg-white">
+                        <nav>
+                            <ul class="pagination justify-content-center mb-0" id="credenciaisPagination"></ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção de Visitas -->
+            <div id="visitas-section" class="tab-section" style="display:none;">
+                <div class="table-card">
+                    <div class="table-card-header">
+                        <div>
+                            <span class="fw-semibold text-dark">
+                                <i class="fas fa-calendar-check me-2 text-primary"></i>Histórico de Visitas
+                            </span>
+                        </div>
+                        <div>
+                            <input type="text" id="visitasSearch" data-section="visitas" 
+                                class="form-control section-search"
+                                placeholder="Pesquisar visitas...">
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table id="pedidosTable" class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" class="form-check-input selectAll" data-section="visitas"></th>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Apelido</th>
+                                    <th>Cód. Formando</th>
+                                    <th>Qualificação</th>
+                                    <th>Turma</th>
+                                    <th>Data Visita</th>
+                                    <th>Hora Visita</th>
+                                    <th>Empresa</th>
+                                    <th>Motivo</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="visitasTbody"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="px-3 py-3 border-top bg-white">
+                        <nav>
+                            <ul class="pagination justify-content-center mb-0" id="visitasPagination"></ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção de Avaliações -->
+            <div id="avaliacoes-section" class="tab-section" style="display:none;">
+                <div class="table-card">
+                    <div class="table-card-header">
+                        <div>
+                            <span class="fw-semibold text-dark">
+                                <i class="fas fa-file-pdf me-2 text-primary"></i>Histórico de Avaliações
+                            </span>
+                        </div>
+                        <div>
+                            <input type="text" id="avaliacoesSearch" data-section="avaliacoes" 
+                                class="form-control section-search"
+                                placeholder="Pesquisar avaliações...">
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table id="pedidosTable" class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" class="form-check-input selectAll" data-section="avaliacoes"></th>
+                                    <th>Nome</th>
+                                    <th>Apelido</th>
+                                    <th>Cód. Formando</th>
+                                    <th>Qualificação</th>
+                                    <th>Turma</th>
+                                    <th>Empresa</th>
+                                    <th>Resultado</th>
+                                    <th>Documento</th>
+                                </tr>
+                            </thead>
+                            <tbody id="avaliacoesTbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-3 py-3 border-top bg-white">
+                <nav>
+                    <ul class="pagination justify-content-center mb-0" id="avaliacoesPagination"></ul>
+                </nav>
+            </div>
         </div>
+
     </main>
 
     <script src="/estagio/Assets/JS/portalDeEstudante.js"></script>

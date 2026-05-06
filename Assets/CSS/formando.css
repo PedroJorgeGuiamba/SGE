@@ -221,6 +221,80 @@
     color: #cbd5e1;
 }
 
+/* Estilos para as tabs */
+.section-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0;
+}
+
+.tab-btn {
+    padding: 0.75rem 1.5rem;
+    background: none;
+    border: none;
+    font-weight: 600;
+    color: #6c757d;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.tab-btn:hover {
+    color: #3a4c91;
+    background-color: #f8f9fa;
+}
+
+.tab-btn.active {
+    color: #3a4c91;
+    background-color: #ffffff;
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #3a4c91;
+}
+
+.tab-section {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Estilos para busca por seção */
+.section-search {
+    width: 250px;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
 /* ====== RESPONSIVIDADE ====== */
 @media (max-width: 1200px) {
     /* .portal-section {

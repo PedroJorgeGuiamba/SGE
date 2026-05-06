@@ -4,7 +4,7 @@
     <div class="card shadow-sm border-0 rounded-4">
         <div class="card-header bg-white border-bottom-0 mt-3 pt-4 pb-3 d-flex justify-content-between align-items-center">
             <div>
-                <h3 class="fw-bold text-primary"><i class="fas fa-list-alt me-2"></i>Lista de Todas as Avaliações de Estágio</h3>
+                <h3 class="fw-bold text-primary"><i class="fas fa-list-alt me-2"></i>Histórico de Todas as Avaliações de Estágio</h3>
                 <p class="text-muted small mb-0">Faça a gestão das avaliações de estágio em sistema</p>
             </div>
             <div class="w-25">
@@ -18,7 +18,7 @@
         <div class="card-body p-4 pt-0">
             <div class="mb-3 d-flex gap-2 flex-wrap">
                 <a href="/estagio/avaliacao-estagio/criar" class="btn btn-primary shadow-sm"><i class="fas fa-plus-circle me-1"></i> Nova Avaliação</a>
-                <a href="/estagio/avaliacao-estagio/historico" class="btn btn-success shadow-sm"><i class="fas fa-history me-1"></i> Histórico</a>
+                <a href="/estagio/avaliacao-estagio/listar" class="btn btn-success shadow-sm"><i class="fas fa-history me-1"></i> Lista Activa</a>
                 <button id="deleteSelected" class="btn btn-danger shadow-sm"><i class="fas fa-trash-alt me-1"></i> Deletar Selecionados</button>
             </div>
 
@@ -56,7 +56,7 @@
 <!-- Scripts do BootStrap -->
 <?php require_once __DIR__ . '/../../Includes/footer.php' ?>
 
-<script src="/estagio/Assets/JS/listaDeAvaliacoes.js"></script>
+<script src="/estagio/Assets/JS/HistoricoDeAvaliacoes.js"></script>
 </body>
 
 </html>

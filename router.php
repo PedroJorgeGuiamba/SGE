@@ -368,6 +368,10 @@ switch ($modulo) {
                 $auth->verificarAutenticacao();
                 require 'Controller/Estagio/editarAvaliacao.php';
                 break;
+            case 'historico':
+                $auth->verificarAutenticacao();
+                require 'View/Estagio/HistoricoDeAvaliacoes.php';
+                break;
             default:
                 require 'View/Erros/error.php';
         }
@@ -557,6 +561,10 @@ switch ($modulo) {
             case 'avalicoes':
                 $auth->verificarAutenticacao();
                 require 'Controller/Estagio/search_avalicoes.php';
+                break;
+            case 'historico-avalicoes':
+                $auth->verificarAutenticacao();
+                require 'Controller/Estagio/search_historico_avalicoes.php';
                 break;
             default:
                 header('Content-Type: application/json');

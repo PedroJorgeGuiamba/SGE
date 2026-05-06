@@ -113,6 +113,6 @@ $stmt->close();
 
     <!-- Bootstrap JS -->
     <?php require_once __DIR__ . '/../../Includes/footer.php' ?>
-    <script src="/estagio/Assets/JS/editarAvaiacao.js"></script>
+    <script src="/estagio/Assets/JS/editarAvaliacao.js"></script>
 </body>
 </html>

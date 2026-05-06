@@ -6,11 +6,11 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 $conexao = new Conector();
 $conn    = $conexao->getConexao();
-$criptografia =  new Criptografia();
-$termo = trim($_GET['termo'] ?? '');
+$criptografia = new Criptografia();
 
+$termo = trim($_GET['termo'] ?? '');
+$filtroBase = "AND a.resultado IS NOT NULL";
 // --- Filtro por qualificação do supervisor ---
-$filtroAdicional = "";
 $filtroQualificacao = "";
 
 if (isset($_SESSION['role']) && $_SESSION['role'] === 'supervisor' && isset($_SESSION['usuario_id'])) {
@@ -35,37 +35,32 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'supervisor' && isset($_SE
 
     if (!empty($qualificacaoIds)) {
         $placeholders        = implode(',', $qualificacaoIds);
-        $filtroQualificacao  = "AND v.qualificacao IN ($placeholders)";
+        $filtroQualificacao  = "AND p.qualificacao IN ($placeholders)";
     }
-}
-
-if (isset($_SESSION['role']) && $_SESSION['role'] === 'formando' && isset($_SESSION['usuario_id'])) {
-    $userId = (int) $_SESSION['usuario_id'];
-    $codigoFormando = (int) $_SESSION['codigo_formando'];
-
-    $filtroAdicional = "AND v.codigo_formando = $codigoFormando";
 }
 
 // --- Queries ---
 if ($termo === '') {
     $sql = "
-        SELECT v.*, p.qualificacao, q.descricao AS qualificacao_descricao
-        FROM visita_estagio v
-        JOIN pedido_carta p ON v.id_pedido_carta = p.id_pedido_carta
+        SELECT a.*, p.nome as nome, p.apelido as apelido, p.qualificacao, q.descricao AS qualificacao_descricao, t.nome as turma_nome
+        FROM avaliacao_estagio a
+        JOIN pedido_carta p ON a.id_pedido_estagio = p.id_pedido_carta
         LEFT JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
-        WHERE 1=1 $filtroQualificacao $filtroAdicional
-        ORDER BY v.id_visita DESC
+        LEFT JOIN turma t ON a.turma = t.codigo
+        WHERE 1=1 $filtroBase $filtroQualificacao
+        ORDER BY a.id_avaliacao DESC
     ";
     $result = $conn->query($sql);
 } else {
     $sql = "
-        SELECT v.*, p.qualificacao, q.descricao AS qualificacao_descricao
-        FROM visita_estagio v
-        JOIN pedido_carta p ON v.id_pedido_carta = p.id_pedido_carta
+        SELECT a.*, p.nome as nome, p.apelido as apelido, p.qualificacao, q.descricao AS qualificacao_descricao, t.nome as turma_nome
+        FROM avaliacao_estagio a
+        JOIN pedido_carta p ON a.id_pedido_estagio = p.id_pedido_carta
         LEFT JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
-        WHERE 1=1 $filtroQualificacao $filtroAdicional
-          AND (v.empresa LIKE ? OR v.nome LIKE ? OR v.apelido LIKE ?)
-        ORDER BY v.id_visita DESC
+        LEFT JOIN turma t ON a.turma = t.codigo
+        WHERE 1=1 $filtroBase $filtroQualificacao
+            AND (a.empresa LIKE ? OR a.codigo_formando LIKE ? OR a.empresa LIKE ?)
+        ORDER BY a.id_avaliacao DESC
     ";
     $stmt       = $conn->prepare($sql);
     $searchTerm = '%' . $termo . '%';
@@ -77,19 +72,17 @@ if ($termo === '') {
 $pedidos = [];
 while ($row = $result->fetch_assoc()) {
     $pedidos[] = [
-        'id_visita' => $row['id_visita'],
+        'id_avaliacao' => $row['id_avaliacao'],
         'nome' => $row['nome'],
         'apelido' => $row['apelido'],
         'codigo_formando' => $row['codigo_formando'],
-        'contactoFormando' => $criptografia->descriptografar($row['contactoFormando']),
         'empresa' => $row['empresa'],
-        'endereco' => $row['endereco'],
-        'nomeSupervisor' => $row['nomeSupervisor'],
-        'contactoSupervisor' => $criptografia->descriptografar($row['contactoSupervisor']),
-        'data_do_pedido' => $row['data_do_pedido'],
-        'dataHoraDaVisita' => $row['dataHoraDaVisita'],
-        'status' => $row['status'],
-        'id_pedido_carta' => $row['id_pedido_carta']
+        'qualificacao_descricao' => $row['qualificacao_descricao'],
+        'turma' => $row['turma_nome'],
+        'ano_turma' => $row['ano_turma'],
+        'doc_path' => $row['doc_path'],
+        'resultado' => $row['resultado'],
+        'comentario' => $row['comentario']
     ];
 }
 

@@ -113,7 +113,7 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
         crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
     <link href='https://cdn.boxicons.com/fonts/brands/boxicons-brands.min.css' rel='stylesheet'>
 </head>
@@ -174,11 +174,11 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
         <nav class="bg-white shadow-sm border-bottom">
             <ul class="nav justify-content-center py-2">
                 <li class="nav-item mx-1">
-                    <a class="nav-link fw-semibold text-dark active" href="../../View/<?php echo $_SESSION['role'] === 'admin'
-                                                                                            ? 'Admin/portalDoAdmin.php'
-                                                                                            : ($_SESSION['role'] === 'supervisor'
-                                                                                                ? 'Supervisor/portalDoSupervisor.php'
-                                                                                                : 'Formando/portalDeEstudante.php'); ?>">
+                    <a class="nav-link fw-semibold text-dark active" href="<?php echo $_SESSION['role'] === 'admin'
+                                                                                ? '/estagio/admin'
+                                                                                : ($_SESSION['role'] === 'supervisor'
+                                                                                    ? '/estagio/supervisor'
+                                                                                    : '/estagio/formando'); ?>">
                         <i class="fas fa-home fa-fw me-1 text-primary"></i> Home
                     </a>
                 </li>
@@ -206,7 +206,7 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                         </ul>
                     </li>
                     <li class="nav-item mx-1">
-                        <a class="nav-link fw-semibold text-dark" href="relatorio.php">
+                        <a class="nav-link fw-semibold text-dark" href="/estagio/relatorio">
                             <i class="fas fa-file-pdf fa-fw me-1 text-danger"></i> Gerar Relatórios
                         </a>
                     </li>
@@ -336,7 +336,7 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                         </div>
 
                         <div class="preview-footer">
-                            <a href="formularioDeCartaDeEstagio.php" class="btn btn-secondary shadow-sm px-5 py-2 fw-bold text-white">
+                            <a href="/estagio/estagio/criar" class="btn btn-secondary shadow-sm px-5 py-2 fw-bold text-white">
                                 <i class="fas fa-arrow-left me-1"></i> Voltar e corrigir
                             </a>
 

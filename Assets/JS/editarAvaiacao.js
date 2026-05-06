@@ -10,7 +10,7 @@ $(document).ready(function () {
       success: function (response) {
         if (response.success) {
           alert(response.message);
-          window.location.href = "/estagio/credencial/listar";
+          window.location.href = "/estagio/avaliacao-estagio/listar";
         } else {
           alert(response.message);
         }
@@ -26,67 +26,26 @@ $(document).ready(function () {
   });
 });
 
-$.validator.addMethod(
-  "telefone_mz",
-  function (value, element) {
-    if (this.optional(element)) return true;
-    return /^(\+258)?[ -]?[8][2-8][0-9]{7}$/.test(value);
-  },
-  "Número inválido. Ex: +258 84xxxxxxx ou 84xxxxxxx",
-);
-
 $("#formEditarPedido").validate({
   rules: {
     codigo_formando: {
       required: true,
       digits: true,
     },
-    nome: {
-      required: true,
-      minlength: 2,
-    },
-    apelido: {
-      required: true,
-      minlength: 2,
-    },
     empresa: {
       required: true,
       minlength: 2,
-    },
-    codigo_formando: {
-      required: true,
-      telefone_mz: true,
-    },
-    email: {
-      required: true,
-      email: true,
-    },
+    }
   },
   messages: {
     codigo_formando: {
       required: "Campo obrigatório.",
       digits: "Apenas números são permitidos.",
     },
-    nome: {
-      required: "Informe o nome",
-      minlength: "O nome deve ter pelo menos 2 caracteres.",
-    },
-    apelido: {
-      required: "Informe o apelido",
-      minlength: "O apelido deve ter pelo menos 2 caracteres.",
-    },
     empresa: {
       required: "Informe o nome da empresa.",
       minlength: "O nome da empresa deve ter pelo menos 2 caracteres.",
-    },
-    contactoFormando: {
-      required: "Campo obrigatório.",
-      telefone_mz: "Número inválido. Ex: +258 84xxxxxxx",
-    },
-    email: {
-      required: "Informe o e-mail.",
-      email: "Endereço de e-mail inválido.",
-    },
+    }
   },
   errorClass: "is-invalid",
   validClass: "is-valid",

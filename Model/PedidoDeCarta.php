@@ -2,16 +2,16 @@
 
 class PedidoDeCarta
 {
-    private $codigoFormando;
-    private $numero;
-    private $qualificacao;
-    private $turma;
-    private $dataPedido;
-    private $horaPedido;
-    private $empresa;
-    private $contactoPrincipal;
-    private $contactoSecundario;
-    private $email;
+    private int $codigoFormando;
+    private int $numero;
+    private int $qualificacao;
+    private int $turma;
+    private string $dataPedido;
+    private string $horaPedido;
+    private string $empresa;
+    private string $contactoPrincipal;
+    private string $contactoSecundario;
+    private string $email;
 
     // Getters e setters
     public function setCodigoFormando(int $codigoFormando)
@@ -137,7 +137,7 @@ class PedidoDeCarta
         return $stmt->execute();
     }
 
-    public function LastInsertId($conn){
+    public function LastInsertId(mysqli $conn){
         return $conn->insert_id;
     }
 }

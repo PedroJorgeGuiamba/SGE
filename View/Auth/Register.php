@@ -24,7 +24,7 @@ SecurityHeaders::setLogin();
     <!-- Fazer link do CSS Global -->
     <link rel="stylesheet" href="/estagio/Assets/CSS/global.css">
     <!-- FontAwesome para icones -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 </head>
 
 <body>
@@ -36,13 +36,13 @@ SecurityHeaders::setLogin();
                     <img src="https://www.itc.ac.mz/wp-content/uploads/2020/07/cropped-LOGO_ITC-09.png" alt="ITC Logo">
                 </a>
             </div>
-            
+
             <h3 class="auth-title">Registo de Utilizador</h3>
             <p class="auth-subtitle">Crie uma conta para aceder ao sistema</p>
 
             <form method="post" action="/estagio/register/salvar">
                 <?= CSRFProtection::getTokenField() ?>
-                
+
                 <?php if (isset($_GET['erros'])): ?>
                     <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
                         <i class="fas fa-exclamation-circle me-2"></i> <?php echo htmlspecialchars($_GET['erros']); ?>

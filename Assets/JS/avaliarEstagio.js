@@ -1,20 +1,86 @@
-// Verificar se jQuery está carregado
-if (typeof jQuery === 'undefined') {
-    console.error('jQuery não foi carregado!');
-} else {
-    console.log('jQuery carregado com sucesso, versão:', jQuery.fn.jquery);
+$(document).ready(function () {
+    carregarDados();
+});
+
+function carregarDados() {
+    $.ajax({
+        url: "/estagio/api/qualificacao",
+        method: "GET",
+        success: function (resposta) {
+            $("#qualificacao").html(resposta);
+        },
+        error: function (xhr, status, error) {
+            console.error("Erro ao carregar qualificações:", status, error);
+            $("#qualificacao").html(
+                "<option>Erro ao carregar qualificações</option>",
+            );
+        },
+    });
+
+    $.ajax({
+        url: "/estagio/api/turmas",
+        method: "GET",
+        success: function (resposta) {
+            $("#turma").html(resposta);
+        },
+        error: function (xhr, status, error) {
+            console.error("Erro ao carregar turmas:", status, error);
+            $("#turma").html("<option>Erro ao carregar turmas</option>");
+        },
+    });
 }
+
 
 // Validação do formulário
 $("#formularioAvaliacao").validate({
     rules: {
-        resultado: {
-            required: true
+        codigoFormando: {
+            required: true,
+            digits: true
+        },
+        qualificacao: {
+            required: true,
+            digits: true
+        },
+        turma: {
+            required: true,
+            digits: true
+        },
+        empresa: {
+            required: true,
+            minlength: 2
+        },
+        anoTurma: {
+            required: true,
+            digits: true
+        },
+        comentario: {
+            minlength: 2
         }
     },
     messages: {
-        resultado: {
-            required: "Informe o resultado."
+        codigoFormando: {
+            required: "Campo obrigatório.",
+            digits: "Apenas números são permitidos."
+        },
+        qualificacao: {
+            required: "Campo obrigatório.",
+            digits: "Apenas números são permitidos."
+        },
+        turma: {
+            required: "Campo obrigatório.",
+            digits: "Apenas números são permitidos."
+        },
+        empresa: {
+            required: "Campo obrigatório.",
+            minlength: "O nome da empresa deve ter pelo menos 2 caracteres."
+        },
+        anoTurma: {
+            required: "Campo obrigatório.",
+            digits: "Apenas números são permitidos."
+        },
+        comentario: {
+            minlength: "O comentário deve ter pelo menos 2 caracteres."
         }
     },
     errorClass: "is-invalid",
@@ -27,31 +93,5 @@ $("#formularioAvaliacao").validate({
     },
     errorPlacement: function (error, element) {
         error.insertAfter(element);
-    },
-    submitHandler: function(form) {
-        // Usar FormData para suportar upload de arquivos
-        var formData = new FormData(form);
-        
-        $.ajax({
-            url: form.action,
-            method: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            dataType: 'json',
-            success: function (response) {
-                if (response.success) {
-                    alert(response.message);
-                    window.location.href = response.redirect;
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function (xhr, status, error) {
-                console.log('Erro AJAX:', xhr.status, status, error, xhr.responseText);
-                alert('Erro ao processar a requisição: ' + (xhr.responseText || 'Verifique o console para mais detalhes.'));
-            }
-        });
-        return false;
     }
 });

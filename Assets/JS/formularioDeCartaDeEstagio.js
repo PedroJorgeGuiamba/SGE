@@ -34,7 +34,7 @@ $.validator.addMethod(
   "telefone_mz",
   function (value, element) {
     if (this.optional(element)) return true;
-    return /^(\+258)?[ -]?[8][2-7][0-9]{7}$/.test(value);
+    return /^(\+258)?[ -]?[8][2-8][0-9]{7}$/.test(value);
   },
   "Número inválido. Ex: +258 84xxxxxxx ou 84xxxxxxx",
 );
@@ -44,71 +44,71 @@ $("#formularioEstagio").validate({
   rules: {
     codigoFormando: {
       required: true,
-      digits: true,
+      digits: true
     },
     qualificacao: {
-      required: true,
+      required: true
     },
     turma: {
-      required: true,
+      required: true
     },
     dataPedido: {
       required: true,
-      date: true,
+      date: true
     },
     horaPedido: {
-      required: true,
+      required: true
     },
     empresa: {
       required: true,
-      minlength: 2,
+      minlength: 2
     },
     contactoPrincipal: {
       required: true,
-      telefone_mz: true,
+      telefone_mz: true
     },
     contactoSecundario: {
       required: true,
-      telefone_mz: true,
+      telefone_mz: true
     },
     email: {
       required: true,
-      email: true,
+      email: true
     },
   },
   messages: {
     codigoFormando: {
       required: "Campo obrigatório.",
-      digits: "Apenas números são permitidos.",
+      digits: "Apenas números são permitidos."
     },
     qualificacao: {
-      required: "Selecione uma qualificação.",
+      required: "Selecione uma qualificação."
     },
     turma: {
-      required: "Selecione uma turma.",
+      required: "Selecione uma turma."
     },
     dataPedido: {
       required: "Informe a data do pedido.",
-      date: "Formato inválido.",
+      date: "Formato inválido."
     },
     horaPedido: {
-      required: "Informe a hora do pedido.",
+      required: "Informe a hora do pedido."
     },
     empresa: {
       required: "Informe o nome da empresa.",
-      minlength: "O nome deve ter pelo menos 2 caracteres.",
+      minlength: "O nome deve ter pelo menos 2 caracteres."
     },
     contactoPrincipal: {
       required: "Campo obrigatório.",
-      telefone_mz: "Número inválido. Ex: +258 84xxxxxxx",
+      telefone_mz: "Número inválido. Ex: +258 84xxxxxxx"
     },
     contactoSecundario: {
       required: "Campo obrigatório.",
-      telefone_mz: "Número inválido. Ex: +258 84xxxxxxx",
+      telefone_mz: "Número inválido. Ex: +258 84xxxxxxx"
     },
     email: {
       required: "Informe o e-mail.",
-      email: "Endereço de e-mail inválido.",
+      email: "Endereço de e-mail inválido."
     },
   },
   errorClass: "is-invalid",

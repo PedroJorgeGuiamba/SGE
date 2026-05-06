@@ -7,6 +7,7 @@ SecurityHeaders::setLogin();
 
 <!DOCTYPE html>
 <html lang="pt-pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,8 +18,9 @@ SecurityHeaders::setLogin();
     <!-- Fazer link do CSS Global -->
     <link rel="stylesheet" href="/estagio/Assets/CSS/global.css">
     <!-- FontAwesome para icones -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 </head>
+
 <body>
     <main class="auth-wrapper">
         <div class="auth-card">
@@ -28,13 +30,13 @@ SecurityHeaders::setLogin();
                     <img src="https://www.itc.ac.mz/wp-content/uploads/2020/07/cropped-LOGO_ITC-09.png" alt="ITC Logo">
                 </a>
             </div>
-            
+
             <h3 class="auth-title">Validação OTP</h3>
             <p class="auth-subtitle">Introduza o código numérico recebido</p>
 
             <form method="post">
                 <?= CSRFProtection::getTokenField() ?>
-                
+
                 <?php if (isset($_GET['erros'])): ?>
                     <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
                         <i class="fas fa-exclamation-circle me-2"></i> <?= htmlspecialchars($_GET['erros']); ?>
@@ -64,4 +66,5 @@ SecurityHeaders::setLogin();
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
+
 </html>

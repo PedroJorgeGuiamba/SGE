@@ -100,6 +100,11 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                                 </button>
                             </li>
                             <?php include __DIR__ . '/notification-widget.php'; ?>
+                            <li class="nav-item">
+                                <a class="nav-link fs-5" href="/estagio/perfil" title="Perfil">
+                                    <i class="fa-solid fa-user"></i>
+                                </a>
+                            </li>
                             <li class="nav-item ms-3">
                                 <a href="/estagio/logout" class="btn btn-danger shadow-sm px-4 fw-semibold rounded-pill"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
                             </li>
@@ -126,6 +131,7 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                         <li><a class="dropdown-item" href="/estagio/estagio/criar"><i class="fas fa-envelope-open-text fa-fw me-2 text-secondary"></i> Pedido de Estágio</a></li>
                         <li><a class="dropdown-item" href="/estagio/credencial/criar"><i class="fas fa-id-badge fa-fw me-2 text-secondary"></i> Credencial de Estágio</a></li>
                         <li><a class="dropdown-item" href="/estagio/visitas/criar"><i class="fas fa-map-marked-alt fa-fw me-2 text-secondary"></i> Visita de Estágio</a></li>
+                        <li><a class="dropdown-item" href="/estagio/avaliacao-estagio/criar"><i class="fas fa-route fa-fw me-2 text-secondary"></i> Avaliações De Estágio</a></li>
                     </ul>
                 </li>
 

@@ -10,6 +10,7 @@ $criptografia = new Criptografia();
 
 $termo = trim($_GET['termo'] ?? '');
 $filtroBase = "AND a.resultado IS NOT NULL";
+$filtroAdicional = "";
 // --- Filtro por qualificação do supervisor ---
 $filtroQualificacao = "";
 
@@ -39,6 +40,13 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'supervisor' && isset($_SE
     }
 }
 
+if (isset($_SESSION['role']) && $_SESSION['role'] === 'formando' && isset($_SESSION['usuario_id'])) {
+    $userId = (int) $_SESSION['usuario_id'];
+    $codigoFormando = (int) $_SESSION['codigo_formando'];
+
+    $filtroAdicional = "AND a.codigo_formando = $codigoFormando";
+}
+
 // --- Queries ---
 if ($termo === '') {
     $sql = "
@@ -47,7 +55,7 @@ if ($termo === '') {
         JOIN pedido_carta p ON a.id_pedido_estagio = p.id_pedido_carta
         LEFT JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
         LEFT JOIN turma t ON a.turma = t.codigo
-        WHERE 1=1 $filtroBase $filtroQualificacao
+        WHERE 1=1 $filtroBase $filtroQualificacao $filtroAdicional
         ORDER BY a.id_avaliacao DESC
     ";
     $result = $conn->query($sql);
@@ -58,7 +66,7 @@ if ($termo === '') {
         JOIN pedido_carta p ON a.id_pedido_estagio = p.id_pedido_carta
         LEFT JOIN qualificacao q ON p.qualificacao = q.id_qualificacao
         LEFT JOIN turma t ON a.turma = t.codigo
-        WHERE 1=1 $filtroBase $filtroQualificacao
+        WHERE 1=1 $filtroBase $filtroQualificacao $filtroAdicional
             AND (a.empresa LIKE ? OR a.codigo_formando LIKE ? OR a.empresa LIKE ?)
         ORDER BY a.id_avaliacao DESC
     ";

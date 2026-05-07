@@ -71,6 +71,10 @@ switch ($modulo) {
         break;
 
     // ================= PORTAIS =================
+    case 'perfil':
+        require 'View/Perfil/perfil.php';
+        break;
+
     case 'admin':
         $auth->verificarAutenticacao();
         require 'View/Admin/portalDoAdmin.php';

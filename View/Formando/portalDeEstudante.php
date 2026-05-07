@@ -111,6 +111,11 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                                 </button>
                             </li>
                             <?php include __DIR__ . '/../../Includes/notification-widget.php'; ?>
+                            <li class="nav-item">
+                                <a class="nav-link fs-5" href="/estagio/perfil" title="Perfil">
+                                    <i class="fa-solid fa-user"></i>
+                                </a>
+                            </li>
                             <li class="nav-item ms-lg-3">
                                 <a href="/estagio/logout" class="btn btn-danger shadow-sm px-4 fw-semibold rounded-pill"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
                             </li>
@@ -307,15 +312,16 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                                 <tr>
                                     <th><input type="checkbox" class="form-check-input selectAll" data-section="visitas"></th>
                                     <th>ID</th>
-                                    <th>Nome</th>
+                                    <th>Nome Form.</th>
                                     <th>Apelido</th>
                                     <th>Cód. Formando</th>
-                                    <th>Qualificação</th>
-                                    <th>Turma</th>
-                                    <th>Data Visita</th>
-                                    <th>Hora Visita</th>
+                                    <th>Cont. Formando</th>
                                     <th>Empresa</th>
-                                    <th>Motivo</th>
+                                    <th>Endereço</th>
+                                    <th>Nome Sup.</th>
+                                    <th>Cont. Sup.</th>
+                                    <th>D/H Visita</th>
+                                    <th>Data do Pedido</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>

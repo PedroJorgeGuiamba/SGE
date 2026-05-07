@@ -101,6 +101,11 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                             </li>
                             <!-- Notificações -->
                             <?php include __DIR__ . '/../../Includes/notification-widget.php'; ?>
+                            <li class="nav-item">
+                                <a class="nav-link fs-5" href="/estagio/perfil" title="Perfil">
+                                    <i class="fa-solid fa-user"></i>
+                                </a>
+                            </li>
                             <!-- Logout -->
                             <li class="nav-item ms-lg-2">
                                 <a href="/estagio/logout" class="btn btn-danger shadow-sm">

@@ -86,7 +86,6 @@ $(document).ready(function () {
               <td>${visita.contactoSupervisor || '-'}</td>
               <td>${visita.dataHoraDaVisita}</td>
               <td>${visita.data_do_pedido}</td>
-              <td>${visita.id_pedido_carta || '-'}</td>
               <td>
                   ${visita.status || 'Desconhecido'}
               </td>

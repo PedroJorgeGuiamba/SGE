@@ -1,8 +1,9 @@
 $(document).ready(function () {
-    carregarDados();
+    carregarQualificacoes();
+    carregarTurmas();
 });
 
-function carregarDados() {
+function carregarQualificacoes() {
     $.ajax({
         url: "/estagio/api/qualificacao",
         method: "GET",
@@ -11,25 +12,29 @@ function carregarDados() {
         },
         error: function (xhr, status, error) {
             console.error("Erro ao carregar qualificações:", status, error);
-            $("#qualificacao").html(
-                "<option>Erro ao carregar qualificações</option>",
-            );
-        },
+            $("#qualificacao").html("<option>Erro ao carregar qualificações</option>");
+        }
     });
+}
 
+function carregarTurmas(qualificacaoId = null) {
     $.ajax({
         url: "/estagio/api/turmas",
         method: "GET",
+        data: { termo: qualificacaoId || "" },
         success: function (resposta) {
             $("#turma").html(resposta);
         },
         error: function (xhr, status, error) {
             console.error("Erro ao carregar turmas:", status, error);
             $("#turma").html("<option>Erro ao carregar turmas</option>");
-        },
+        }
     });
 }
 
+$('#qualificacao').on('change', function () {
+    carregarTurmas($(this).val());
+});
 
 // Validação do formulário
 $("#formularioAvaliacao").validate({

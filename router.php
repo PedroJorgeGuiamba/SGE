@@ -265,6 +265,106 @@ switch ($modulo) {
         }
         break;
     
+    // ================= TURMAS =================
+    case 'modulo':
+        switch ($acao) {
+            case '':
+            case 'listar':
+                $auth->verificarAutenticacao();
+                require 'View/Modulo/listaDeModulos.php';
+                break;
+            case 'criar':
+                $auth->verificarAutenticacao();
+                require 'View/Modulos/CadastrarModulo.php';
+                break;
+            case 'salvar':
+                $auth->verificarAutenticacao();
+                require 'Controller/Modulos/CadastrarModulo.php';
+                break;
+            case 'editar':
+                $auth->verificarAutenticacao();
+                $_GET['codigo'] = $id;
+                require 'View/Turmas/editarTurma.php';
+                break;
+            case 'atualizar':
+                $auth->verificarAutenticacao();
+                require 'Controller/Turmas/editarTurma.php';
+                break;
+            case 'remover':
+                $auth->verificarAutenticacao();
+                require 'Controller/Turmas/getCursos.php';
+                break;
+            default:
+                require 'View/Erros/error.php';
+        }
+        break;
+
+    case 'resultado-aprendizagem':
+        switch ($acao) {
+            case '':
+            case 'listar':
+                $auth->verificarAutenticacao();
+                require 'View/Modulo/listaDeModulos.php';
+                break;
+            case 'criar':
+                $auth->verificarAutenticacao();
+                require 'View/Modulos/CadastrarResultadoDeAprendizagem.php';
+                break;
+            case 'salvar':
+                $auth->verificarAutenticacao();
+                require 'Controller/Modulos/CadastrarResultadoDeAprendizagem.php.php';
+                break;
+            case 'editar':
+                $auth->verificarAutenticacao();
+                $_GET['codigo'] = $id;
+                require 'View/Turmas/editarTurma.php';
+                break;
+            case 'atualizar':
+                $auth->verificarAutenticacao();
+                require 'Controller/Turmas/editarTurma.php';
+                break;
+            case 'remover':
+                $auth->verificarAutenticacao();
+                require 'Controller/Turmas/getCursos.php';
+                break;
+            default:
+                require 'View/Erros/error.php';
+        }
+        break;
+    
+        case 'elemento-competencia':
+        switch ($acao) {
+            case '':
+            case 'listar':
+                $auth->verificarAutenticacao();
+                require 'View/Modulo/listaDeModulos.php';
+                break;
+            case 'criar':
+                $auth->verificarAutenticacao();
+                require 'View/Modulos/CadastrarElementoDeCompetencia.php';
+                break;
+            case 'salvar':
+                $auth->verificarAutenticacao();
+                require 'Controller/Modulos/';
+                break;
+            case 'editar':
+                $auth->verificarAutenticacao();
+                $_GET['codigo'] = $id;
+                require 'View/Turmas/editarTurma.php';
+                break;
+            case 'atualizar':
+                $auth->verificarAutenticacao();
+                require 'Controller/Turmas/editarTurma.php';
+                break;
+            case 'remover':
+                $auth->verificarAutenticacao();
+                require 'Controller/Turmas/getCursos.php';
+                break;
+            default:
+                require 'View/Erros/error.php';
+        }
+        break;
+    
     // ================= QUALIFICACAO =================
     case 'qualificacao':
         switch ($acao) {

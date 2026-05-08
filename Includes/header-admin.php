@@ -125,6 +125,9 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                         <li><a class="dropdown-item" href="/estagio/cursos/criar"><i class="fas fa-graduation-cap fa-fw me-2 text-secondary"></i> Cursos</a></li>
                         <li><a class="dropdown-item" href="/estagio/qualificacao/criar"><i class="fas fa-certificate fa-fw me-2 text-secondary"></i> Qualificações</a></li>
                         <li><a class="dropdown-item" href="/estagio/turma/criar"><i class="fas fa-users-class fa-fw me-2 text-secondary"></i> Turmas</a></li>
+                        <li><a class="dropdown-item" href="/estagio/modulo/criar"><i class="fas fa-users-class fa-fw me-2 text-secondary"></i> Módulos</a></li>
+                        <li><a class="dropdown-item" href="/estagio/resultado-aprendizagem/criar"><i class="fas fa-users-class fa-fw me-2 text-secondary"></i> R. Aprend.</a></li>
+                        <li><a class="dropdown-item" href="/estagio/elemento-competencia/criar"><i class="fas fa-users-class fa-fw me-2 text-secondary"></i> El. Comp.</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>

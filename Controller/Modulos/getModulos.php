@@ -1,0 +1,16 @@
+<?php
+require_once __DIR__ . '/../../Conexao/conector.php';
+
+
+$con = new Conector();
+$mysqli = $con->getConexao();
+
+$query = "SELECT id_modulo, descricao FROM modulo";
+$resultado = mysqli_query($mysqli, $query);
+
+$options = "<option value=''>Selecione uma qualificacao</option>";
+while ($row = mysqli_fetch_assoc($resultado)) {
+    $options .= "<option value='{$row['id_qualificacao']}'>{$row['descricao']}</option>";
+}
+
+echo $options;

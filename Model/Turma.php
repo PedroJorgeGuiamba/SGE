@@ -1,10 +1,13 @@
 <?php
 class Turma
 {
-    private $codigo;
-    private $nome;
-    private $codigoCurso;
-    private $codigoQualificacao;
+    private int $codigo;
+    private string $nome;
+    private string $ano;
+    private string $tipo;
+    private string $turno;
+    private int $codigoCurso;
+    private int $codigoQualificacao;
 
     // Getters e setters
     public function setCodigo(int $codigo)
@@ -15,6 +18,18 @@ class Turma
     public function setNome(string $nome)
     {
         $this->nome = $nome;
+    }
+    public function setAno(string $ano)
+    {
+        $this->ano = $ano;
+    }
+    public function setTipo(string $tipo)
+    {
+        $this->tipo = $tipo;
+    }
+    public function setTurno(string $turno)
+    {
+        $this->turno = $turno;
     }
 
     public function setCodigoCurso(int $codigoCurso)
@@ -29,7 +44,7 @@ class Turma
 
     public function salvar(mysqli $conn): bool
     {
-        $stmt = $conn->prepare("INSERT INTO turma (codigo, nome, codigo_curso, codigo_qualificacao) VALUES (?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO turma (codigo, nome, ano_lectivo, tipo, turno, codigo_curso, codigo_qualificacao) VALUES (?, ?, ?, ?, ?, ?, ?)");
 
         if (!$stmt) {
             // Erro na preparação da query
@@ -37,9 +52,12 @@ class Turma
         }
 
         $stmt->bind_param(
-            "isii",
+            "issssii",
             $this->codigo,
             $this->nome,
+            $this->ano,
+            $this->tipo,
+            $this->turno,
             $this->codigoCurso,
             $this->codigoQualificacao
         );

@@ -37,13 +37,39 @@ include_once __DIR__ . '/../../Helpers/CSRFProtection.php';
                                     <input type="text" name="nomeTurma" class="form-control border-start-0 ps-0" id="nomeTurma" placeholder="Ex: TPW3" required>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="ano_lectivo" class="form-label text-muted fw-bold small">Ano Lectivo</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-hashtag text-muted"></i></span>
+                                    <input type="number" name="ano_lectivo" class="form-control border-start-0 ps-0" id="ano_lectivo" min="1999" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="tipo" class="form-label text-muted fw-bold small">Tipo de Turma</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-id-card text-muted"></i></span>
+                                    <select name="tipo" id="tipo"  class="form-control border-start-0 ps-0">
+                                        <option value="" selected>Selecione uma opção</option>
+                                        <option value="Normal">Normal</option>
+                                        <option value="Especial">Especial</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="turno" class="form-label text-muted fw-bold small">Turno da Turma</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-certificate text-muted"></i></span>
+                                    <select name="turno" id="turno"  class="form-control border-start-0 ps-0">
+                                        <option value="" selected>Selecione uma opção</option>
+                                        <option value="Diurno">Diurno</option>
+                                        <option value="Noturno">Noturno</option>
+                                    </select>
+                                </div>
+                            </div>
                             <div class="col-md-6">
                                 <label for="qualificacao" class="form-label text-muted fw-bold small">Qualificação</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-certificate text-muted"></i></span>
+                                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-id-card text-muted"></i></span>
                                     <select class="form-select border-start-0 ps-0" name="qualificacao" id="qualificacao" required>
                                         <option value="" selected disabled>A carregar qualificações...</option>
                                     </select>

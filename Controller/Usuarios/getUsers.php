@@ -10,7 +10,7 @@ $descriptografar = new Criptografia();
 $query = "SELECT id, Email FROM usuarios WHERE role='formador'";
 $resultado = mysqli_query($mysqli, $query);
 
-$email_descriptografado = $descriptografar->descriptografar($row['Email']);
+// $email_descriptografado = $descriptografar->descriptografar($row['Email']);
 
 
 $options = "<option value=''>Selecione um Utilizador</option>";

@@ -142,6 +142,26 @@ switch ($modulo) {
                 $auth->verificarAutenticacao();
                 require 'Controller/Formador/CadastrarFormador.php';
                 break;
+            case 'associar-modulo':
+                $auth->verificarAutenticacao();
+                require 'View/Formador/CadastrarFormadorModulo.php';
+                break;
+            case 'salvar-associar-modulo':
+                $auth->verificarAutenticacao();
+                require 'Controller/Formador/CadastrarFormadorModulo.php';
+                break;
+            case 'lecionar':
+                $auth->verificarAutenticacao();
+                require 'View/Formador/CadastrarLecionarModulo.php';
+                break;
+            case 'salvar-lecionar':
+                $auth->verificarAutenticacao();
+                require 'Controller/Formador/CadastrarLecionarModulo.php';
+                break;
+            case 'modulos':
+                $auth->verificarAutenticacao();
+                require 'View/Formador/ModulosLecionados.php';
+                break;
             case 'editar':
                 $auth->verificarAutenticacao();
                 $_GET['id_formador'] = $id;
@@ -299,7 +319,7 @@ switch ($modulo) {
         }
         break;
 
-    case 'resultado-aprendizagem':
+    case 'criterio-avaliacao':
         switch ($acao) {
             case '':
             case 'listar':
@@ -308,11 +328,44 @@ switch ($modulo) {
                 break;
             case 'criar':
                 $auth->verificarAutenticacao();
-                require 'View/Modulos/CadastrarResultadoDeAprendizagem.php';
+                require 'View/Modulos/CadastrarCriterioAvaliacao.php';
                 break;
             case 'salvar':
                 $auth->verificarAutenticacao();
-                require 'Controller/Modulos/CadastrarResultadoDeAprendizagem.php.php';
+                require 'Controller/Modulos/CadastrarCriterioAvaliacao.php';
+                break;
+            case 'editar':
+                $auth->verificarAutenticacao();
+                $_GET['codigo'] = $id;
+                require 'View/Turmas/editarTurma.php';
+                break;
+            case 'atualizar':
+                $auth->verificarAutenticacao();
+                require 'Controller/Turmas/editarTurma.php';
+                break;
+            case 'remover':
+                $auth->verificarAutenticacao();
+                require 'Controller/Turmas/getCursos.php';
+                break;
+            default:
+                require 'View/Erros/error.php';
+        }
+        break;
+
+    case 'criterio-desempenho':
+        switch ($acao) {
+            case '':
+            case 'listar':
+                $auth->verificarAutenticacao();
+                require 'View/Modulo/listaDeModulos.php';
+                break;
+            case 'criar':
+                $auth->verificarAutenticacao();
+                require 'View/Modulos/CadastrarCriterioDesempenho.php';
+                break;
+            case 'salvar':
+                $auth->verificarAutenticacao();
+                require 'Controller/Modulos/CadastrarCriterioDesempenho.php';
                 break;
             case 'editar':
                 $auth->verificarAutenticacao();
@@ -345,7 +398,7 @@ switch ($modulo) {
                 break;
             case 'salvar':
                 $auth->verificarAutenticacao();
-                require 'Controller/Modulos/';
+                require 'Controller/Modulos/CadastrarElemento.php';
                 break;
             case 'editar':
                 $auth->verificarAutenticacao();
@@ -622,9 +675,33 @@ switch ($modulo) {
                 $auth->verificarAutenticacao();
                 require 'Controller/Qualificacao/getQualificacoes.php';
                 break;
+            case 'modulo':
+                $auth->verificarAutenticacao();
+                require 'Controller/Modulos/getModulos.php';
+                break;
+            case 'elemento':
+                $auth->verificarAutenticacao();
+                require 'Controller/Modulos/getElem.php';
+                break;
+            case 'tipo-avaliacao':
+                $auth->verificarAutenticacao();
+                require 'Controller/Modulos/getTipoAvaliacao.php';
+                break;
             case 'users':
                 $auth->verificarAutenticacao();
                 require 'Controller/Usuarios/getUsers.php';
+                break;
+            case 'formador':
+                $auth->verificarAutenticacao();
+                require 'Controller/Formador/getFormadores.php';
+                break;
+            case 'formador-modulo':
+                $auth->verificarAutenticacao();
+                require 'Controller/Formador/getFormadorModulo.php';
+                break;
+            case 'modulo-turma':
+                $auth->verificarAutenticacao();
+                require 'Controller/Modulos/getModuloTurma.php';
                 break;
             case 'turmas':
                 $auth->verificarAutenticacao();

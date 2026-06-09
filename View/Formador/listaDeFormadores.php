@@ -19,6 +19,8 @@
             <div class="mb-3 d-flex gap-2">
                 <a href="/estagio/formador/criar" class="btn btn-primary shadow-sm"><i class="fas fa-plus-circle me-1"></i> Novo Formador</a>
                 <button id="deleteSelected" class="btn btn-danger shadow-sm disabled" aria-disabled="true"><i class="fas fa-trash-alt me-1"></i> Deletar Selecionados</button>
+                <a href="/estagio/formador/associar-modulo" class="btn btn-secondary shadow-sm"><i class="fas fa-plus-circle me-1"></i> Associar Formador a Módulo</a>
+                <a href="/estagio/formador/lecionar" class="btn btn-outline-danger shadow-sm"><i class="fas fa-plus-circle me-1"></i> Lecionar Módulo da Turma</a>
             </div>
 
             <div class="table-responsive rounded-3 border">

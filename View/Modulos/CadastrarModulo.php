@@ -10,7 +10,7 @@ include_once __DIR__ . '/../../Helpers/CSRFProtection.php';
             <div class="card shadow-sm border-0 rounded-4">
                 <div class="card-header bg-white border-bottom-0 mt-3 pt-4 pb-0 text-center">
                     <h3 class="fw-bold text-primary"><i class="fas fa-graduation-cap me-2"></i>Cadastrar Módulo</h3>
-                    <p class="text-muted small">Preencha os campos abaixo para adicionar uma nova módulo ao sistema</p>
+                    <p class="text-muted small">Preencha os campos abaixo para adicionar um novo módulo ao sistema</p>
                 </div>
                 <div class="card-body p-5">
                     <form action="/estagio/modulo/salvar" method="post">

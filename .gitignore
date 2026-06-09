@@ -27,3 +27,13 @@ config/.env
 custom_wordlist.txt
 
 curupira/
+
+.infisical.json
+
+.vscode
+
+Conexao/bd_c3.sql
+
+Conexao/bd_v3.sql
+
+Conexao/ra.sql

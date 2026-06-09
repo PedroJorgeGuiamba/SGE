@@ -43,11 +43,17 @@ class CadastrarTurma
 
             $codigo = isset($_POST['codigoTurma']) ? (int) $_POST['codigoTurma'] : null;
             $nome = trim($_POST['nomeTurma'] ?? '');
+            $ano = trim($_POST['ano_lectivo'] ?? '');
+            $tipo = trim($_POST['tipo'] ?? '');
+            $turno = trim($_POST['turno'] ?? '');
             $id_qualificacao = isset($_POST['qualificacao']) ? (int) $_POST['qualificacao'] : null;
             $id_curso = isset($_POST['curso']) ? (int) $_POST['curso'] : null;
 
             $this->turma->setCodigo($codigo);
             $this->turma->setNome($nome);
+            $this->turma->setAno($ano);
+            $this->turma->setTipo($tipo);
+            $this->turma->setTurno($turno);
             $this->turma->setCodigoQualificacao($id_qualificacao);
             $this->turma->setCodigoCurso($id_curso);
 
@@ -61,7 +67,35 @@ class CadastrarTurma
             }
 
             if (!empty($_SESSION['usuario_id'])) {
-                $mensagem = "A turma $nome foi registrada com sucesso.";
+                $mensagem = "A turma $nome - $ano foi registrada com sucesso.";
+
+                $this->notificacao->setId_Utilizador($_SESSION['usuario_id']);
+                $this->notificacao->setMensagem($mensagem);
+                $this->notificacao->salvar($this->conn);
+            }
+
+            $sql = "SELECT codigo_modulo FROM modulo_qualificacao WHERE codigo_qualificacao = ?";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bind_param("i", $id_qualificacao);
+            $stmt->execute();
+            $resultado = $stmt->get_result();
+            
+            $stmt->close();
+            
+            $sql = "INSERT INTO modulo_turma(id_modulo, id_turma) VALUES(?, ?);";
+            $stmt = $this->conn->prepare($sql);
+            
+            $adicionados = 0;
+            while($modulo = $resultado->fetch_assoc()){
+                $stmt->bind_param("ii", $modulo['codigo_modulo'], $codigo);
+                $stmt->execute();
+                $adicionados++;
+            }
+
+            $stmt->close();
+
+            if (!empty($_SESSION['usuario_id'])) {
+                $mensagem = "Vinculados com sucesso $adicionados módulos a turma $nome.";
 
                 $this->notificacao->setId_Utilizador($_SESSION['usuario_id']);
                 $this->notificacao->setMensagem($mensagem);
@@ -81,11 +115,9 @@ class CadastrarTurma
                 }
             }
 
-            header("LOCATION: /estagio/turma/criar?erros=" . urlencode("Erro no sistema."));
+            header("LOCATION: /estagio/turma/criar?erros=" . urlencode("Erro no sistema." . $e));
             exit();
         }
-
-        return $turma;
     }
 }
 

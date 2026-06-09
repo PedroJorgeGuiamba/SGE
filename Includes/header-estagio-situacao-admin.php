@@ -24,6 +24,10 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
 
 $themeValue = isset($_SESSION['theme']) ? trim($_SESSION['theme']) : 'light';
 $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : 'light';
+
+require_once __DIR__ . '/../Helpers/BaseURL.php';
+$baseURL = new BaseURL();
+$baseUrl = $baseURL->getBaseUrl();
 ?>
 <!DOCTYPE html>
 <html lang="pt-pt" data-bs-theme="<?php echo htmlspecialchars($themeValue, ENT_QUOTES, 'UTF-8'); ?>">
@@ -96,12 +100,12 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
 
                             <?php include __DIR__ . '/notification-widget.php'; ?>
                             <li class="nav-item">
-                                <a class="nav-link fs-5" href="/estagio/perfil" title="Perfil">
+                                <a class="nav-link fs-5" href="<?= $baseUrl ?>/perfil" title="Perfil">
                                     <i class="fa-solid fa-user"></i>
                                 </a>
                             </li>
                             <li class="nav-item ms-3">
-                                <a href="/estagio/logout" class="btn btn-danger shadow-sm px-4 fw-semibold rounded-pill">
+                                <a href="<?= $baseUrl ?>/logout" class="btn btn-danger shadow-sm px-4 fw-semibold rounded-pill">
                                     <i class="fas fa-sign-out-alt me-2"></i>Logout
                                 </a>
                             </li>
@@ -115,7 +119,7 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
         <nav class="bg-white shadow-sm border-bottom">
             <ul class="nav justify-content-center py-2">
                 <li class="nav-item mx-1">
-                    <a class="nav-link fw-semibold text-dark active" aria-current="page" href="/estagio/admin">
+                    <a class="nav-link fw-semibold text-dark active" aria-current="page" href="<?= $baseUrl ?>/admin">
                         <i class="fas fa-home fa-fw me-1 text-primary"></i> Home
                     </a>
                 </li>
@@ -124,10 +128,10 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                         <i class="fas fa-plus-circle fa-fw me-1 text-success"></i> Fazer Pedidos
                     </a>
                     <ul class="dropdown-menu shadow border-0 mt-2" aria-labelledby="pedidosDropdown">
-                        <li><a class="dropdown-item" href="/estagio/estagio/criar"><i class="fas fa-envelope-open-text fa-fw me-2 text-secondary"></i> Pedido de Estágio</a></li>
-                        <li><a class="dropdown-item" href="/estagio/credencial/criar"><i class="fas fa-id-badge fa-fw me-2 text-secondary"></i> Credencial de Estágio</a></li>
-                        <li><a class="dropdown-item" href="/estagio/visitas/criar"><i class="fas fa-map-marked-alt fa-fw me-2 text-secondary"></i> Visita de Estágio</a></li>
-                        <li><a class="dropdown-item" href="/estagio/avaliacao-estagio/criar"><i class="fas fa-route fa-fw me-2 text-secondary"></i> Avaliações De Estágio</a></li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/estagio/criar"><i class="fas fa-envelope-open-text fa-fw me-2 text-secondary"></i> Pedido de Estágio</a></li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/credencial/criar"><i class="fas fa-id-badge fa-fw me-2 text-secondary"></i> Credencial de Estágio</a></li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/visitas/criar"><i class="fas fa-map-marked-alt fa-fw me-2 text-secondary"></i> Visita de Estágio</a></li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/avaliacao-estagio/criar"><i class="fas fa-route fa-fw me-2 text-secondary"></i> Avaliações De Estágio</a></li>
                     </ul>
                 </li>
                 <li class="nav-item mx-1 dropdown">
@@ -135,10 +139,10 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                         <i class="fas fa-list-ul fa-fw me-1 text-info"></i> Listas
                     </a>
                     <ul class="dropdown-menu shadow border-0 mt-2" aria-labelledby="listasDropdown">
-                        <li><a class="dropdown-item" href="/estagio/estagio/listar"><i class="fas fa-file-alt fa-fw me-2 text-secondary"></i> Pedidos de Estágio</a></li>
-                        <li><a class="dropdown-item" href="/estagio/credencial/listar"><i class="fas fa-id-card-clip fa-fw me-2 text-secondary"></i> Pedidos de Credencial</a></li>
-                        <li><a class="dropdown-item" href="/estagio/visitas/listar"><i class="fas fa-route fa-fw me-2 text-secondary"></i> Pedidos de Visita</a></li>
-                        <li><a class="dropdown-item" href="/estagio/avaliacao-estagio/listar"><i class="fas fa-route fa-fw me-2 text-secondary"></i> Avaliações De Estágio</a></li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/estagio/listar"><i class="fas fa-file-alt fa-fw me-2 text-secondary"></i> Pedidos de Estágio</a></li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/credencial/listar"><i class="fas fa-id-card-clip fa-fw me-2 text-secondary"></i> Pedidos de Credencial</a></li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/visitas/listar"><i class="fas fa-route fa-fw me-2 text-secondary"></i> Pedidos de Visita</a></li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/avaliacao-estagio/listar"><i class="fas fa-route fa-fw me-2 text-secondary"></i> Avaliações De Estágio</a></li>
                     </ul>
                 </li>
                 <li class="nav-item mx-1">

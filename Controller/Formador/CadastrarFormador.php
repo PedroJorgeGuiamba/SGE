@@ -16,7 +16,7 @@ SecurityHeaders::setBasic();
 
 class CadastrarFormador
 {
-    private $conn;
+    private mysqli $conn;
     private Criptografia $criptografia;
     private Usuario $usuario;
     private Notificacao $notificacao;

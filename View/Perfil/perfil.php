@@ -114,6 +114,10 @@ if ($user && $user['role'] === 'supervisor') {
 
 $themeValue = isset($_SESSION['theme']) ? trim($_SESSION['theme']) : 'light';
 $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : 'light';
+
+require_once __DIR__ . '/../../Helpers/BaseURL.php';
+$baseURL = new BaseURL();
+$baseUrl = $baseURL->getBaseUrl();
 ?>
 
 <!DOCTYPE html>
@@ -201,11 +205,24 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
         <nav class="bg-white shadow-sm border-bottom">
             <ul class="nav justify-content-center py-2">
                 <li class="nav-item mx-2">
-                    <a class="nav-link fw-semibold text-dark active" href="/estagio/<?php echo $_SESSION['role'] === 'admin'
-                                                                                        ? 'admin'
-                                                                                        : ($_SESSION['role'] === 'supervisor'
-                                                                                            ? 'supervisor'
-                                                                                            : 'formando'); ?>">
+                    <a class="nav-link fw-semibold text-dark active" href="<?= $baseUrl ?>/<?php switch($_SESSION['role']){
+                                                                                            case 'formador':
+                                                                                                echo 'formador';
+                                                                                                break;
+                                                                                            case 'admin':
+                                                                                                echo 'admin';
+                                                                                                break;
+                                                                                            case 'supervisor':
+                                                                                                echo 'supervisor';
+                                                                                                break;
+                                                                                            case 'formando':
+                                                                                                echo 'formando';
+                                                                                                break;
+                                                                                            default:
+                                                                                                echo 'login';
+                                                                                                break;
+                                                                                        } ?>
+                        ">
                         <i class="fas fa-home fa-fw me-1 text-primary"></i> Home
                     </a>
                 </li>

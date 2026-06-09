@@ -9,7 +9,7 @@ require_once __DIR__ . '/../../Helpers/Actividade.php';
 require_once __DIR__ . '/../../Helpers/CSRFProtection.php';
 require_once __DIR__ . '/../../Conexao/conector.php';
 
-class CadastrarResultadoDeAprendizagem
+class CadastrarElemento
 {
     private mysqli $conn;
     private Notificacao $notificacao;
@@ -22,10 +22,10 @@ class CadastrarResultadoDeAprendizagem
         $conexao = new Conector();
         $this->conn = $conexao->getConexao();
     }
-    public function cadastrarResultadoDeAprendizagem()
+    public function cadastrarElem()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("LOCATION: /estagio/resultado-aprendizagem/criar?erros=" . urlencode("Método da Requisição Inválido"));
+            header("LOCATION: /estagio/elemento-competencia/criar?erros=" . urlencode("Método da Requisição Inválido"));
             exit();
         }
         try {
@@ -33,34 +33,34 @@ class CadastrarResultadoDeAprendizagem
             try {
                 CSRFProtection::validateToken($token);
             } catch (ErrorException $e) {
-                header("LOCATION: /estagio/resultado-aprendizagem/criar?erros=" . urlencode($e));
+                header("LOCATION: /estagio/elemento-competencia/criar?erros=" . urlencode($e));
             }
 
+            $modulo = $_POST['modulo'] ?? '';
             $codigoResultado = $_POST['codigo_resultado'] ?? '';
             $descricao = $_POST['descricao_resultado'] ?? '';
-            $tipoResultado = $_POST['tipo_resultado'] ?? '';
-            $observacoes = $_POST['carga_horaria'] ?? '';
+            $ctx_aplicacao = $_POST['ctx_aplicacao'] ?? '';
 
             // Validação
-            if (empty($codigoResultado)) {
-                header("LOCATION: /estagio/resultado-aprendizagem/criar?erros=" . urlencode("Erro: O código do modulo deve ser um número válido."));
+            if (empty($modulo)) {
+                header("LOCATION: /estagio/elemento-competencia/criar?erros=" . urlencode("Erro: O código do modulo deve ser um número válido."));
                 exit();
             }
 
             if(empty($descricao)){
-                header("LOCATION: /estagio/resultado-aprendizagem/criar?erros=" . urlencode("Erro: A descrição do modulo é obrigatória."));
+                header("LOCATION: /estagio/elemento-competencia/criar?erros=" . urlencode("Erro: A descrição do modulo é obrigatória."));
                 exit();
             }
 
             $this->conn->begin_transaction();
 
-            $this->modulo->setCodigoResultado($codigoResultado);
-            $this->modulo->setDescricaoResultado($descricao);
-            $this->modulo->setTipoResultado($tipoResultado);
-            $this->modulo->setObservacoesResultado($observacoes);
+            $this->modulo->setNumeroCompt($codigoResultado);
+            $this->modulo->setDescricaoCompt($descricao);
+            $this->modulo->setCtxAplic($ctx_aplicacao);
+            $this->modulo->setIdModulo($modulo);
 
-            if (!$this->modulo->salvarResultadoAprend($this->conn)) {
-                header("LOCATION: /estagio/resultado-aprendizagem/criar?erros=" . urlencode("Erro ao cadastrar a R.A. " . $this->conn->error));
+            if (!$this->modulo->salvarElementoComp($this->conn)) {
+                header("LOCATION: /estagio/elemento-competencia/criar?erros=" . urlencode("Erro ao cadastrar a R.A. " . $this->conn->error));
                 exit();
             }
 
@@ -69,7 +69,7 @@ class CadastrarResultadoDeAprendizagem
             }
 
             if (!empty($_SESSION['usuario_id'])) {
-                $mensagem = "O R.A :  $descricao foi registrado com sucesso e associado a qualificacao.";
+                $mensagem = "O R.A : $modulo-$descricao foi registrado com sucesso e associado ao módulo.";
 
                 $this->notificacao->setId_Utilizador($_SESSION['usuario_id']);
                 $this->notificacao->setMensagem($mensagem);
@@ -80,11 +80,11 @@ class CadastrarResultadoDeAprendizagem
             header("Location: /estagio/admin");
             exit;
         } catch (Exception $e) {
-            header("LOCATION: /estagio/resultado-aprendizagem/criar?erros=" . urlencode("ERRO DO SISTEMA: $e"));
+            header("LOCATION: /estagio/elemento-competencia/criar?erros=" . urlencode("ERRO DO SISTEMA: $e"));
             exit();
         }
     }
 }
 
-$modulo = new CadastrarResultadoDeAprendizagem();
-$modulo->cadastrarResultadoDeAprendizagem();
+$modulo = new CadastrarElemento();
+$modulo->cadastrarElem();

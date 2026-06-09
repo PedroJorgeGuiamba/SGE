@@ -25,6 +25,10 @@ $notifications = NotificationHelper::getNotifications($conn, $userId);
 
 $themeValue = isset($_SESSION['theme']) ? trim($_SESSION['theme']) : 'light';
 $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : 'light';
+
+require_once __DIR__ . '/../Helpers/BaseURL.php';
+$baseURL = new BaseURL();
+$baseUrl = $baseURL->getBaseUrl();
 ?>
 <!DOCTYPE html>
 <html lang="pt-pt" data-bs-theme="<?php echo htmlspecialchars($themeValue, ENT_QUOTES, 'UTF-8'); ?>">
@@ -95,8 +99,13 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                                 </button>
                             </li>
                             <?php include __DIR__ . '/notification-widget.php'; ?>
+                            <li class="nav-item">
+                                <a class="nav-link fs-5" href="<?= $baseUrl ?>/perfil" title="Perfil">
+                                    <i class="fa-solid fa-user"></i>
+                                </a>
+                            </li>
                             <li class="nav-item ms-lg-3">
-                                <a href="/estagio/logout" class="btn btn-danger shadow-sm px-4 fw-semibold rounded-pill"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+                                <a href="<?= $baseUrl ?>/logout" class="btn btn-danger shadow-sm px-4 fw-semibold rounded-pill"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
                             </li>
                         </ul>
                     </div>
@@ -107,7 +116,7 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
         <nav class="bg-white shadow-sm border-bottom">
             <ul class="nav justify-content-center py-2">
                 <li class="nav-item mx-2">
-                    <a class="nav-link active fw-semibold text-dark" aria-current="page" href="/estagio/admin">
+                    <a class="nav-link active fw-semibold text-dark" aria-current="page" href="<?= $baseUrl ?>/admin">
                         <i class="fas fa-home me-1 text-primary"></i> Home
                     </a>
                 </li>
@@ -122,18 +131,22 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                         <i class="fas fa-plus-circle me-1 text-primary"></i> Cadastrar
                     </a>
                     <ul class="dropdown-menu shadow-sm border-0" aria-labelledby="dropdownModulos">
-                        <li><a class="dropdown-item" href="/estagio/cursos/criar"><i class="fas fa-graduation-cap fa-fw me-2 text-secondary"></i> Cursos</a></li>
-                        <li><a class="dropdown-item" href="/estagio/qualificacao/criar"><i class="fas fa-certificate fa-fw me-2 text-secondary"></i> Qualificações</a></li>
-                        <li><a class="dropdown-item" href="/estagio/turma/criar"><i class="fas fa-users-class fa-fw me-2 text-secondary"></i> Turmas</a></li>
-                        <li><a class="dropdown-item" href="/estagio/modulo/criar"><i class="fas fa-users-class fa-fw me-2 text-secondary"></i> Módulos</a></li>
-                        <li><a class="dropdown-item" href="/estagio/resultado-aprendizagem/criar"><i class="fas fa-users-class fa-fw me-2 text-secondary"></i> R. Aprend.</a></li>
-                        <li><a class="dropdown-item" href="/estagio/elemento-competencia/criar"><i class="fas fa-users-class fa-fw me-2 text-secondary"></i> El. Comp.</a></li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/cursos/criar"><i class="fas fa-graduation-cap fa-fw me-2 text-secondary"></i> Cursos</a></li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/qualificacao/criar"><i class="fas fa-certificate fa-fw me-2 text-secondary"></i> Qualificações</a></li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/turma/criar"><i class="fas fa-users-class fa-fw me-2 text-secondary"></i> Turmas</a></li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/modulo/criar"><i class="fas fa-users-class fa-fw me-2 text-secondary"></i> Módulos</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="/estagio/formando/criar"><i class="fas fa-user-graduate fa-fw me-2 text-secondary"></i> Formandos</a></li>
-                        <li><a class="dropdown-item" href="/estagio/formador/criar"><i class="fas fa-chalkboard-teacher fa-fw me-2 text-secondary"></i> Formadores</a></li>
-                        <li><a class="dropdown-item" href="/estagio/supervisor/criar"><i class="fas fa-user-tie fa-fw me-2 text-secondary"></i> Supervisores</a></li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/criterio-avaliacao/criar"><i class="fas fa-users-class fa-fw me-2 text-secondary"></i> Ct. Aval.</a></li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/elemento-competencia/criar"><i class="fas fa-users-class fa-fw me-2 text-secondary"></i> El. Comp.</a></li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/criterio-desempenho/criar"><i class="fas fa-users-class fa-fw me-2 text-secondary"></i> Ct. Desemp.</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/formando/criar"><i class="fas fa-user-graduate fa-fw me-2 text-secondary"></i> Formandos</a></li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/formador/criar"><i class="fas fa-chalkboard-teacher fa-fw me-2 text-secondary"></i> Formadores</a></li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/supervisor/criar"><i class="fas fa-user-tie fa-fw me-2 text-secondary"></i> Supervisores</a></li>
                     </ul>
                 </li>
 
@@ -142,15 +155,15 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                         <i class="fas fa-list-ul fa-fw me-1 text-info"></i> Listar
                     </a>
                     <ul class="dropdown-menu shadow-sm border-0" aria-labelledby="dropdownModulos">
-                        <li><a class="dropdown-item" href="/estagio/cursos/listar"><i class="fas fa-graduation-cap fa-fw me-2 text-secondary"></i> Cursos</a></li>
-                        <li><a class="dropdown-item" href="/estagio/qualificacao/listar"><i class="fas fa-certificate fa-fw me-2 text-secondary"></i> Qualificações</a></li>
-                        <li><a class="dropdown-item" href="/estagio/turma/listar"><i class="fas fa-users-class fa-fw me-2 text-secondary"></i> Turmas</a></li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/cursos/listar"><i class="fas fa-graduation-cap fa-fw me-2 text-secondary"></i> Cursos</a></li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/qualificacao/listar"><i class="fas fa-certificate fa-fw me-2 text-secondary"></i> Qualificações</a></li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/turma/listar"><i class="fas fa-users-class fa-fw me-2 text-secondary"></i> Turmas</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="/estagio/formando/listar"><i class="fas fa-user-graduate fa-fw me-2 text-secondary"></i> Formandos</a></li>
-                        <li><a class="dropdown-item" href="/estagio/formador/listar"><i class="fas fa-chalkboard-teacher fa-fw me-2 text-secondary"></i> Formadores</a></li>
-                        <li><a class="dropdown-item" href="/estagio/supervisor/listar"><i class="fas fa-user-tie fa-fw me-2 text-secondary"></i> Supervisores</a></li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/formando/listar"><i class="fas fa-user-graduate fa-fw me-2 text-secondary"></i> Formandos</a></li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/formador/listar"><i class="fas fa-chalkboard-teacher fa-fw me-2 text-secondary"></i> Formadores</a></li>
+                        <li><a class="dropdown-item" href="<?= $baseUrl ?>/supervisor/listar"><i class="fas fa-user-tie fa-fw me-2 text-secondary"></i> Supervisores</a></li>
                     </ul>
                 </li>
 
@@ -165,7 +178,7 @@ $themeValue = in_array($themeValue, ['light', 'dark', 'auto']) ? $themeValue : '
                     </a>
                 </li>
                 <li class="nav-item mx-2">
-                    <a class="nav-link fw-semibold text-dark" href="/estagio/estagio">
+                    <a class="nav-link fw-semibold text-dark" href="<?= $baseUrl ?>/estagio">
                         <i class="fas fa-briefcase me-1 text-primary"></i> Situação de Estágio
                     </a>
                 </li>

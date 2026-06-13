@@ -76,11 +76,6 @@ logMsg("GET: "    . json_encode($_GET));
 logMsg("POST: "   . json_encode($_POST));
 
 // ─── CONFIGURAÇÕES ────────────────────────────────────────────────────────────
-$env = parse_ini_file(__DIR__ . '/../../config/.env');
-
-foreach ($env as $key => $value) {
-    putenv("$key=$value");
-}
 
 $wkhtmltopdfPath = getenv('wkhtmltopdfPath');
 $baseUrl         = "http://localhost/estagio/api/carta";

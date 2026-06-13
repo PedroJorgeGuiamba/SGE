@@ -98,12 +98,6 @@ class AuthController
             exit();
         }
 
-        $env = parse_ini_file(__DIR__ . '/../../config/.env');
-
-        foreach ($env as $key => $value) {
-            putenv("$key=$value");
-        }
-
         $projectId = getenv("GOOGLE_CLOUD_PROJECT_ID");
         $apiKey = getenv("GOOGLE_RECAPTCHA_API_KEY");
         $siteKey = getenv("GOOGLE_DATA_SITE_KEY");

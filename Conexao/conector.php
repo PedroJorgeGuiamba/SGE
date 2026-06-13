@@ -6,30 +6,46 @@ class Conector {
     public function __construct() {
         mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-        $envPath = __DIR__ . '/../config/.env';
-        
-        if (!file_exists($envPath)) {
-            throw new RuntimeException("Ficheiro .env não encontrado em: $envPath");
-        }
-        
-        $env = parse_ini_file(__DIR__ . '/../config/.env');
+        $dbHost = getenv('DB_HOST') ?: null;
+        $dbUser = getenv('DB_USER') ?: null;
+        $dbPass = getenv('DB_PASS') ?: null;
+        $dbName = getenv('DB_NAME_ITC') ?: null;
+        $dbPort = getenv('DB_PORT') ?: null;
 
-        foreach (['DB_HOST', 'DB_USER', 'DB_NAME_ITC', 'DB_PASS', 'DB_PORT'] as $key) {
-            if (empty($env[$key])) {
-                throw new RuntimeException("Variável '$key' em falta ou vazia no .env");
+        if (!$dbHost || !$dbUser || !$dbPass || !$dbName) {
+            $envPath = __DIR__ . '/../config/.env';
+            
+            if (file_exists($envPath)) {
+                $env = parse_ini_file($envPath);
+                
+                $dbHost = $dbHost ?: ($env['DB_HOST'] ?? null);
+                $dbUser = $dbUser ?: ($env['DB_USER'] ?? null);
+                $dbPass = $dbPass ?: ($env['DB_PASS'] ?? null);
+                $dbName = $dbName ?: ($env['DB_NAME_ITC'] ?? null);
+                $dbPort = $dbPort ?: ($env['DB_PORT'] ?? null);
             }
         }
 
-        foreach ($env as $key => $value) {
-            putenv("$key=$value");
+        $missing = [];
+        if (!$dbHost) $missing[] = 'DB_HOST';
+        if (!$dbUser) $missing[] = 'DB_USER';
+        if (!$dbPass) $missing[] = 'DB_PASS';
+        if (!$dbName) $missing[] = 'DB_NAME_ITC';
+        if (!$dbPort) $missing[] = 'DB_PORT';
+
+        if (!empty($missing)) {
+            throw new RuntimeException(
+                "Variáveis em falta: " . implode(', ', $missing) . 
+                ". Configure no Infisical ou no arquivo .env"
+            );
         }
 
         $this->conexao = mysqli_connect(
-            getenv("DB_HOST"),
-            getenv("DB_USER"),
-            getenv("DB_PASS"),
-            getenv("DB_NAME_ITC"),
-            (int) getenv("DB_PORT")
+            $dbHost,
+            $dbUser,
+            $dbPass,
+            $dbName,
+            (int) $dbPort
         );
 
         if ($this->conexao->connect_error) {

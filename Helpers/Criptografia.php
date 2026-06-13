@@ -4,11 +4,6 @@ class Criptografia {
     private $iv;
 
     public function __construct() {
-        $env = parse_ini_file(__DIR__ . '/../Config/.env');
-
-        foreach ($env as $key => $value) {
-            putenv("$key=$value");
-        }
         
         $chave_base64 = getenv('ENCRYPTION_KEY');
         if (!$chave_base64) {

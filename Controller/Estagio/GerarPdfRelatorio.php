@@ -265,12 +265,6 @@ file_put_contents($json_file, json_encode([
     'output' => $output_pdf,
 ]));
 
-$env = parse_ini_file(__DIR__ . '/../../Config/.env');
-
-foreach ($env as $key => $value) {
-    putenv("$key=$value");
-}
-
 $python_bin = getenv("python_bin");
 
 $cmd = escapeshellarg($python_bin) . ' '

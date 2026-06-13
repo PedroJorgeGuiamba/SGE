@@ -9,12 +9,6 @@ SecurityHeaders::setLogin();
 
 include_once __DIR__ . '/../../Controller/Auth/AuthController.php';
 
-$env = parse_ini_file(__DIR__ . '/../../config/.env');
-
-foreach ($env as $key => $value) {
-    putenv("$key=$value");
-}
-
 $site = getenv("GOOGLE_DATA_SITE_KEY");
 ?>
 <!DOCTYPE html>
